@@ -1,0 +1,42 @@
+import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Bot, ChevronLeft, LayoutDashboard, LogOut, Megaphone, Menu, Package, X } from "lucide-react";
+import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
+
+export function AdminLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <div className="admin-shell">
+      <AnimatePresence>
+        {sidebarOpen && <motion.button className="admin-overlay" aria-label="Menyuni yopish" onClick={() => setSidebarOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />}
+      </AnimatePresence>
+      <motion.aside className={`admin-sidebar ${sidebarOpen ? "is-open" : ""}`} initial={reduceMotion ? false : { x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: .45, ease: [0.22, 1, 0.36, 1] }}>
+        <div className="admin-brand"><a href="/" aria-label="NOVA bosh sahifa">NOVA<i>.</i></a><button onClick={() => setSidebarOpen(false)} aria-label="Menyuni yopish"><X size={19}/></button></div>
+        <nav className="admin-nav" aria-label="Admin navigatsiya">
+          <span>Workspace</span>
+          <NavLink to="/admin" end onClick={() => setSidebarOpen(false)}><LayoutDashboard size={18}/><b>Dashboard</b></NavLink>
+          <NavLink to="/admin/products" onClick={() => setSidebarOpen(false)}><Package size={18}/><b>Mahsulotlar</b></NavLink>
+          <NavLink to="/admin/advertisements" onClick={() => setSidebarOpen(false)}><Megaphone size={18}/><b>Reklamalar</b></NavLink>
+          <NavLink to="/admin/operators" onClick={() => setSidebarOpen(false)}><Bot size={18}/><b>Operatorlar</b></NavLink>
+        </nav>
+        <div className="admin-sidebar-foot">
+          <a href="/" target="_blank">Saytni ochish <ArrowUpRight size={16}/></a>
+          <div className="admin-profile"><span>{user?.name?.charAt(0)}</span><div><strong>{user?.name}</strong><small>{user?.email}</small></div></div>
+          <button className="admin-logout" onClick={logout}><LogOut size={17}/> Chiqish</button>
+        </div>
+      </motion.aside>
+      <div className="admin-main">
+        <header className="admin-topbar">
+          <button className="admin-menu" onClick={() => setSidebarOpen(true)} aria-label="Menyuni ochish"><Menu/></button>
+          <div className="admin-context"><span>NOVA</span><i/>Administratsiya</div>
+          <div className="admin-top-actions"><a href="/" aria-label="Saytga qaytish"><ChevronLeft size={16}/> Sayt</a></div>
+        </header>
+        <Outlet />
+      </div>
+    </div>
+  );
+}
