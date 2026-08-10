@@ -3,11 +3,24 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Bot, ChevronLeft, LayoutDashboard, LogOut, Megaphone, Menu, Package, X } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { AdminUiProvider, useAdminUi } from "./AdminUi.jsx";
 
-export function AdminLayout() {
+function AdminLayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { confirm } = useAdminUi();
   const reduceMotion = useReducedMotion();
+
+  const handleLogout = async () => {
+    const approved = await confirm({
+      tone: "warning",
+      eyebrow: "SESSIYA",
+      title: "Admin paneldan chiqilsinmi?",
+      description: "Joriy sessiya yakunlanadi. Davom etish uchun qayta kirishingiz kerak bo‘ladi.",
+      confirmLabel: "Chiqish"
+    });
+    if (approved) await logout();
+  };
 
   return (
     <div className="admin-shell">
@@ -24,9 +37,9 @@ export function AdminLayout() {
           <NavLink to="/admin/operators" onClick={() => setSidebarOpen(false)}><Bot size={18}/><b>Operatorlar</b></NavLink>
         </nav>
         <div className="admin-sidebar-foot">
-          <a href="/" target="_blank">Saytni ochish <ArrowUpRight size={16}/></a>
+          <a href="/" target="_blank" rel="noreferrer">Saytni ochish <ArrowUpRight size={16}/></a>
           <div className="admin-profile"><span>{user?.name?.charAt(0)}</span><div><strong>{user?.name}</strong><small>{user?.email}</small></div></div>
-          <button className="admin-logout" onClick={logout}><LogOut size={17}/> Chiqish</button>
+          <button type="button" className="admin-logout" onClick={handleLogout}><LogOut size={17}/> Chiqish</button>
         </div>
       </motion.aside>
       <div className="admin-main">
@@ -39,4 +52,8 @@ export function AdminLayout() {
       </div>
     </div>
   );
+}
+
+export function AdminLayout() {
+  return <AdminUiProvider><AdminLayoutContent/></AdminUiProvider>;
 }
