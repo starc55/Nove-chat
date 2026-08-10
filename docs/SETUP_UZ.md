@@ -149,6 +149,22 @@ Bir operator boshqa operatorga biriktirilgan chatga javob bera olmaydi. Har webh
 
 ## 8. Production deploy
 
+### Render API sozlamasi
+
+Repository rootida `render.yaml` tayyor. Mavjud Render Web Service’ni qo‘lda sozlasangiz, quyidagi qiymatlarni aynan kiriting:
+
+```text
+Root Directory: bo‘sh qoldiring
+Build Command: npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api
+Start Command: npm run start -w @nova/api
+Health Check Path: /api/v1/health
+Node Version: 22.22.0
+```
+
+Productionda `npm run dev`, `node --watch` yoki `cd apps/api && npm run dev` ishlatmang. Render repository rootidan workspace lockfile bilan dependencylarni o‘rnatishi kerak.
+
+Render Environment bo‘limiga `CLIENT_URL`, `DATABASE_URL`, `DIRECT_URL`, JWT va Telegram qiymatlarini kiriting. Sozlamani saqlagach `Clear build cache & deploy` orqali qayta deploy qiling.
+
 API muhitida:
 
 ```env

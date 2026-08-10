@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, ShieldCheck, X } from "lucide-react";
 
 const navItems = [
   ["Xizmatlar", "#services"],
@@ -28,7 +28,10 @@ export function Header({ company = "NOVA" }) {
         <nav className="desktop-nav" aria-label="Asosiy navigatsiya">
           {navItems.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
         </nav>
-        <a className="nav-cta" href="#contact">Loyihani boshlash <ArrowUpRight size={16} /></a>
+        <div className="nav-actions">
+          <a className="admin-access" href="/admin/login"><ShieldCheck size={14}/><span>Admin</span></a>
+          <a className="nav-cta" href="#contact">Loyihani boshlash <ArrowUpRight size={16} /></a>
+        </div>
         <button className="menu-button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mobile-menu" aria-label="Menyuni ochish">
           {open ? <X /> : <Menu />}
         </button>
@@ -37,6 +40,7 @@ export function Header({ company = "NOVA" }) {
         {open && (
           <motion.nav id="mobile-menu" className="mobile-nav" aria-label="Mobil navigatsiya" initial={reduceMotion ? false : { opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
             {navItems.map(([label, href]) => <a key={href} href={href} onClick={() => setOpen(false)}>{label}<ArrowUpRight size={18} /></a>)}
+            <a className="mobile-admin-access" href="/admin/login" onClick={() => setOpen(false)}><span><ShieldCheck size={17}/> Admin panel</span><ArrowUpRight size={18}/></a>
           </motion.nav>
         )}
       </AnimatePresence>

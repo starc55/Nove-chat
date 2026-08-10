@@ -42,6 +42,8 @@ Development admin: `admin@nova.uz` / `NovaDev2026!`. Bu parol production uchun i
 
 ## Production buyruqlari
 
+Render uchun repository rootida tayyor `render.yaml` mavjud. Mavjud Web Service’da root directory’ni bo‘sh qoldiring, build command sifatida `npm run render:build`, start command sifatida `npm run render:start` ishlating.
+
 ```powershell
 npm ci
 npm run db:generate

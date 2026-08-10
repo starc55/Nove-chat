@@ -13,7 +13,7 @@ export function Footer({ settings = {} }) {
       <div className="container footer-grid">
         <div><a className="wordmark" href="#top">{company.name || "NOVA"}<i>.</i></a><p>{company.descriptor || "Independent digital studio"}</p></div>
         <div><span>Manzil</span><p>{contact.address || "Toshkent, O‘zbekiston"}</p><p>{contact.phone || "+998 90 000 00 00"}</p></div>
-        <div><span>Sahifalar</span><a href="#services">Xizmatlar</a><a href="#approach">Yondashuv</a><a href="#reviews">Mijozlar</a></div>
+        <div><span>Sahifalar</span><a href="#services">Xizmatlar</a><a href="#approach">Yondashuv</a><a href="#reviews">Mijozlar</a><a href="/admin/login">Admin panel</a></div>
         <div><span>Bog‘lanish</span><a href={contact.telegramUrl || "https://t.me"}>Telegram</a><a href="/privacy">Maxfiylik</a></div>
       </div>
       <div className="container footer-bottom"><p>© {new Date().getFullYear()} NOVA Studio</p><a href="#top">Yuqoriga ↑</a></div>

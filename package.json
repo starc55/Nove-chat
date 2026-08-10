@@ -11,12 +11,14 @@
     "db:generate": "npm run db:generate -w @nova/api",
     "db:migrate": "npm run db:migrate -w @nova/api",
     "db:seed": "npm run db:seed -w @nova/api",
-    "admin:create": "npm run admin:create -w @nova/api"
+    "admin:create": "npm run admin:create -w @nova/api",
+    "render:build": "npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api",
+    "render:start": "npm run start -w @nova/api"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.12.0 <23"
   }
 }
