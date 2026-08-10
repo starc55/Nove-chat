@@ -128,10 +128,10 @@ export function ChatWidget() {
           <motion.section className="chat-panel" aria-label="NOVA bilan jonli chat" initial={reduceMotion ? false : { opacity: 0, y: 22, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: .98 }} transition={{ duration: .3, ease: [0.22, 1, 0.36, 1] }}>
             <header className="chat-head">
               <div className="chat-operator-avatar"><span>N</span><i className={`presence-${presence.status?.toLowerCase()}`}/></div>
-              <div><strong>{presence.name || "NOVA operator"}</strong><p>{presence.status === "ONLINE" ? "Operator online" : presence.status === "AWAY" ? "Operator tanaffusda" : "Operator hozir offline"}</p></div>
+              <div><strong>{presence.name || "NOVA operator"}</strong><p>{presence.chatMode === "WAITING" ? "Operator javobi kutilmoqda" : presence.status === "ONLINE" ? "Operator online" : presence.status === "AWAY" ? "Operator tanaffusda" : "Operator hozir offline"}</p></div>
               <button onClick={() => setOpen(false)} aria-label="Chatni yopish"><ChevronDown size={20}/></button>
             </header>
-            <div className="chat-context"><span className={presence.status === "ONLINE" ? "is-live" : ""}>{presence.chatMode === "LIVE" ? "LIVE SUPPORT" : "OFFLINE MODE"}</span><small>#{session?.publicId || "YUKLANMOQDA"}</small></div>
+            <div className="chat-context"><span className={presence.chatMode === "LIVE" ? "is-live" : presence.chatMode === "WAITING" ? "is-waiting" : ""}>{presence.chatMode === "LIVE" ? "LIVE SUPPORT" : presence.chatMode === "WAITING" ? "NAVBATDA" : "OFFLINE MODE"}</span><small>#{session?.publicId || "YUKLANMOQDA"}</small></div>
             <div className="chat-messages" aria-live="polite">
               {loading && <div className="chat-loading"><i/><i/><i/><p>Suhbat ochilmoqda</p></div>}
               {!loading && error && !session && <div className="chat-state"><WifiOff size={20}/><p>{error}</p><button onClick={openWidget}>Qayta ulanish</button></div>}

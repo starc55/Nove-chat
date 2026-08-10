@@ -85,11 +85,19 @@ async function claimConversation(telegramOperator, publicId) {
   if (conversation.assignedOperatorId && conversation.assignedOperatorId !== telegramOperator.operatorId) {
     throw new ApiError(409, "CONVERSATION_ASSIGNED", "Suhbat boshqa operatorga biriktirilgan.");
   }
-  await prisma.$transaction([
-    prisma.conversation.update({ where: { id: conversation.id }, data: { assignedOperatorId: telegramOperator.operatorId, status: "ASSIGNED" } }),
-    prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { activeConversationId: conversation.id, lastInteractionAt: new Date() } }),
-    prisma.message.updateMany({ where: { conversationId: conversation.id, senderType: "CUSTOMER", status: { not: "READ" } }, data: { status: "READ", readAt: new Date(), deliveredAt: new Date() } })
-  ]);
+  await prisma.$transaction(async (tx) => {
+    const claimed = await tx.conversation.updateMany({
+      where: {
+        id: conversation.id,
+        status: { not: "CLOSED" },
+        OR: [{ assignedOperatorId: null }, { assignedOperatorId: telegramOperator.operatorId }]
+      },
+      data: { assignedOperatorId: telegramOperator.operatorId, status: "ASSIGNED" }
+    });
+    if (!claimed.count) throw new ApiError(409, "CONVERSATION_ASSIGNED", "Suhbatni boshqa operator oldinroq qabul qildi.");
+    await tx.telegramOperator.update({ where: { id: telegramOperator.id }, data: { activeConversationId: conversation.id, lastInteractionAt: new Date() } });
+    await tx.message.updateMany({ where: { conversationId: conversation.id, senderType: "CUSTOMER", status: { not: "READ" } }, data: { status: "READ", readAt: new Date(), deliveredAt: new Date() } });
+  });
   const history = conversation.messages.reverse().map((message) => `${message.senderType === "CUSTOMER" ? "Mijoz" : "NOVA"}: ${message.content}`).join("\n");
   return { conversation, text: `✅ #${conversation.publicId} sizga biriktirildi.\nMijoz: ${customerLabel(conversation)}\n\n${history || "Hali xabar yo‘q."}\n\nJavobingizni oddiy xabar qilib yuboring.` };
 }

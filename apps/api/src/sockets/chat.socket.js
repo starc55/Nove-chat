@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { authorizeCustomer, getPresence } from "../services/chat.service.js";
+import { authorizeCustomer, getConversationPresence } from "../services/chat.service.js";
 
 const joinSchema = z.object({ visitorId: z.string().uuid(), publicId: z.string().min(3).max(30) });
 
@@ -13,7 +13,7 @@ export function registerChatSocket(socket) {
       socket.data.chatRoom = room;
       socket.data.chatIdentity = input;
       await socket.join(room);
-      socket.emit("operator:presence", await getPresence());
+      socket.emit("operator:presence", await getConversationPresence(conversation.id));
       acknowledge({ success: true });
     } catch {
       acknowledge({ success: false, error: "Suhbatga ulanish rad etildi." });

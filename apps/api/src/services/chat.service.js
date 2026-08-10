@@ -18,12 +18,11 @@ export function serializeMessage(message) {
   };
 }
 
-async function availableOperator() {
-  return prisma.operator.findFirst({
-    where: { status: { in: ["ONLINE", "AWAY"] }, user: { active: true } },
-    orderBy: { status: "asc" },
-    select: { id: true, displayName: true, avatarUrl: true, status: true, lastSeenAt: true }
+async function hasAvailableOperator() {
+  const count = await prisma.operator.count({
+    where: { status: { in: ["ONLINE", "AWAY"] }, user: { active: true } }
   });
+  return count > 0;
 }
 
 async function configuredReply(trigger) {
@@ -50,8 +49,8 @@ export async function openChatSession({ visitorId, sourcePath }) {
     where: { customerId: customer.id, status: { not: "CLOSED" } },
     orderBy: { lastMessageAt: "desc" }
   });
-  const operator = await availableOperator();
   let initialMessage = null;
+  let isNewConversation = false;
 
   if (!conversation) {
     for (let attempt = 0; attempt < 3 && !conversation; attempt += 1) {
@@ -61,15 +60,20 @@ export async function openChatSession({ visitorId, sourcePath }) {
             publicId: newPublicId(),
             customerId: customer.id,
             sourcePath,
-            status: operator ? "OPEN" : "WAITING",
-            assignedOperatorId: operator?.id
+            status: "WAITING",
+            assignedOperatorId: null
           }
         });
+        isNewConversation = true;
       } catch (error) {
         if (error.code !== "P2002" || attempt === 2) throw error;
       }
     }
-    const reply = await configuredReply(operator ? "CHAT_OPEN" : "OFFLINE");
+  }
+
+  const presence = await getConversationPresence(conversation.id);
+  if (isNewConversation) {
+    const reply = await configuredReply(presence.status === "OFFLINE" ? "OFFLINE" : "CHAT_OPEN");
     if (reply) {
       initialMessage = await prisma.message.create({
         data: {
@@ -97,8 +101,8 @@ export async function openChatSession({ visitorId, sourcePath }) {
     roomId: conversation.id,
     publicId: conversation.publicId,
     status: conversation.status,
-    chatMode: operator ? "LIVE" : "OFFLINE_AUTO_REPLY",
-    operator: operator ? { name: operator.displayName, avatarUrl: operator.avatarUrl, status: operator.status, lastSeenAt: operator.lastSeenAt } : { name: "NOVA operator", avatarUrl: null, status: "OFFLINE", lastSeenAt: null },
+    chatMode: presence.chatMode,
+    operator: { name: presence.name, avatarUrl: presence.avatarUrl, status: presence.status, lastSeenAt: presence.lastSeenAt },
     messages: messages.map(serializeMessage),
     initialMessage: initialMessage ? serializeMessage(initialMessage) : null
   };
@@ -117,7 +121,7 @@ export async function sendCustomerMessage({ publicId, visitorId, content }) {
       where: { id: conversation.id },
       data: {
         lastMessageAt: created.createdAt,
-        status: conversation.status === "WAITING" ? "WAITING" : conversation.assignedOperatorId ? "ASSIGNED" : "OPEN"
+        status: conversation.assignedOperatorId ? "ASSIGNED" : "WAITING"
       }
     });
     return created;
@@ -145,11 +149,30 @@ export async function markCustomerRead({ publicId, visitorId }) {
   return { roomId: conversation.id, readAt };
 }
 
-export async function getPresence() {
-  const operator = await availableOperator();
-  return operator
-    ? { status: operator.status, name: operator.displayName, lastSeenAt: operator.lastSeenAt, chatMode: "LIVE" }
-    : { status: "OFFLINE", name: "NOVA operator", lastSeenAt: null, chatMode: "OFFLINE_AUTO_REPLY" };
+export async function getConversationPresence(conversationId) {
+  const conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    select: {
+      assignedOperator: { select: { displayName: true, avatarUrl: true, status: true, lastSeenAt: true } }
+    }
+  });
+  if (conversation?.assignedOperator) {
+    return {
+      status: conversation.assignedOperator.status,
+      name: conversation.assignedOperator.displayName,
+      avatarUrl: conversation.assignedOperator.avatarUrl,
+      lastSeenAt: conversation.assignedOperator.lastSeenAt,
+      chatMode: "LIVE"
+    };
+  }
+  const available = await hasAvailableOperator();
+  return {
+    status: available ? "ONLINE" : "OFFLINE",
+    name: "NOVA operator",
+    avatarUrl: null,
+    lastSeenAt: null,
+    chatMode: "WAITING"
+  };
 }
 
 export async function getConversationForAdmin(publicId) {
@@ -190,7 +213,7 @@ export async function sendAdminReply({ publicId, userId, content }) {
     });
     await tx.conversation.update({
       where: { id: conversation.id },
-      data: { lastMessageAt: created.createdAt, status: conversation.assignedOperatorId ? "ASSIGNED" : "OPEN" }
+      data: { lastMessageAt: created.createdAt, status: conversation.assignedOperatorId ? "ASSIGNED" : "WAITING" }
     });
     return created;
   });
