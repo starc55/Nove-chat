@@ -34,7 +34,7 @@ export async function authorizeCustomer(publicId, visitorId) {
   if (!publicId || !visitorId) throw new ApiError(401, "CHAT_ACCESS_REQUIRED", "Chat sessiyasi topilmadi.");
   const conversation = await prisma.conversation.findFirst({
     where: { publicId, customer: { visitorId } },
-    select: { id: true, publicId: true, status: true }
+    select: { id: true, publicId: true, status: true, assignedOperatorId: true }
   });
   if (!conversation) throw new ApiError(403, "CHAT_ACCESS_DENIED", "Bu suhbatga ruxsat yo‘q.");
   return conversation;
@@ -113,7 +113,13 @@ export async function sendCustomerMessage({ publicId, visitorId, content }) {
     const created = await tx.message.create({
       data: { conversationId: conversation.id, senderType: "CUSTOMER", senderId: visitorId, content, status: "SENT" }
     });
-    await tx.conversation.update({ where: { id: conversation.id }, data: { lastMessageAt: created.createdAt, status: conversation.status === "WAITING" ? "WAITING" : "OPEN" } });
+    await tx.conversation.update({
+      where: { id: conversation.id },
+      data: {
+        lastMessageAt: created.createdAt,
+        status: conversation.status === "WAITING" ? "WAITING" : conversation.assignedOperatorId ? "ASSIGNED" : "OPEN"
+      }
+    });
     return created;
   });
 

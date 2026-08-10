@@ -225,21 +225,19 @@ export async function handleTelegramUpdate(update, io) {
 
 export async function queueTelegramNotifications(messageId) {
   if (!isTelegramConfigured()) return;
-  const message = await prisma.message.findUnique({ where: { id: messageId }, include: { conversation: { select: { assignedOperatorId: true } } } });
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+    include: { conversation: { select: { id: true, status: true, assignedOperatorId: true } } }
+  });
   if (!message || message.senderType !== "CUSTOMER") return;
-  let recipients = await prisma.telegramOperator.findMany({
+  if (message.conversation.status === "CLOSED") return;
+  const recipients = await prisma.telegramOperator.findMany({
     where: {
       enabled: true, verifiedAt: { not: null }, telegramChatId: { not: null }, operator: { user: { active: true } },
       ...(message.conversation.assignedOperatorId ? { operatorId: message.conversation.assignedOperatorId } : {})
     },
     select: { id: true }
   });
-  if (!recipients.length && message.conversation.assignedOperatorId) {
-    recipients = await prisma.telegramOperator.findMany({
-      where: { enabled: true, verifiedAt: { not: null }, telegramChatId: { not: null }, operator: { user: { active: true } } },
-      select: { id: true }
-    });
-  }
   if (!recipients.length) return;
   await prisma.telegramDelivery.createMany({
     data: recipients.map((recipient) => ({ messageId, telegramOperatorId: recipient.id })),
@@ -257,7 +255,7 @@ export async function processTelegramDeliveries(messageId) {
   const deliveries = await prisma.telegramDelivery.findMany({
     where: { ...(messageId ? { messageId } : {}), status: { in: ["PENDING", "FAILED"] }, attempts: { lt: env.TELEGRAM_RETRY_LIMIT }, nextAttemptAt: { lte: new Date() } },
     include: {
-      telegramOperator: { select: { telegramChatId: true } },
+      telegramOperator: { select: { telegramChatId: true, activeConversationId: true } },
       message: { include: { conversation: { include: { customer: { select: { name: true, visitorId: true } } } } } }
     },
     orderBy: { createdAt: "asc" },
@@ -268,10 +266,16 @@ export async function processTelegramDeliveries(messageId) {
     if (!claimed.count) continue;
     try {
       const conversation = delivery.message.conversation;
+      const isActiveTelegramChat = delivery.telegramOperator.activeConversationId === conversation.id;
+      const replyMarkup = isActiveTelegramChat
+        ? keyboard([[['Yopish', `close:${conversation.publicId}`]]])
+        : conversation.assignedOperatorId
+          ? keyboard([[['Ochish', `open:${conversation.publicId}`]]])
+          : keyboard([[['Qabul qilish', `claim:${conversation.publicId}`]], [['Navbatni ko‘rish', 'list:waiting']]]);
       await telegramRequest("sendMessage", {
         chat_id: delivery.telegramOperator.telegramChatId,
-        text: `🔔 Yangi mijoz xabari\n#${conversation.publicId} · ${customerLabel(conversation)}\n\n${delivery.message.content}`,
-        reply_markup: keyboard([[['Qabul qilish', `claim:${conversation.publicId}`]], [['Navbatni ko‘rish', 'list:waiting']]])
+        text: `${isActiveTelegramChat ? '💬 Mijoz yozdi' : '🔔 Yangi mijoz xabari'}\n#${conversation.publicId} · ${customerLabel(conversation)}\n\n${delivery.message.content}`,
+        reply_markup: replyMarkup
       });
       await prisma.telegramDelivery.update({ where: { id: delivery.id }, data: { status: "SENT", sentAt: new Date(), lastError: null } });
     } catch (error) {
