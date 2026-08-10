@@ -9,7 +9,7 @@ telegramRouter.post("/webhook", async (req, res, next) => {
     if (!verifyTelegramSecret(req.get("X-Telegram-Bot-Api-Secret-Token"))) {
       return res.status(401).json({ success: false, error: { code: "INVALID_TELEGRAM_SECRET", message: "Webhook tasdiqlanmadi." } });
     }
-    await handleTelegramUpdate(req.body, req.app.get("io"));
-    res.json({ ok: true });
+    const result = await handleTelegramUpdate(req.body, req.app.get("io"));
+    res.json({ ok: true, processed: result.processed });
   } catch (error) { next(error); }
 });

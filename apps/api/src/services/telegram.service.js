@@ -136,7 +136,10 @@ async function handleAuthorizedMessage(message, telegramOperator, io) {
     return;
   }
   if (command === "/open") {
-    if (!argument) throw new ApiError(422, "PUBLIC_ID_REQUIRED", "Misol: /open C1234ABCD");
+    if (!argument) {
+      await telegramRequest("sendMessage", { chat_id: chatId, text: "Chat ID kiriting. Misol: /open C1234ABCD\n\nYoki /waiting orqali chatni tanlang." });
+      return;
+    }
     const claimed = await claimConversation(telegramOperator, argument.toUpperCase());
     io?.to(`conversation:${claimed.conversation.id}`).emit("operator:presence", { status: "ONLINE", name: telegramOperator.operator.displayName, lastSeenAt: new Date().toISOString(), chatMode: "LIVE" });
     io?.to(`conversation:${claimed.conversation.id}`).emit("conversation:read", { reader: "OPERATOR", readAt: new Date().toISOString() });
@@ -149,13 +152,23 @@ async function handleAuthorizedMessage(message, telegramOperator, io) {
     return;
   }
   if (command === "/close") {
+    if (!telegramOperator.activeConversationId) {
+      await telegramRequest("sendMessage", { chat_id: chatId, text: "Hozir faol chat yo‘q. Yangi chatni /waiting orqali tanlang." });
+      return;
+    }
     const closed = await closeActiveConversation(telegramOperator);
     io?.to(`conversation:${closed.id}`).emit("conversation:closed", { publicId: closed.publicId, closedAt: new Date().toISOString() });
     await telegramRequest("sendMessage", { chat_id: chatId, text: `#${closed.publicId} suhbat yopildi.` });
     return;
   }
-  if (command.startsWith("/")) throw new ApiError(422, "UNKNOWN_COMMAND", "Noma’lum buyruq. /help ni yuboring.");
-  if (!telegramOperator.activeConversationId) throw new ApiError(409, "NO_ACTIVE_CONVERSATION", "Avval /waiting orqali suhbatni tanlang.");
+  if (command.startsWith("/")) {
+    await telegramRequest("sendMessage", { chat_id: chatId, text: "Noma’lum buyruq. Mavjud buyruqlarni ko‘rish uchun /help ni yuboring." });
+    return;
+  }
+  if (!telegramOperator.activeConversationId) {
+    await telegramRequest("sendMessage", { chat_id: chatId, text: "Javob yuborishdan oldin /waiting orqali chatni tanlang." });
+    return;
+  }
 
   const result = await sendOperatorReply({ conversationId: telegramOperator.activeConversationId, operatorId: telegramOperator.operatorId, content: text });
   await prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { lastInteractionAt: new Date() } });
@@ -165,7 +178,12 @@ async function handleAuthorizedMessage(message, telegramOperator, io) {
 
 async function handleCallback(callback, telegramOperator, io) {
   const chatId = callback.message?.chat?.id;
-  await telegramRequest("answerCallbackQuery", { callback_query_id: callback.id });
+  try {
+    await telegramRequest("answerCallbackQuery", { callback_query_id: callback.id });
+  } catch (error) {
+    const expired = /query is too old|query ID is invalid|response timeout expired/i.test(String(error.message));
+    if (!expired) throw error;
+  }
   if (!chatId) return;
   const [action, publicId] = String(callback.data || "").split(":", 2);
   if (action === "list") return sendWaitingList(chatId, telegramOperator.operatorId, false);
@@ -217,9 +235,23 @@ export async function handleTelegramUpdate(update, io) {
   try {
     await processUpdate(update, io);
     await prisma.telegramUpdate.update({ where: { updateId }, data: { status: "PROCESSED", processedAt: new Date(), error: null } });
+    return { processed: true };
   } catch (error) {
-    await prisma.telegramUpdate.update({ where: { updateId }, data: { status: "FAILED", error: String(error.message).slice(0, 500) } });
-    throw error;
+    const errorText = String(error.message || error).slice(0, 500);
+    const handled = error instanceof ApiError;
+    const chatId = update.message?.chat?.id || update.callback_query?.message?.chat?.id;
+    console.error("[telegram:update] processing failed", { updateId: String(updateId), handled, error: errorText });
+    if (chatId) {
+      const text = handled ? `⚠️ ${error.message}` : "⚠️ Buyruqni bajarishda vaqtinchalik xatolik yuz berdi. Qayta urinib ko‘ring.";
+      await telegramRequest("sendMessage", { chat_id: chatId, text }).catch((notifyError) => {
+        console.error("[telegram:update] error notification failed", { updateId: String(updateId), error: String(notifyError.message) });
+      });
+    }
+    await prisma.telegramUpdate.update({
+      where: { updateId },
+      data: { status: handled ? "PROCESSED" : "FAILED", processedAt: handled ? new Date() : null, error: errorText }
+    });
+    return { processed: handled, error: errorText };
   }
 }
 
