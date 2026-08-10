@@ -4,7 +4,7 @@ import {
   createAdvertisement, createProduct, deleteAdvertisement, deleteProduct,
   listAdvertisements, listProducts, updateAdvertisement, updateProduct
 } from "../services/admin-catalog.service.js";
-import { createOperator, deactivateOperator, listOperators, updateOperator } from "../services/operator.service.js";
+import { createOperator, deleteOperator, listOperators, updateOperator } from "../services/operator.service.js";
 
 export const adminManagementRouter = Router();
 
@@ -117,6 +117,6 @@ adminManagementRouter.patch("/operators/:id", route(async (req, res) => {
   res.json({ success: true, data: await updateOperator(idSchema.parse(req.params.id), input) });
 }));
 adminManagementRouter.delete("/operators/:id", route(async (req, res) => {
-  await deactivateOperator(idSchema.parse(req.params.id));
+  await deleteOperator(idSchema.parse(req.params.id));
   res.status(204).end();
 }));

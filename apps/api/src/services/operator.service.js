@@ -70,13 +70,23 @@ export async function updateOperator(id, input) {
   });
 }
 
-export async function deactivateOperator(id) {
+export async function deleteOperator(id) {
   const operator = await prisma.operator.findUnique({ where: { id }, select: { userId: true } });
   if (!operator) throw new ApiError(404, "OPERATOR_NOT_FOUND", "Operator topilmadi.");
-  await prisma.$transaction([
-    prisma.user.update({ where: { id: operator.userId }, data: { active: false } }),
-    prisma.operator.update({ where: { id }, data: { status: "OFFLINE" } }),
-    prisma.telegramOperator.updateMany({ where: { operatorId: id }, data: { enabled: false, activeConversationId: null } }),
-    prisma.conversation.updateMany({ where: { assignedOperatorId: id, status: { not: "CLOSED" } }, data: { assignedOperatorId: null, status: "WAITING" } })
-  ]);
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: operator.userId }, data: { active: false } });
+    await tx.operator.update({ where: { id }, data: { status: "OFFLINE" } });
+    await tx.conversation.updateMany({
+      where: { assignedOperatorId: id, status: { not: "CLOSED" } },
+      data: { assignedOperatorId: null, status: "WAITING" }
+    });
+    await tx.conversation.updateMany({
+      where: { assignedOperatorId: id, status: "CLOSED" },
+      data: { assignedOperatorId: null }
+    });
+    await tx.message.updateMany({ where: { operatorId: id }, data: { operatorId: null, senderId: null } });
+    await tx.lead.updateMany({ where: { assignedOperatorId: id }, data: { assignedOperatorId: null } });
+    await tx.rating.updateMany({ where: { operatorId: id }, data: { operatorId: null } });
+    await tx.user.delete({ where: { id: operator.userId } });
+  });
 }
