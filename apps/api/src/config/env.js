@@ -31,3 +31,10 @@ const schema = z.object({
 });
 
 export const env = schema.parse(process.env);
+
+const configuredClientOrigins = env.CLIENT_URL.split(",").map((origin) => origin.trim()).filter(Boolean);
+export const clientOrigins = [...new Set([
+  ...configuredClientOrigins,
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
+])];

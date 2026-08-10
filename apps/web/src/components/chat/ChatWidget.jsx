@@ -58,7 +58,12 @@ export function ChatWidget() {
     if (!session) return undefined;
     const socket = io(import.meta.env.VITE_SOCKET_URL || window.location.origin, { transports: ["websocket", "polling"], withCredentials: true });
     socketRef.current = socket;
-    socket.emit("conversation:join", { visitorId: customerId, publicId: session.publicId });
+    const joinConversation = () => {
+      socket.emit("conversation:join", { visitorId: customerId, publicId: session.publicId }, (result) => {
+        if (!result?.success) setError("Jonli chatga ulanish rad etildi.");
+      });
+    };
+    socket.on("connect", joinConversation);
     socket.on("message:new", (message) => {
       setMessages((current) => mergeMessages(current, message));
       if (message.senderType !== "CUSTOMER" && !openRef.current) setUnread((value) => value + 1);

@@ -1,13 +1,13 @@
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { app } from "./app.js";
-import { env } from "./config/env.js";
+import { clientOrigins, env } from "./config/env.js";
 import { registerChatSocket } from "./sockets/chat.socket.js";
 import { startTelegramDeliveryWorker } from "./services/telegram.service.js";
 
 const httpServer = createServer(app);
 export const io = new Server(httpServer, {
-  cors: { origin: env.CLIENT_URL.split(",").map((origin) => origin.trim()), credentials: true }
+  cors: { origin: clientOrigins, credentials: true }
 });
 app.set("io", io);
 
