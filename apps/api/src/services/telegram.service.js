@@ -1,17 +1,12 @@
 import { timingSafeEqual } from "node:crypto";
 import { prisma } from "../config/database.js";
-import { env } from "../config/env.js";
-import { sendOperatorReply } from "./chat.service.js";
+import { env, telegramWebAppUrl } from "../config/env.js";
 import { ApiError } from "../utils/api-error.js";
 
 const COMMANDS = [
-  { command: "start", description: "Botni operator hisobiga ulash" },
-  { command: "waiting", description: "Kutilayotgan suhbatlar" },
-  { command: "chats", description: "Mening faol suhbatlarim" },
-  { command: "open", description: "Suhbatni ochish: /open C1234ABCD" },
-  { command: "close", description: "Joriy suhbatni yopish" },
-  { command: "cancel", description: "Joriy suhbatdan chiqish" },
-  { command: "help", description: "Yordam" }
+  { command: "start", description: "Operator panelini ulash" },
+  { command: "panel", description: "NOVA operator panelini ochish" },
+  { command: "help", description: "Panelni ochish bo‘yicha yordam" }
 ];
 
 export function isTelegramConfigured() {
@@ -38,34 +33,20 @@ async function telegramRequest(method, payload = {}) {
   return result.result;
 }
 
-function keyboard(rows) {
-  return { inline_keyboard: rows.map((row) => row.map(([text, callback_data]) => ({ text, callback_data }))) };
+function webAppKeyboard(text = "Operator panelini ochish") {
+  return telegramWebAppUrl ? { inline_keyboard: [[{ text, web_app: { url: telegramWebAppUrl } }]] } : undefined;
+}
+
+async function sendOperatorPanel(chatId, operatorName, text = "Navbat, faol chatlar va mijozlarga javob berish — barchasi NOVA Operator Panel ichida.") {
+  await telegramRequest("sendMessage", {
+    chat_id: chatId,
+    text: `NOVA OPS · ${operatorName}\n\n${text}`,
+    reply_markup: webAppKeyboard("NOVA Operator Panel")
+  });
 }
 
 function customerLabel(conversation) {
   return conversation.customer.name || `Mehmon #${conversation.customer.visitorId.slice(-6).toUpperCase()}`;
-}
-
-async function sendWaitingList(chatId, operatorId, mineOnly = false) {
-  const conversations = await prisma.conversation.findMany({
-    where: mineOnly
-      ? { assignedOperatorId: operatorId, status: { in: ["OPEN", "ASSIGNED"] } }
-      : { status: { in: ["WAITING", "OPEN"] }, OR: [{ assignedOperatorId: null }, { assignedOperatorId: operatorId }] },
-    include: { customer: { select: { name: true, visitorId: true } }, messages: { take: 1, orderBy: { createdAt: "desc" }, select: { content: true } } },
-    orderBy: { lastMessageAt: "desc" },
-    take: 10
-  });
-  if (!conversations.length) {
-    await telegramRequest("sendMessage", { chat_id: chatId, text: mineOnly ? "Sizda faol suhbat yo‘q." : "Hozir kutilayotgan suhbat yo‘q." });
-    return;
-  }
-  for (const conversation of conversations) {
-    await telegramRequest("sendMessage", {
-      chat_id: chatId,
-      text: `#${conversation.publicId} · ${customerLabel(conversation)}\n${conversation.messages[0]?.content || "Xabar yo‘q"}`,
-      reply_markup: keyboard([[mineOnly ? ["Ochish", `open:${conversation.publicId}`] : ["Qabul qilish", `claim:${conversation.publicId}`]]])
-    });
-  }
 }
 
 async function authorizedOperator(fromId) {
@@ -75,52 +56,14 @@ async function authorizedOperator(fromId) {
   });
 }
 
-async function claimConversation(telegramOperator, publicId) {
-  const conversation = await prisma.conversation.findUnique({
-    where: { publicId },
-    include: { customer: { select: { name: true, visitorId: true } }, messages: { orderBy: { createdAt: "desc" }, take: 12 } }
-  });
-  if (!conversation) throw new ApiError(404, "CONVERSATION_NOT_FOUND", "Suhbat topilmadi.");
-  if (conversation.status === "CLOSED") throw new ApiError(409, "CONVERSATION_CLOSED", "Bu suhbat yopilgan.");
-  if (conversation.assignedOperatorId && conversation.assignedOperatorId !== telegramOperator.operatorId) {
-    throw new ApiError(409, "CONVERSATION_ASSIGNED", "Suhbat boshqa operatorga biriktirilgan.");
-  }
-  await prisma.$transaction(async (tx) => {
-    const claimed = await tx.conversation.updateMany({
-      where: {
-        id: conversation.id,
-        status: { not: "CLOSED" },
-        OR: [{ assignedOperatorId: null }, { assignedOperatorId: telegramOperator.operatorId }]
-      },
-      data: { assignedOperatorId: telegramOperator.operatorId, status: "ASSIGNED" }
-    });
-    if (!claimed.count) throw new ApiError(409, "CONVERSATION_ASSIGNED", "Suhbatni boshqa operator oldinroq qabul qildi.");
-    await tx.telegramOperator.update({ where: { id: telegramOperator.id }, data: { activeConversationId: conversation.id, lastInteractionAt: new Date() } });
-    await tx.message.updateMany({ where: { conversationId: conversation.id, senderType: "CUSTOMER", status: { not: "READ" } }, data: { status: "READ", readAt: new Date(), deliveredAt: new Date() } });
-  });
-  const history = conversation.messages.reverse().map((message) => `${message.senderType === "CUSTOMER" ? "Mijoz" : "NOVA"}: ${message.content}`).join("\n");
-  return { conversation, text: `✅ #${conversation.publicId} sizga biriktirildi.\nMijoz: ${customerLabel(conversation)}\n\n${history || "Hali xabar yo‘q."}\n\nJavobingizni oddiy xabar qilib yuboring.` };
-}
-
-async function closeActiveConversation(telegramOperator) {
-  if (!telegramOperator.activeConversationId) throw new ApiError(409, "NO_ACTIVE_CONVERSATION", "Avval suhbatni tanlang.");
-  const conversation = await prisma.conversation.findFirst({ where: { id: telegramOperator.activeConversationId, assignedOperatorId: telegramOperator.operatorId } });
-  if (!conversation) throw new ApiError(404, "CONVERSATION_NOT_FOUND", "Faol suhbat topilmadi.");
-  await prisma.$transaction([
-    prisma.conversation.update({ where: { id: conversation.id }, data: { status: "CLOSED", closedAt: new Date() } }),
-    prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { activeConversationId: null } })
-  ]);
-  return conversation;
-}
-
-async function handleAuthorizedMessage(message, telegramOperator, io) {
+async function handleAuthorizedMessage(message, telegramOperator, _io) {
   const chatId = message.chat.id;
   const text = message.text?.trim();
   if (!text) {
     await telegramRequest("sendMessage", { chat_id: chatId, text: "Hozircha faqat matnli javoblar qo‘llanadi." });
     return;
   }
-  const [rawCommand, argument] = text.split(/\s+/, 2);
+  const [rawCommand] = text.split(/\s+/, 1);
   const command = rawCommand.toLowerCase().split("@")[0];
 
   if (command === "/start") {
@@ -128,63 +71,17 @@ async function handleAuthorizedMessage(message, telegramOperator, io) {
       prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { telegramChatId: String(chatId), username: message.from.username || telegramOperator.username, verifiedAt: new Date(), lastInteractionAt: new Date() } }),
       prisma.operator.update({ where: { id: telegramOperator.operatorId }, data: { status: "ONLINE", lastSeenAt: new Date() } })
     ]);
-    await telegramRequest("sendMessage", { chat_id: chatId, text: `✅ ${telegramOperator.operator.displayName}, NOVA operator botiga muvaffaqiyatli ulandingiz.\n\n/waiting — yangi chatlar\n/chats — faol chatlaringiz\n/help — yordam` });
+    await sendOperatorPanel(chatId, telegramOperator.operator.displayName, "Profil tasdiqlandi. Barcha operator amallari premium Mini App ichida tayyor.");
     return;
   }
   if (!telegramOperator.verifiedAt || telegramOperator.telegramChatId !== String(chatId)) {
     await telegramRequest("sendMessage", { chat_id: chatId, text: "Botni ulash uchun /start buyrug‘ini yuboring." });
     return;
   }
-  if (command === "/help") {
-    await telegramRequest("sendMessage", { chat_id: chatId, text: "/waiting — navbat\n/chats — sizga biriktirilgan chatlar\n/open C... — chatni ochish\n/close — joriy chatni yopish\n/cancel — joriy tanlovni bekor qilish\n\nChat tanlangach, oddiy matn yuborsangiz u mijozga yetadi." });
-    return;
-  }
-  if (command === "/waiting" || command === "/chats") {
-    await sendWaitingList(chatId, telegramOperator.operatorId, command === "/chats");
-    return;
-  }
-  if (command === "/open") {
-    if (!argument) {
-      await telegramRequest("sendMessage", { chat_id: chatId, text: "Chat ID kiriting. Misol: /open C1234ABCD\n\nYoki /waiting orqali chatni tanlang." });
-      return;
-    }
-    const claimed = await claimConversation(telegramOperator, argument.toUpperCase());
-    io?.to(`conversation:${claimed.conversation.id}`).emit("operator:presence", { status: "ONLINE", name: telegramOperator.operator.displayName, lastSeenAt: new Date().toISOString(), chatMode: "LIVE" });
-    io?.to(`conversation:${claimed.conversation.id}`).emit("conversation:read", { reader: "OPERATOR", readAt: new Date().toISOString() });
-    await telegramRequest("sendMessage", { chat_id: chatId, text: claimed.text, reply_markup: keyboard([[['Yopish', `close:${claimed.conversation.publicId}`]]]) });
-    return;
-  }
-  if (command === "/cancel") {
-    await prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { activeConversationId: null, lastInteractionAt: new Date() } });
-    await telegramRequest("sendMessage", { chat_id: chatId, text: "Joriy suhbat tanlovi bekor qilindi." });
-    return;
-  }
-  if (command === "/close") {
-    if (!telegramOperator.activeConversationId) {
-      await telegramRequest("sendMessage", { chat_id: chatId, text: "Hozir faol chat yo‘q. Yangi chatni /waiting orqali tanlang." });
-      return;
-    }
-    const closed = await closeActiveConversation(telegramOperator);
-    io?.to(`conversation:${closed.id}`).emit("conversation:closed", { publicId: closed.publicId, closedAt: new Date().toISOString() });
-    await telegramRequest("sendMessage", { chat_id: chatId, text: `#${closed.publicId} suhbat yopildi.` });
-    return;
-  }
-  if (command.startsWith("/")) {
-    await telegramRequest("sendMessage", { chat_id: chatId, text: "Noma’lum buyruq. Mavjud buyruqlarni ko‘rish uchun /help ni yuboring." });
-    return;
-  }
-  if (!telegramOperator.activeConversationId) {
-    await telegramRequest("sendMessage", { chat_id: chatId, text: "Javob yuborishdan oldin /waiting orqali chatni tanlang." });
-    return;
-  }
-
-  const result = await sendOperatorReply({ conversationId: telegramOperator.activeConversationId, operatorId: telegramOperator.operatorId, content: text });
-  await prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { lastInteractionAt: new Date() } });
-  io?.to(`conversation:${result.roomId}`).emit("message:new", result.message);
-  await telegramRequest("sendMessage", { chat_id: chatId, text: `✓ #${result.publicId} mijoziga yuborildi.` });
+  await sendOperatorPanel(chatId, telegramOperator.operator.displayName, command === "/help" ? "Panelni quyidagi tugma orqali oching. Navbat, chat tarixi, javob va yopish amallari shu yerda." : undefined);
 }
 
-async function handleCallback(callback, telegramOperator, io) {
+async function handleCallback(callback, telegramOperator, _io) {
   const chatId = callback.message?.chat?.id;
   try {
     await telegramRequest("answerCallbackQuery", { callback_query_id: callback.id });
@@ -193,25 +90,7 @@ async function handleCallback(callback, telegramOperator, io) {
     if (!expired) throw error;
   }
   if (!chatId) return;
-  const [action, publicId] = String(callback.data || "").split(":", 2);
-  if (action === "list") return sendWaitingList(chatId, telegramOperator.operatorId, false);
-  if (action === "claim" || action === "open") {
-    const claimed = await claimConversation(telegramOperator, publicId);
-    io?.to(`conversation:${claimed.conversation.id}`).emit("operator:presence", { status: "ONLINE", name: telegramOperator.operator.displayName, lastSeenAt: new Date().toISOString(), chatMode: "LIVE" });
-    io?.to(`conversation:${claimed.conversation.id}`).emit("conversation:read", { reader: "OPERATOR", readAt: new Date().toISOString() });
-    await telegramRequest("sendMessage", { chat_id: chatId, text: claimed.text, reply_markup: keyboard([[['Yopish', `close:${claimed.conversation.publicId}`]]]) });
-    return;
-  }
-  if (action === "close") {
-    const current = await prisma.conversation.findUnique({ where: { publicId } });
-    if (!current || current.assignedOperatorId !== telegramOperator.operatorId) throw new ApiError(403, "CONVERSATION_ACCESS_DENIED", "Bu suhbat sizga tegishli emas.");
-    await prisma.$transaction([
-      prisma.conversation.update({ where: { id: current.id }, data: { status: "CLOSED", closedAt: new Date() } }),
-      prisma.telegramOperator.update({ where: { id: telegramOperator.id }, data: { activeConversationId: null } })
-    ]);
-    io?.to(`conversation:${current.id}`).emit("conversation:closed", { publicId, closedAt: new Date().toISOString() });
-    await telegramRequest("sendMessage", { chat_id: chatId, text: `#${publicId} suhbat yopildi.` });
-  }
+  await sendOperatorPanel(chatId, telegramOperator.operator.displayName, "Bot buyruqlari Mini Appga ko‘chirildi. Davom etish uchun panelni oching.");
 }
 
 async function processUpdate(update, io) {
@@ -263,7 +142,7 @@ export async function handleTelegramUpdate(update, io) {
   }
 }
 
-export async function queueTelegramNotifications(messageId) {
+export async function queueTelegramNotifications(messageId, { broadcastToAll = false } = {}) {
   if (!isTelegramConfigured()) return;
   const message = await prisma.message.findUnique({
     where: { id: messageId },
@@ -274,7 +153,7 @@ export async function queueTelegramNotifications(messageId) {
   const recipients = await prisma.telegramOperator.findMany({
     where: {
       enabled: true, verifiedAt: { not: null }, telegramChatId: { not: null }, operator: { user: { active: true } },
-      ...(message.conversation.assignedOperatorId ? { operatorId: message.conversation.assignedOperatorId } : {})
+      ...(!broadcastToAll && message.conversation.assignedOperatorId ? { operatorId: message.conversation.assignedOperatorId } : {})
     },
     select: { id: true }
   });
@@ -307,11 +186,7 @@ export async function processTelegramDeliveries(messageId) {
     try {
       const conversation = delivery.message.conversation;
       const isActiveTelegramChat = delivery.telegramOperator.activeConversationId === conversation.id;
-      const replyMarkup = isActiveTelegramChat
-        ? keyboard([[['Yopish', `close:${conversation.publicId}`]]])
-        : conversation.assignedOperatorId
-          ? keyboard([[['Ochish', `open:${conversation.publicId}`]]])
-          : keyboard([[['Qabul qilish', `claim:${conversation.publicId}`]], [['Navbatni ko‘rish', 'list:waiting']]]);
+      const replyMarkup = webAppKeyboard(conversation.assignedOperatorId ? "Chatni ochish" : "Navbatni ochish");
       await telegramRequest("sendMessage", {
         chat_id: delivery.telegramOperator.telegramChatId,
         text: `${isActiveTelegramChat ? '💬 Mijoz yozdi' : '🔔 Yangi mijoz xabari'}\n#${conversation.publicId} · ${customerLabel(conversation)}\n\n${delivery.message.content}`,
@@ -325,6 +200,32 @@ export async function processTelegramDeliveries(messageId) {
   }
 }
 
+export async function notifyConversationClaimed(publicId, acceptedOperatorId, acceptedOperatorName) {
+  if (!isTelegramConfigured()) return;
+  const conversation = await prisma.conversation.findUnique({
+    where: { publicId },
+    include: { customer: { select: { name: true, visitorId: true } } }
+  });
+  if (!conversation) return;
+  const recipients = await prisma.telegramOperator.findMany({
+    where: {
+      operatorId: { not: acceptedOperatorId },
+      enabled: true,
+      verifiedAt: { not: null },
+      telegramChatId: { not: null },
+      operator: { user: { active: true } }
+    },
+    select: { telegramChatId: true }
+  });
+  for (const recipient of recipients) {
+    await telegramRequest("sendMessage", {
+      chat_id: recipient.telegramChatId,
+      text: `✓ #${publicId} · ${customerLabel(conversation)}\n\n${acceptedOperatorName} bu suhbatni qabul qildi.`,
+      reply_markup: webAppKeyboard("Operator panelini yangilash")
+    }).catch((error) => console.error("[telegram:claim-notification]", error.message));
+  }
+}
+
 export function startTelegramDeliveryWorker() {
   if (!isTelegramConfigured()) return null;
   void processTelegramDeliveries().catch((error) => console.error("Telegram delivery worker:", error));
@@ -335,6 +236,7 @@ export function startTelegramDeliveryWorker() {
 
 export async function setupTelegramWebhook() {
   if (!env.TELEGRAM_WEBHOOK_URL) throw new ApiError(422, "TELEGRAM_WEBHOOK_URL_REQUIRED", "TELEGRAM_WEBHOOK_URL kiritilmagan.");
+  if (!telegramWebAppUrl) throw new ApiError(422, "TELEGRAM_WEBAPP_URL_REQUIRED", "TELEGRAM_WEBAPP_URL kiritilmagan.");
   const webhook = await telegramRequest("setWebhook", {
     url: env.TELEGRAM_WEBHOOK_URL,
     secret_token: env.TELEGRAM_WEBHOOK_SECRET,
@@ -343,7 +245,8 @@ export async function setupTelegramWebhook() {
     max_connections: 20
   });
   await telegramRequest("setMyCommands", { commands: COMMANDS });
-  return { webhook, url: env.TELEGRAM_WEBHOOK_URL };
+  await telegramRequest("setChatMenuButton", { menu_button: { type: "web_app", text: "NOVA Operator", web_app: { url: telegramWebAppUrl } } });
+  return { webhook, url: env.TELEGRAM_WEBHOOK_URL, webAppUrl: telegramWebAppUrl };
 }
 
 export async function getTelegramStatus() {
@@ -357,6 +260,7 @@ export async function getTelegramStatus() {
     configured: true,
     webhook: { url: webhook.url, pendingUpdateCount: webhook.pending_update_count, lastErrorMessage: webhook.last_error_message || null },
     registeredOperators,
-    verifiedOperators
+    verifiedOperators,
+    webAppUrl: telegramWebAppUrl || null
   };
 }

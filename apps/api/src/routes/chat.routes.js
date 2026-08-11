@@ -25,8 +25,9 @@ chatRouter.post("/:publicId/messages", messageLimiter, async (req, res, next) =>
     const result = await sendCustomerMessage({ publicId: req.params.publicId, ...input });
     const room = `conversation:${result.roomId}`;
     req.app.get("io")?.to(room).emit("message:new", result.message);
+    req.app.get("io")?.to("operators:verified").emit("queue:updated", { publicId: req.params.publicId, reason: "customer_message" });
     if (result.autoReply) req.app.get("io")?.to(room).emit("message:new", result.autoReply);
-    void queueTelegramNotifications(result.message.id).catch((error) => console.error("Telegram notification queue:", error));
+    void queueTelegramNotifications(result.message.id, { broadcastToAll: result.broadcastToAllOperators }).catch((error) => console.error("Telegram notification queue:", error));
     res.status(201).json({ success: true, data: { message: result.message, autoReply: result.autoReply } });
   } catch (error) { next(error); }
 });

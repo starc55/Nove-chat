@@ -28,7 +28,6 @@ function timeLabel(value) {
 function Receipt({ status }) {
   if (status === "sending") return <span className="chat-sending-dot" aria-label="Yuborilmoqda"/>;
   if (status === "READ") return <CheckCheck size={13} aria-label="O‘qildi"/>;
-  if (status === "DELIVERED") return <CheckCheck size={13} aria-label="Yetkazildi"/>;
   return <Check size={13} aria-label="Yuborildi"/>;
 }
 
@@ -41,7 +40,7 @@ export function ChatWidget() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [unread, setUnread] = useState(0);
-  const [presence, setPresence] = useState({ status: "OFFLINE", name: "NOVA operator", chatMode: "OFFLINE_AUTO_REPLY" });
+  const [presence, setPresence] = useState({ status: "OFFLINE", name: "NOVA yordam markazi", chatMode: "WAITING" });
   const [closed, setClosed] = useState(false);
   const socketRef = useRef(null);
   const openRef = useRef(open);

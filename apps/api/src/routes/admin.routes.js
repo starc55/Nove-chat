@@ -27,6 +27,7 @@ adminRouter.post("/conversations/:publicId/messages", async (req, res, next) => 
     const { content } = z.object({ content: z.string().trim().min(1).max(2000) }).parse(req.body);
     const result = await sendAdminReply({ publicId: req.params.publicId, userId: req.auth.sub, content });
     req.app.get("io")?.to(`conversation:${result.roomId}`).emit("message:new", result.message);
+    req.app.get("io")?.to(`conversation:${result.roomId}`).emit("conversation:read", { reader: "OPERATOR", readAt: result.readAt });
     res.status(201).json({ success: true, data: result.message });
   } catch (error) { next(error); }
 });

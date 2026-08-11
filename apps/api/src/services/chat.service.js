@@ -136,7 +136,7 @@ export async function sendCustomerMessage({ publicId, visitorId, content }) {
       });
     }
   }
-  return { roomId: conversation.id, message: serializeMessage(message), autoReply: autoReply ? serializeMessage(autoReply) : null };
+  return { roomId: conversation.id, message: serializeMessage(message), autoReply: autoReply ? serializeMessage(autoReply) : null, broadcastToAllOperators: !conversation.assignedOperatorId };
 }
 
 export async function markCustomerRead({ publicId, visitorId }) {
@@ -168,7 +168,7 @@ export async function getConversationPresence(conversationId) {
   const available = await hasAvailableOperator();
   return {
     status: available ? "ONLINE" : "OFFLINE",
-    name: "NOVA operator",
+    name: "NOVA yordam markazi",
     avatarUrl: null,
     lastSeenAt: null,
     chatMode: "WAITING"
@@ -200,7 +200,8 @@ export async function sendAdminReply({ publicId, userId, content }) {
   const conversation = await prisma.conversation.findUnique({ where: { publicId } });
   if (!conversation) throw new ApiError(404, "CONVERSATION_NOT_FOUND", "Suhbat topilmadi.");
   if (conversation.status === "CLOSED") throw new ApiError(409, "CONVERSATION_CLOSED", "Yakunlangan suhbatga xabar yuborib bo‘lmaydi.");
-  const message = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const readAt = new Date();
     const created = await tx.message.create({
       data: {
         conversationId: conversation.id,
@@ -215,9 +216,13 @@ export async function sendAdminReply({ publicId, userId, content }) {
       where: { id: conversation.id },
       data: { lastMessageAt: created.createdAt, status: conversation.assignedOperatorId ? "ASSIGNED" : "WAITING" }
     });
-    return created;
+    await tx.message.updateMany({
+      where: { conversationId: conversation.id, senderType: "CUSTOMER", status: { not: "READ" } },
+      data: { status: "READ", readAt, deliveredAt: readAt }
+    });
+    return { created, readAt };
   });
-  return { roomId: conversation.id, message: serializeMessage(message) };
+  return { roomId: conversation.id, message: serializeMessage(result.created), readAt: result.readAt };
 }
 
 export async function sendOperatorReply({ conversationId, operatorId, content }) {
@@ -227,7 +232,8 @@ export async function sendOperatorReply({ conversationId, operatorId, content })
   if (conversation.assignedOperatorId && conversation.assignedOperatorId !== operatorId) {
     throw new ApiError(409, "CONVERSATION_ASSIGNED", "Bu suhbat boshqa operatorga biriktirilgan.");
   }
-  const message = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const readAt = new Date();
     const created = await tx.message.create({
       data: { conversationId, senderType: "OPERATOR", senderId: operatorId, operatorId, content, status: "SENT" }
     });
@@ -235,7 +241,11 @@ export async function sendOperatorReply({ conversationId, operatorId, content })
       where: { id: conversationId },
       data: { assignedOperatorId: operatorId, status: "ASSIGNED", lastMessageAt: created.createdAt }
     });
-    return created;
+    await tx.message.updateMany({
+      where: { conversationId, senderType: "CUSTOMER", status: { not: "READ" } },
+      data: { status: "READ", readAt, deliveredAt: readAt }
+    });
+    return { created, readAt };
   });
-  return { roomId: conversationId, publicId: conversation.publicId, message: serializeMessage(message) };
+  return { roomId: conversationId, publicId: conversation.publicId, message: serializeMessage(result.created), readAt: result.readAt };
 }

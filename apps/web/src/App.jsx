@@ -13,6 +13,7 @@ const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage.j
 const AdminProductsPage = lazy(() => import("./pages/admin/AdminProductsPage.jsx").then((module) => ({ default: module.AdminProductsPage })));
 const AdminAdvertisementsPage = lazy(() => import("./pages/admin/AdminAdvertisementsPage.jsx").then((module) => ({ default: module.AdminAdvertisementsPage })));
 const AdminOperatorsPage = lazy(() => import("./pages/admin/AdminOperatorsPage.jsx").then((module) => ({ default: module.AdminOperatorsPage })));
+const OperatorAppPage = lazy(() => import("./pages/OperatorAppPage.jsx").then((module) => ({ default: module.OperatorAppPage })));
 
 function RouteFallback() {
   return <div className="admin-auth-loading" role="status"><span>NOVA.</span><p>Sahifa yuklanmoqda...</p></div>;
@@ -25,6 +26,7 @@ export function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/products/:slug" element={<ProductPage />} />
+          <Route path="/operator" element={<OperatorAppPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboardPage />} />

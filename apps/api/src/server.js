@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import { app } from "./app.js";
 import { clientOrigins, env } from "./config/env.js";
 import { registerChatSocket } from "./sockets/chat.socket.js";
+import { registerOperatorSocket } from "./sockets/operator.socket.js";
 import { startTelegramDeliveryWorker } from "./services/telegram.service.js";
 
 const httpServer = createServer(app);
@@ -14,6 +15,7 @@ app.set("io", io);
 io.on("connection", (socket) => {
   socket.emit("system:ready", { connectedAt: new Date().toISOString() });
   registerChatSocket(socket);
+  registerOperatorSocket(socket);
 });
 
 httpServer.listen(env.PORT, () => console.log(`NOVA API http://localhost:${env.PORT}`));

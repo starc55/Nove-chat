@@ -15,6 +15,7 @@ const schema = z.object({
   TELEGRAM_BOT_TOKEN: optionalString(z.string().regex(/^\d{6,15}:[A-Za-z0-9_-]{30,}$/)),
   TELEGRAM_WEBHOOK_SECRET: optionalString(z.string().min(16).max(256).regex(/^[A-Za-z0-9_-]+$/)),
   TELEGRAM_WEBHOOK_URL: optionalString(z.string().url()),
+  TELEGRAM_WEBAPP_URL: optionalString(z.string().url()),
   TELEGRAM_RETRY_LIMIT: z.coerce.number().int().min(1).max(10).default(5)
 }).superRefine((value, ctx) => {
   if (Boolean(value.TELEGRAM_BOT_TOKEN) !== Boolean(value.TELEGRAM_WEBHOOK_SECRET)) {
@@ -31,6 +32,10 @@ const schema = z.object({
 });
 
 export const env = schema.parse(process.env);
+
+export const telegramWebAppUrl = env.TELEGRAM_WEBAPP_URL || (env.TELEGRAM_WEBHOOK_URL
+  ? `${new URL(env.TELEGRAM_WEBHOOK_URL).origin}/operator`
+  : undefined);
 
 const configuredClientOrigins = env.CLIENT_URL.split(",").map((origin) => origin.trim()).filter(Boolean);
 export const clientOrigins = [...new Set([
