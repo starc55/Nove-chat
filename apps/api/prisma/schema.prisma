@@ -326,14 +326,16 @@ model Review {
 model PurchaseRequest {
   id          String      @id @default(cuid())
   customerId  String
-  productId   String
+  productId   String?
+  productTitle String
+  productPrice Decimal?   @db.Decimal(15, 2)
   name        String
   phone       String
   comment     String?
   status      OrderStatus @default(NEW)
   sourcePath  String?
   customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  product     Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  product     Product?    @relation(fields: [productId], references: [id], onDelete: SetNull)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 

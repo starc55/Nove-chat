@@ -34,7 +34,7 @@ export async function listOrders({ page, limit, q }) {
     { name: { contains: q, mode: "insensitive" } },
     { phone: { contains: q, mode: "insensitive" } },
     { comment: { contains: q, mode: "insensitive" } },
-    { product: { title: { contains: q, mode: "insensitive" } } }
+    { productTitle: { contains: q, mode: "insensitive" } }
   ] } : {};
   const [items, total] = await Promise.all([
     prisma.purchaseRequest.findMany({ where, include: { product: { select: { title: true, price: true, image: true } } }, orderBy: { createdAt: "desc" }, skip: (page - 1) * limit, take: limit }),

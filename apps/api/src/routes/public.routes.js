@@ -71,7 +71,7 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
       comment: z.string().trim().max(1000).optional().default(""),
       sourcePath: z.string().trim().max(300).optional().default("/")
     }).parse(req.body);
-    const product = await prisma.product.findFirst({ where: { id: input.productId, active: true }, select: { id: true } });
+    const product = await prisma.product.findFirst({ where: { id: input.productId, active: true }, select: { id: true, title: true, price: true } });
     if (!product) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
     const order = await prisma.$transaction(async (tx) => {
       const customer = await tx.customer.upsert({
@@ -83,6 +83,8 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
         data: {
           customerId: customer.id,
           productId: product.id,
+          productTitle: product.title,
+          productPrice: product.price,
           name: input.name,
           phone: input.phone,
           comment: input.comment || null,
