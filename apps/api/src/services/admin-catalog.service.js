@@ -29,9 +29,8 @@ export async function updateProduct(id, input) {
 }
 
 export async function deleteProduct(id) {
-  const existing = await prisma.product.findUnique({ where: { id }, select: { id: true } });
-  if (!existing) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
-  await prisma.product.delete({ where: { id } });
+  const deleted = await prisma.product.deleteMany({ where: { id } });
+  if (!deleted.count) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
 }
 
 export async function listAdvertisements({ page, limit, q }) {
