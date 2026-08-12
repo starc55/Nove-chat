@@ -1,33 +1,30 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
-export function Hero({ settings = {} }) {
-  const hero = settings.hero || {};
-  const stats = settings.stats || [];
+export function Hero({ settings = {}, advertisement, featuredProduct, onBuy }) {
+  const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
-  const reveal = reduceMotion ? {} : { initial: { opacity: 0, y: 34 }, animate: { opacity: 1, y: 0 } };
+  const stats = settings.stats || [];
+  const visualTitle = advertisement?.title || featuredProduct?.title || "NOVA Digital Suite";
+  const visualText = advertisement?.description || featuredProduct?.shortDescription || t.heroText;
+  const visualImage = advertisement?.image || featuredProduct?.image;
   return (
     <main id="top" className="hero">
-      <div className="container hero-grid">
-        <div className="hero-copy">
-          <motion.p className="eyebrow" {...reveal} transition={{ duration: .65 }}><span />{hero.eyebrow || "Toshkent · Global hamkorlik"}</motion.p>
-          <motion.h1 {...reveal} transition={{ duration: .8, delay: .08, ease: [0.22, 1, 0.36, 1] }}>
-            Yaxshi brend<br/>ko‘rinadi. <em>Buyuk</em><br/><em>brend seziladi.</em>
-          </motion.h1>
-          <motion.div className="hero-lower" {...reveal} transition={{ duration: .75, delay: .2 }}>
-            <p>{hero.subtitle || "Strategiya, dizayn va raqamli tajribani yagona kuchli tizimga birlashtiramiz."}</p>
-            <div className="hero-actions"><a className="button button--light" href="#contact">{hero.primaryCta || "Loyihani boshlash"}<ArrowUpRight size={17}/></a><a className="text-link" href="#services">{hero.secondaryCta || "Ishlarimizni ko‘rish"}<ArrowDown size={16}/></a></div>
-          </motion.div>
-        </div>
-        <motion.div className="hero-visual" initial={reduceMotion ? false : { opacity: 0, scale: .96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: .2, ease: [0.22, 1, 0.36, 1] }} aria-label="NOVA ijodiy tizimi vizualizatsiyasi">
-          <div className="visual-orbit orbit-one"/><div className="visual-orbit orbit-two"/>
-          <div className="visual-core"><span>N</span><small>Strategy<br/>Design<br/>Digital</small></div>
-          <p className="visual-label label-top">Built for distinction</p><p className="visual-label label-bottom">EST. 2021 · TAS</p>
+      <div className="container hero-shell">
+        <motion.div className="hero-copy" initial={reduceMotion ? false : { opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }}>
+          <p className="eyebrow"><span/>{t.heroEyebrow}</p>
+          <h1>{t.heroTitleA}<br/><em>{t.heroTitleB}</em><br/>{t.heroTitleC}</h1>
+          <p className="hero-description">{settings.hero?.subtitle || t.heroText}</p>
+          <div className="hero-actions"><a className="button button--primary" href="#products">{t.heroPrimary}<ArrowDownRight size={18}/></a><a className="text-link" href="#contact">{t.heroSecondary}<ArrowUpRight size={17}/></a></div>
         </motion.div>
+        <motion.aside className={`hero-feature ${visualImage ? "has-image" : ""}`} initial={reduceMotion ? false : { opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: .85, delay: .12, ease: [0.22, 1, 0.36, 1] }} style={visualImage ? { backgroundImage: `linear-gradient(180deg,rgba(13,110,253,.05),rgba(9,24,44,.88)),url(${visualImage})` } : undefined}>
+          <div className="hero-feature-top"><span>FEATURED · {new Date().getFullYear()}</span><i>01</i></div>
+          <div className="hero-feature-copy"><span className="feature-icon"><CheckCircle2 size={20}/></span><h2>{visualTitle}</h2><p>{visualText}</p>{featuredProduct ? <button type="button" onClick={() => onBuy(featuredProduct)}>{t.buy}<ArrowUpRight size={16}/></button> : advertisement?.ctaUrl ? <a href={advertisement.ctaUrl}>{advertisement.ctaLabel || t.learnMore}<ArrowUpRight size={16}/></a> : null}</div>
+          <div className="hero-orbit orbit-a"/><div className="hero-orbit orbit-b"/><div className="hero-monogram">N</div>
+        </motion.aside>
       </div>
-      <div className="container stat-row">
-        {stats.length ? stats.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>) : <><div><strong>42+</strong><span>ishga tushirilgan loyiha</span></div><div><strong>91%</strong><span>qayta hamkorlik</span></div><div><strong>4.9</strong><span>mijozlar bahosi</span></div></>}
-      </div>
+      <div className="container trust-strip">{stats.length ? stats.slice(0,3).map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>) : <><div><strong>42+</strong><span>Projects delivered</span></div><div><strong>4.9/5</strong><span>Client experience</span></div><div><strong>24/7</strong><span>Live operator support</span></div></>}</div>
     </main>
   );
 }

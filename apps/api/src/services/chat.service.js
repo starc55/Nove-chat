@@ -39,11 +39,11 @@ export async function authorizeCustomer(publicId, visitorId) {
   return conversation;
 }
 
-export async function openChatSession({ visitorId, sourcePath }) {
+export async function openChatSession({ visitorId, sourcePath, name, phone }) {
   const customer = await prisma.customer.upsert({
     where: { visitorId },
-    update: {},
-    create: { visitorId }
+    update: { name, phone },
+    create: { visitorId, name, phone }
   });
   let conversation = await prisma.conversation.findFirst({
     where: { customerId: customer.id, status: { not: "CLOSED" } },
@@ -55,19 +55,34 @@ export async function openChatSession({ visitorId, sourcePath }) {
   if (!conversation) {
     for (let attempt = 0; attempt < 3 && !conversation; attempt += 1) {
       try {
-        conversation = await prisma.conversation.create({
-          data: {
-            publicId: newPublicId(),
-            customerId: customer.id,
-            sourcePath,
-            status: "WAITING",
-            assignedOperatorId: null
-          }
+        conversation = await prisma.$transaction(async (tx) => {
+          const created = await tx.conversation.create({
+            data: {
+              publicId: newPublicId(),
+              customerId: customer.id,
+              sourcePath,
+              status: "WAITING",
+              assignedOperatorId: null
+            }
+          });
+          await tx.lead.create({
+            data: { customerId: customer.id, conversationId: created.id, name, phone, source: "live_chat" }
+          });
+          return created;
         });
         isNewConversation = true;
       } catch (error) {
         if (error.code !== "P2002" || attempt === 2) throw error;
       }
+    }
+  }
+
+  if (!isNewConversation) {
+    const lead = await prisma.lead.findFirst({ where: { conversationId: conversation.id }, select: { id: true } });
+    if (lead) {
+      await prisma.lead.update({ where: { id: lead.id }, data: { name, phone } });
+    } else {
+      await prisma.lead.create({ data: { customerId: customer.id, conversationId: conversation.id, name, phone, source: "live_chat" } });
     }
   }
 

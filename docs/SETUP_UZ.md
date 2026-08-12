@@ -29,7 +29,7 @@ Manzillar:
 
 ```text
 Landing: http://localhost:5173
-Admin:   http://localhost:5173/admin/login
+Admin:   loyiha egasiga berilgan private boshqaruv URL’i
 API:     http://localhost:4000/api/v1
 Health:  http://localhost:4000/api/v1/health
 Socket:  http://localhost:4000/socket.io
@@ -44,10 +44,11 @@ Parol: NovaDev2026!
 
 ## 3. Admin paneldan foydalanish
 
-1. `http://localhost:5173/admin/login` manziliga kiring.
+1. Loyiha egasiga berilgan private boshqaruv manziliga kiring.
 2. `Mahsulotlar` bo‘limida sarlavha, slug, narx, kategoriya, rasm URL va holatni kiriting.
 3. `Reklamalar` bo‘limida CTA, joylashuv, boshlanish/tugash vaqti va faollikni belgilang.
-4. `Operatorlar` bo‘limida operator emaili, vaqtinchalik parol va Telegram User ID’ni kiriting.
+4. `Murojaatlar`, `Buyurtmalar` va `Sharhlar` bo‘limlarida landingdan kelgan yozuvlarni boshqaring.
+5. `Operatorlar` bo‘limida operator emaili, vaqtinchalik parol va Telegram User ID’ni kiriting.
 
 Operator o‘chirilganda chat tarixi o‘chmaydi: hisob faolsizlanadi va Telegram ruxsati bekor qilinadi.
 

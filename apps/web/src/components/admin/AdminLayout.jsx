@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Bot, ChevronLeft, LayoutDashboard, LogOut, Megaphone, Menu, Package, X } from "lucide-react";
+import { ArrowUpRight, Bot, ChevronLeft, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, X } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { AdminUiProvider, useAdminUi } from "./AdminUi.jsx";
+import { ADMIN_BASE } from "../../config/admin.js";
 
 function AdminLayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -31,10 +32,13 @@ function AdminLayoutContent() {
         <div className="admin-brand"><a href="/" aria-label="NOVA bosh sahifa">NOVA<i>.</i></a><button onClick={() => setSidebarOpen(false)} aria-label="Menyuni yopish"><X size={19}/></button></div>
         <nav className="admin-nav" aria-label="Admin navigatsiya">
           <span>Workspace</span>
-          <NavLink to="/admin" end onClick={() => setSidebarOpen(false)}><LayoutDashboard size={18}/><b>Dashboard</b></NavLink>
-          <NavLink to="/admin/products" onClick={() => setSidebarOpen(false)}><Package size={18}/><b>Mahsulotlar</b></NavLink>
-          <NavLink to="/admin/advertisements" onClick={() => setSidebarOpen(false)}><Megaphone size={18}/><b>Reklamalar</b></NavLink>
-          <NavLink to="/admin/operators" onClick={() => setSidebarOpen(false)}><Bot size={18}/><b>Operatorlar</b></NavLink>
+          <NavLink to={ADMIN_BASE} end onClick={() => setSidebarOpen(false)}><LayoutDashboard size={18}/><b>Dashboard</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/products`} onClick={() => setSidebarOpen(false)}><Package size={18}/><b>Mahsulotlar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/advertisements`} onClick={() => setSidebarOpen(false)}><Megaphone size={18}/><b>Bannerlar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/leads`} onClick={() => setSidebarOpen(false)}><ClipboardList size={18}/><b>Murojaatlar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/orders`} onClick={() => setSidebarOpen(false)}><ShoppingBag size={18}/><b>Buyurtmalar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/reviews`} onClick={() => setSidebarOpen(false)}><Star size={18}/><b>Sharhlar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/operators`} onClick={() => setSidebarOpen(false)}><Bot size={18}/><b>Operatorlar</b></NavLink>
         </nav>
         <div className="admin-sidebar-foot">
           <a href="/" target="_blank" rel="noreferrer">Saytni ochish <ArrowUpRight size={16}/></a>

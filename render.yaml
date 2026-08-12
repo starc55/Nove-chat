@@ -2,7 +2,7 @@ services:
   - type: web
     name: nova-api
     runtime: node
-    buildCommand: npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api && npm run build -w @nova/web
+    buildCommand: npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api && npm run db:deploy -w @nova/api && npm run build -w @nova/web
     startCommand: npm run start -w @nova/api
     healthCheckPath: /api/v1/health
     autoDeployTrigger: commit

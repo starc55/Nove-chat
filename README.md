@@ -27,7 +27,7 @@ npm run dev
 ```
 
 - Landing: `http://localhost:5173`
-- Admin: `http://localhost:5173/admin/login`
+- Admin: landingda ko‘rsatilmaydigan private boshqaruv URL’i orqali
 - API: `http://localhost:4000/api/v1`
 - Health: `http://localhost:4000/api/v1/health`
 
@@ -35,10 +35,10 @@ Development admin: `admin@nova.uz` / `NovaDev2026!`. Bu parol production uchun i
 
 ## Admin bo‘limlari
 
-- `/admin/products` — mahsulot qo‘shish, tahrirlash va o‘chirish;
-- `/admin/advertisements` — reklama, joylashuv va vaqt oralig‘ini boshqarish;
-- `/admin/operators` — operator hisoblari, holati va Telegram ID ruxsatlari;
-- `/admin` — KPI, suhbatlar va jamoa dashboardi.
+- mahsulot va vaqtli bannerlarni qo‘shish, tahrirlash va o‘chirish;
+- chat murojaatlari, buyurtmalar va sharhlarni alohida boshqarish;
+- operator hisoblari, holati va Telegram ID ruxsatlari;
+- KPI, suhbatlar va jamoa dashboardi.
 
 ## Production buyruqlari
 

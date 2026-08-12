@@ -60,6 +60,14 @@ enum ReviewStatus {
   REJECTED
 }
 
+enum OrderStatus {
+  NEW
+  PROCESSING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
 enum AdvertisementPlacement {
   HERO
   AFTER_HERO
@@ -156,6 +164,8 @@ model Customer {
   conversations Conversation[]
   leads         Lead[]
   ratings       Rating[]
+  reviews       Review[]
+  purchaseRequests PurchaseRequest[]
   subscriptions PushSubscription[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -264,6 +274,7 @@ model Product {
   featured         Boolean        @default(false)
   sortOrder        Int            @default(0)
   images           ProductImage[]
+  purchaseRequests PurchaseRequest[]
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   @@index([active, featured, sortOrder])
@@ -297,15 +308,38 @@ model Advertisement {
 
 model Review {
   id             String       @id @default(cuid())
+  customerId     String?
   customerName   String
+  customerPhone  String?
   conversationId String?      @unique
   rating         Int
   comment        String
   status         ReviewStatus @default(PENDING)
   conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  customer       Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   @@index([status, createdAt])
+  @@index([customerId, createdAt])
+}
+
+model PurchaseRequest {
+  id          String      @id @default(cuid())
+  customerId  String
+  productId   String
+  name        String
+  phone       String
+  comment     String?
+  status      OrderStatus @default(NEW)
+  sourcePath  String?
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([status, createdAt])
+  @@index([customerId, createdAt])
+  @@index([productId, createdAt])
 }
 
 model Rating {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Activity, Award, CircleDot, Clock3, Layers3, Megaphone, MessageCircle, Package, Star, UsersRound } from "lucide-react";
+import { Activity, Award, CircleDot, Clock3, Layers3, Megaphone, MessageCircle, Package, ShoppingBag, Star, UsersRound } from "lucide-react";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 
@@ -9,7 +9,7 @@ const kpiMeta = [
   ["waitingChats", "Kutilayotgan chatlar", Clock3], ["offlineLeads", "Yangi offline lead", UsersRound],
   ["onlineOperators", "Online operatorlar", Activity], ["totalProducts", "Faol mahsulotlar", Package],
   ["activeAdvertisements", "Faol reklamalar", Megaphone], ["averageRating", "O‘rtacha baho", Star],
-  ["newReviews", "Yangi sharhlar", Award]
+  ["newReviews", "Yangi sharhlar", Award], ["newOrders", "Yangi buyurtmalar", ShoppingBag]
 ];
 const statusLabels = { OPEN: "Ochiq", WAITING: "Kutilmoqda", ASSIGNED: "Biriktirilgan", CLOSED: "Yopilgan", NEW: "Yangi", CONTACTED: "Bog‘lanilgan", QUALIFIED: "Malakali", APPROVED: "Tasdiqlangan", PENDING: "Kutilmoqda", REJECTED: "Rad etilgan", ONLINE: "Online", AWAY: "Tanaffus", OFFLINE: "Offline" };
 const todayLabel = new Intl.DateTimeFormat("uz-UZ", { day: "2-digit", month: "short" }).format(new Date()).toUpperCase();

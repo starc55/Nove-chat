@@ -5,6 +5,10 @@ import {
   listAdvertisements, listProducts, updateAdvertisement, updateProduct
 } from "../services/admin-catalog.service.js";
 import { createOperator, deleteOperator, listOperators, updateOperator } from "../services/operator.service.js";
+import {
+  deleteLead, deleteOrder, deleteReview, listLeads, listOrders, listReviews,
+  updateLead, updateOrder, updateReview
+} from "../services/admin-operations.service.js";
 
 export const adminManagementRouter = Router();
 
@@ -118,5 +122,41 @@ adminManagementRouter.patch("/operators/:id", route(async (req, res) => {
 }));
 adminManagementRouter.delete("/operators/:id", route(async (req, res) => {
   await deleteOperator(idSchema.parse(req.params.id));
+  res.status(204).end();
+}));
+
+adminManagementRouter.get("/leads", route(async (req, res) => {
+  res.json({ success: true, data: await listLeads(paginationSchema.parse(req.query)) });
+}));
+adminManagementRouter.patch("/leads/:id", route(async (req, res) => {
+  const { status } = z.object({ status: z.enum(["NEW", "CONTACTED", "QUALIFIED", "CLOSED"]) }).parse(req.body);
+  res.json({ success: true, data: await updateLead(idSchema.parse(req.params.id), status) });
+}));
+adminManagementRouter.delete("/leads/:id", route(async (req, res) => {
+  await deleteLead(idSchema.parse(req.params.id));
+  res.status(204).end();
+}));
+
+adminManagementRouter.get("/orders", route(async (req, res) => {
+  res.json({ success: true, data: await listOrders(paginationSchema.parse(req.query)) });
+}));
+adminManagementRouter.patch("/orders/:id", route(async (req, res) => {
+  const { status } = z.object({ status: z.enum(["NEW", "PROCESSING", "CONFIRMED", "COMPLETED", "CANCELLED"]) }).parse(req.body);
+  res.json({ success: true, data: await updateOrder(idSchema.parse(req.params.id), status) });
+}));
+adminManagementRouter.delete("/orders/:id", route(async (req, res) => {
+  await deleteOrder(idSchema.parse(req.params.id));
+  res.status(204).end();
+}));
+
+adminManagementRouter.get("/reviews", route(async (req, res) => {
+  res.json({ success: true, data: await listReviews(paginationSchema.parse(req.query)) });
+}));
+adminManagementRouter.patch("/reviews/:id", route(async (req, res) => {
+  const { status } = z.object({ status: z.enum(["PENDING", "APPROVED", "REJECTED"]) }).parse(req.body);
+  res.json({ success: true, data: await updateReview(idSchema.parse(req.params.id), status) });
+}));
+adminManagementRouter.delete("/reviews/:id", route(async (req, res) => {
+  await deleteReview(idSchema.parse(req.params.id));
   res.status(204).end();
 }));

@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { ADMIN_BASE } from "../../config/admin.js";
 
 export function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,11 +15,11 @@ export function AdminLoginPage() {
   const reduceMotion = useReducedMotion();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ defaultValues: { email: "", password: "" } });
 
-  useEffect(() => { if (user) navigate(location.state?.from || "/admin", { replace: true }); }, [user, navigate, location.state]);
+  useEffect(() => { if (user) navigate(location.state?.from || ADMIN_BASE, { replace: true }); }, [user, navigate, location.state]);
 
   const onSubmit = async (values) => {
     setServerError("");
-    try { await login(values); navigate(location.state?.from || "/admin", { replace: true }); }
+    try { await login(values); navigate(location.state?.from || ADMIN_BASE, { replace: true }); }
     catch (error) { setServerError(error.message); }
   };
 

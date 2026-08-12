@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../services/api.js";
 import { Header } from "../components/layout/Header.jsx";
+import { Footer } from "../components/layout/Footer.jsx";
+import { PurchaseModal } from "../components/common/PurchaseModal.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 
 export function ProductPage() {
+  const { t } = useLanguage();
   const { slug } = useParams();
   const [state, setState] = useState({
     product: null,
     loading: true,
     error: "",
   });
+  const [buying, setBuying] = useState(false);
   useEffect(() => {
     api
       .get(`/public/products/${slug}`)
@@ -45,12 +50,12 @@ export function ProductPage() {
             <p className="product-intro">
               {state.product.longDescription || state.product.shortDescription}
             </p>
-            <a className="button button--light" href="/#contact">
-              Loyihani muhokama qilish <ArrowUpRight size={17} />
-            </a>
+            <button className="button button--primary" type="button" onClick={() => setBuying(true)}><ShoppingBag size={17}/>{t.buy}</button>
           </>
         )}
       </main>
+      <Footer/>
+      <PurchaseModal product={buying ? state.product : null} onClose={() => setBuying(false)}/>
     </div>
   );
 }

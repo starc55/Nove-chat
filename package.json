@@ -12,7 +12,7 @@
     "db:migrate": "npm run db:migrate -w @nova/api",
     "db:seed": "npm run db:seed -w @nova/api",
     "admin:create": "npm run admin:create -w @nova/api",
-    "render:build": "npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api && npm run build -w @nova/web",
+    "render:build": "npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api && npm run db:deploy -w @nova/api && npm run build -w @nova/web",
     "render:start": "npm run start -w @nova/api"
   },
   "devDependencies": {

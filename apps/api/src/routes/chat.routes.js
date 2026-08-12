@@ -11,7 +11,12 @@ const identitySchema = z.string().uuid();
 
 chatRouter.post("/session", sessionLimiter, async (req, res, next) => {
   try {
-    const input = z.object({ visitorId: identitySchema, sourcePath: z.string().max(300).default("/") }).parse(req.body);
+    const input = z.object({
+      visitorId: identitySchema,
+      sourcePath: z.string().max(300).default("/"),
+      name: z.string().trim().min(2).max(100),
+      phone: z.string().trim().regex(/^\+?[0-9 ()-]{7,24}$/)
+    }).parse(req.body);
     const session = await openChatSession(input);
     const { roomId, initialMessage, ...safeSession } = session;
     if (initialMessage) req.app.get("io")?.to(`conversation:${roomId}`).emit("message:new", initialMessage);
