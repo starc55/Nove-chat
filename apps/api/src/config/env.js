@@ -40,6 +40,7 @@ export const telegramWebAppUrl = env.TELEGRAM_WEBAPP_URL || (env.TELEGRAM_WEBHOO
 const configuredClientOrigins = env.CLIENT_URL.split(",").map((origin) => origin.trim()).filter(Boolean);
 export const clientOrigins = [...new Set([
   ...configuredClientOrigins,
+  "https://nove-chat-web.vercel.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ])];
