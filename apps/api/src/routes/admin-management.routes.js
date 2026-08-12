@@ -15,7 +15,8 @@ export const adminManagementRouter = Router();
 const idSchema = z.string().cuid();
 const nullableText = (max) => z.union([z.string().trim().max(max), z.null()]).transform((value) => value || null);
 const nullableUrl = z.union([z.string().trim().url().max(1000), z.literal(""), z.null()]).transform((value) => value || null);
-const nullablePrice = z.preprocess((value) => value === "" || value === null ? null : value, z.coerce.number().nonnegative().max(999_999_999_999).nullable());
+const MAX_PRODUCT_PRICE = 9_999_999_999_999.99;
+const nullablePrice = z.preprocess((value) => value === "" || value === null ? null : value, z.coerce.number().nonnegative().max(MAX_PRODUCT_PRICE).nullable());
 const nullableDate = z.union([z.string().datetime(), z.literal(""), z.null()]).transform((value) => value ? new Date(value) : null);
 const linkValue = z.union([
   z.string().trim().url().max(1000),
