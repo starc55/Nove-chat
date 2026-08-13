@@ -17,7 +17,7 @@ export function LandingPage() {
   const featuredProduct = data.products.find((item) => item.featured) || data.products[0];
   return (
     <div className="site-shell">
-      <Header company={data.settings.company?.name} />
+      <Header company={data.settings.company?.name} contact={data.settings.contact} />
       <Hero settings={data.settings} advertisement={heroAd} featuredProduct={featuredProduct} onBuy={setSelectedProduct}/>
       <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>
       <Campaigns advertisements={data.advertisements}/>
