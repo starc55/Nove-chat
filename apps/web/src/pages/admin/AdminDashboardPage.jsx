@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Activity, Award, CircleDot, Clock3, Layers3, Megaphone, MessageCircle, Package, ShoppingBag, Star, UsersRound } from "lucide-react";
+import { Link } from "react-router-dom";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { ADMIN_BASE } from "../../config/admin.js";
 
 const kpiMeta = [
   ["conversationsToday", "Bugungi suhbatlar", MessageCircle], ["openChats", "Ochiq chatlar", CircleDot],
@@ -33,6 +35,12 @@ export function AdminDashboardPage() {
   return (
     <motion.main className="admin-content" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }}>
       <div className="admin-page-head"><div><p>{todayLabel} · LIVE OVERVIEW</p><h1>Xayrli kun, {user?.name?.split(" ")[0]}.</h1><span>NOVA platformasining bugungi holati.</span></div><button onClick={load} disabled={state.loading}>Yangilash</button></div>
+      <section className="admin-content-map" aria-label="Landing boshqaruvi">
+        <Link to={`${ADMIN_BASE}/products`}><Package/><span><small>LANDING</small><strong>Mahsulotlar</strong><i>Tarif va sotib olish kartalari</i></span></Link>
+        <Link to={`${ADMIN_BASE}/advertisements`}><Megaphone/><span><small>SWIPERS</small><strong>Bannerlar</strong><i>Hero va aksiyalar slaydlari</i></span></Link>
+        <Link to={`${ADMIN_BASE}/reviews`}><Star/><span><small>MODERATION</small><strong>Sharhlar</strong><i>Tasdiqlash, rad etish, o‘chirish</i></span></Link>
+        <Link to={`${ADMIN_BASE}/orders`}><ShoppingBag/><span><small>SALES</small><strong>Buyurtmalar</strong><i>Landing orqali kelgan arizalar</i></span></Link>
+      </section>
       {state.error && <div className="admin-error" role="alert"><div><strong>Dashboard yuklanmadi</strong><p>{state.error}</p></div><button onClick={load}>Qayta urinish</button></div>}
       {state.loading && <div className="admin-kpi-grid" aria-label="Dashboard yuklanmoqda">{Array.from({ length: 9 }).map((_, index) => <div className="admin-kpi-skeleton" key={index}/>)}</div>}
       {state.data && <>
