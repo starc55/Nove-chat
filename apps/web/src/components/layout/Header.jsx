@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { ChevronDown, Eye, Map, Menu, Phone, Search, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 
+const megaColumns = [
+  { title: "Mahsulotlar", groups: [{ label: "Raqamli mahsulotlar", links: ["Web platformalar", "CRM va avtomatizatsiya", "Mobil yechimlar"] }, { label: "Biznes uchun", links: ["Start paket", "Growth paket", "Enterprise yechim"] }] },
+  { title: "Takliflar", groups: [{ label: "Maxsus takliflar", links: ["Yangi mijozlar uchun", "Kompleks xizmatlar", "Hamkorlik dasturi"] }, { label: "Xizmatlar", links: ["Dizayn va strategiya", "Ishga tushirish", "Texnik qo‘llab-quvvatlash"] }] },
+  { title: "Servislar", groups: [{ label: "Mijozlar markazi", links: ["Jonli chat", "Telegram operator", "Buyurtma holati"] }, { label: "Ma’lumot", links: ["Yangiliklar", "Sharhlar", "Aloqa va yordam"] }] }
+];
+
 export function Header({ company = "NOVA", contact = {} }) {
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
@@ -22,8 +28,15 @@ export function Header({ company = "NOVA", contact = {} }) {
     return () => document.documentElement.classList.remove("is-high-contrast");
   }, [contrast]);
 
-  const phone = contact.phone || "+998 90 000 00 00";
+  useEffect(() => {
+    document.body.classList.toggle("mega-menu-open", open);
+    const onKeyDown = (event) => event.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKeyDown);
+    return () => { document.body.classList.remove("mega-menu-open"); window.removeEventListener("keydown", onKeyDown); };
+  }, [open]);
 
+  const phone = contact.phone || "+998 90 000 00 00";
+  const closeMenu = () => setOpen(false);
   return <header className={`site-header ${compact ? "is-compact" : ""}`}>
     <div className="container header-top">
       <a className="wordmark" href="#top" aria-label={`${company} bosh sahifa`}>{company}<i>.</i></a>
@@ -34,12 +47,9 @@ export function Header({ company = "NOVA", contact = {} }) {
         <a className="header-icon" href="#contact" aria-label="Manzil"><Map size={17}/></a>
         <a className="nav-cta" href="#contact">Bog‘lanish</a>
       </div>
-      <button className="menu-button" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mobile-menu" aria-label="Menyuni ochish">{open ? <X/> : <Menu/>}</button>
+      <button className="menu-button" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mega-menu" aria-label={open ? "Menyuni yopish" : "Menyuni ochish"}>{open ? <X/> : <Menu/>}</button>
     </div>
-    <div className="header-subbar"><div className="container header-subbar-inner">
-      <nav className="secondary-nav" aria-label="Bo‘limlar">{secondary.map(([label, href]) => <a key={href} href={href}>{label}<ChevronDown size={12}/></a>)}<a href="#contact">Xizmatlar<ChevronDown size={12}/></a></nav>
-      <div className="header-contact"><a href={`tel:${phone.replace(/\s/g, "")}`}><Phone size={16}/><strong>{phone}</strong></a><a href="#contact">Biz bilan bog‘laning</a><button type="button" aria-label="Mahsulotlarni ko‘rish" onClick={() => document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" })}><Search size={18}/></button></div>
-    </div></div>
-    {open ? <nav id="mobile-menu" className="mobile-nav" aria-label="Mobil navigatsiya">{primary.map(([label, href]) => <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}<div className="mobile-languages">{["uz", "ru", "en"].map((item) => <button type="button" className={language === item ? "is-active" : ""} key={item} onClick={() => setLanguage(item)}>{item.toUpperCase()}</button>)}</div></nav> : null}
+    <div className="header-subbar"><div className="container header-subbar-inner"><nav className="secondary-nav" aria-label="Bo‘limlar">{secondary.map(([label, href]) => <a key={href} href={href}>{label}<ChevronDown size={12}/></a>)}<a href="#contact">Xizmatlar<ChevronDown size={12}/></a></nav><div className="header-contact"><a href={`tel:${phone.replace(/\s/g, "")}`}><Phone size={16}/><strong>{phone}</strong></a><a href="#contact">Biz bilan bog‘laning</a><button type="button" aria-label="Mahsulotlarni ko‘rish" onClick={() => document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" })}><Search size={18}/></button></div></div></div>
+    {open ? <div className="mega-menu-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}><nav id="mega-menu" className="mega-menu" aria-label="Barcha bo‘limlar"><div className="container mega-menu-shell"><button className="mega-close" type="button" onClick={closeMenu} aria-label="Menyuni yopish"><X/></button>{megaColumns.map((column, columnIndex) => <section className="mega-column" key={column.title}><h2>{column.title}</h2>{column.groups.map((group) => <div className="mega-group" key={group.label}><a className="mega-group-title" href={columnIndex === 0 ? "#products" : columnIndex === 1 ? "#campaigns" : "#contact"} onClick={closeMenu}><ChevronDown size={11}/>{group.label}</a>{group.links.map((link, index) => <a key={link} href={columnIndex === 0 ? "#products" : columnIndex === 1 ? "#campaigns" : index === 1 ? "#reviews" : "#contact"} onClick={closeMenu}>{link}</a>)}</div>)}</section>)}</div></nav></div> : null}
   </header>;
 }

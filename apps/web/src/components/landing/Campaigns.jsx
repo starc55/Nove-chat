@@ -1,17 +1,17 @@
-import { ArrowUpRight } from "lucide-react";
-import { Reveal } from "../common/Reveal.jsx";
+import { ArrowUpRight, ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useHorizontalScroller } from "../../hooks/useHorizontalScroller.js";
 
-export function Campaigns({ advertisements = [] }) {
+export function Campaigns({ advertisements = [], products = [], onBuy }) {
   const { language, t } = useLanguage();
-  const visible = advertisements.slice(0, 5);
+  const productOffers = products.slice(0, 4).map((product) => ({ id: `offer-${product.id}`, title: product.title, description: product.shortDescription, image: product.image, createdAt: product.createdAt, product }));
+  const visible = [...advertisements, ...productOffers].slice(0, 7);
+  const { ref, scroll, canPrev, canNext } = useHorizontalScroller(visible.length);
   if (!visible.length) return null;
-  return (
-    <section id="campaigns" className="section campaigns-section"><div className="container">
-      <div className="editorial-heading"><div><p className="eyebrow"><span/>{t.campaignsEyebrow}</p><h2>{t.campaignsTitle}</h2></div><p>{t.campaignsText}</p></div>
-      <div className={`campaign-grid ${visible.length === 1 ? "is-single" : ""}`}>{visible.map((item, index) => <Reveal className={`campaign-card campaign-${index + 1} ${item.image ? "has-image" : ""}`} key={item.id} delay={index * .04}>
-        {item.image ? <img src={item.image} alt="" loading="lazy"/> : null}<div className="campaign-overlay"/><div className="campaign-meta"><span>{t.published}</span><time>{new Intl.DateTimeFormat(language === "uz" ? "uz-UZ" : language, { day: "2-digit", month: "short", year: "numeric" }).format(new Date(item.startAt || item.createdAt))}</time></div><div className="campaign-copy"><h3>{item.title}</h3>{item.description ? <p>{item.description}</p> : null}{item.ctaUrl ? <a href={item.ctaUrl}>{item.ctaLabel || t.learnMore}<ArrowUpRight size={16}/></a> : null}</div>
-      </Reveal>)}</div>
-    </div></section>
-  );
+  return <section id="campaigns" className="section campaigns-section"><div className="container">
+    <div className="section-line campaign-heading"><div><p className="eyebrow">{t.campaignsEyebrow}</p><h2>{t.campaignsTitle}</h2><span>{t.campaignsText}</span></div><div className="slider-controls"><button type="button" onClick={() => scroll(-1)} disabled={!canPrev} aria-label="Oldingi aksiya"><ChevronLeft/></button><button type="button" onClick={() => scroll(1)} disabled={!canNext} aria-label="Keyingi aksiya"><ChevronRight/></button></div></div>
+    <div className="campaign-track" ref={ref}>{visible.map((item, index) => <article className={`campaign-card campaign-${index + 1} ${item.image ? "has-image" : ""}`} key={item.id}>
+      {item.image ? <img src={item.image} alt="" loading="lazy"/> : null}<div className="campaign-overlay"/><div className="campaign-meta"><span>{item.product ? t.navProducts : t.published}</span><time>{new Intl.DateTimeFormat(language === "uz" ? "uz-UZ" : language, { day: "2-digit", month: "short", year: "numeric" }).format(new Date(item.startAt || item.createdAt || Date.now()))}</time></div><div className="campaign-copy"><h3>{item.title}</h3>{item.description ? <p>{item.description}</p> : null}{item.product ? <button type="button" onClick={() => onBuy(item.product)}><ShoppingBag size={15}/>{t.buy}</button> : item.ctaUrl ? <a href={item.ctaUrl}>{item.ctaLabel || t.learnMore}<ArrowUpRight size={16}/></a> : <a href="#products">{t.learnMore}<ArrowUpRight size={16}/></a>}</div>
+    </article>)}</div>
+  </div></section>;
 }

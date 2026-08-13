@@ -1,8 +1,8 @@
-import { useRef } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "../common/Reveal.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useHorizontalScroller } from "../../hooks/useHorizontalScroller.js";
 
 function money(value, fallback) {
   if (value == null) return fallback;
@@ -11,10 +11,9 @@ function money(value, fallback) {
 
 export function Services({ products, loading, error, onBuy }) {
   const { t } = useLanguage();
-  const trackRef = useRef(null);
-  const scroll = (direction) => trackRef.current?.scrollBy({ left: direction * 340, behavior: "smooth" });
+  const { ref: trackRef, scroll, canPrev, canNext } = useHorizontalScroller(products.length);
   return <section id="products" className="section products-section"><div className="container product-showcase">
-    <div className="section-line"><div><p className="eyebrow">NOVA YECHIMLARI</p><h2>{t.navProducts}</h2></div><div className="slider-controls"><button type="button" onClick={() => scroll(-1)} aria-label="Oldingi mahsulot"><ChevronLeft/></button><button type="button" onClick={() => scroll(1)} aria-label="Keyingi mahsulot"><ChevronRight/></button></div></div>
+    <div className="section-line"><div><p className="eyebrow">NOVA YECHIMLARI</p><h2>{t.navProducts}</h2></div><div className="slider-controls"><button type="button" onClick={() => scroll(-1)} disabled={!canPrev} aria-label="Oldingi mahsulot"><ChevronLeft/></button><button type="button" onClick={() => scroll(1)} disabled={!canNext} aria-label="Keyingi mahsulot"><ChevronRight/></button></div></div>
     {loading ? <div className="product-grid">{[1,2,3].map((n) => <div className="product-card product-skeleton" key={n}/>)}</div> : null}
     {error ? <div className="inline-state"><p>{error}</p></div> : null}
     {!loading && !error && products.length === 0 ? <div className="inline-state"><p>Hozircha mahsulotlar yo‘q.</p></div> : null}

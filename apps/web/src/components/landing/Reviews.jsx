@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { CheckCircle2, LoaderCircle, Quote, Star } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, LoaderCircle, Quote, Star } from "lucide-react";
 import { api } from "../../services/api.js";
 import { getVisitorId, getVisitorProfile, saveVisitorProfile } from "../../services/visitor.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useHorizontalScroller } from "../../hooks/useHorizontalScroller.js";
 
 export function Reviews({ reviews = [], loading }) {
   const { language, t } = useLanguage();
@@ -11,6 +12,7 @@ export function Reviews({ reviews = [], loading }) {
     return { name: profile?.name || "", phone: profile?.phone || "", rating: 5, comment: "" };
   });
   const [state, setState] = useState({ sending: false, success: false, error: "" });
+  const { ref, scroll, canPrev, canNext } = useHorizontalScroller(`${loading}-${reviews.length}`);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -25,8 +27,8 @@ export function Reviews({ reviews = [], loading }) {
 
   return (
     <section id="reviews" className="section reviews-section"><div className="container">
-      <div className="editorial-heading"><div><p className="eyebrow"><span/>{t.reviewsEyebrow}</p><h2>{t.reviewsTitle}</h2></div><p>{t.reviewText}</p></div>
-      <div className="reviews-layout"><div className="review-stream">
+      <div className="section-line reviews-heading"><div><p className="eyebrow">{t.reviewsEyebrow}</p><h2>{t.reviewsTitle}</h2><span>{t.reviewText}</span></div><div className="slider-controls"><button type="button" onClick={() => scroll(-1)} disabled={!canPrev} aria-label="Oldingi sharh"><ChevronLeft/></button><button type="button" onClick={() => scroll(1)} disabled={!canNext} aria-label="Keyingi sharh"><ChevronRight/></button></div></div>
+      <div className="reviews-layout"><div className="review-stream" ref={ref}>
         {loading ? [1,2].map((item) => <div className="review-card review-skeleton" key={item}/>) : null}
         {!loading && !reviews.length ? <div className="inline-state"><p>{t.noReviews}</p></div> : null}
         {reviews.slice(0, 4).map((review) => <article className="review-card" key={review.id}><Quote className="review-quote" size={28}/><div className="stars" aria-label={`${review.rating} yulduz`}>{Array.from({ length: 5 }).map((_, index) => <Star key={index} size={14} fill={index < review.rating ? "currentColor" : "none"}/>)}</div><blockquote>{review.comment}</blockquote><footer><span className="review-avatar">{review.customerName.charAt(0)}</span><div><strong>{review.customerName}</strong><time>{new Intl.DateTimeFormat(language === "uz" ? "uz-UZ" : language, { day: "2-digit", month: "long", year: "numeric" }).format(new Date(review.createdAt))}</time></div></footer></article>)}

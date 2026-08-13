@@ -13,14 +13,12 @@ import { PurchaseModal } from "../components/common/PurchaseModal.jsx";
 export function LandingPage() {
   const { data, loading, error } = useLandingData();
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const heroAd = data.advertisements.find((item) => item.placement === "HERO");
-  const featuredProduct = data.products.find((item) => item.featured) || data.products[0];
   return (
     <div className="site-shell">
       <Header company={data.settings.company?.name} contact={data.settings.contact} />
-      <Hero settings={data.settings} advertisement={heroAd} featuredProduct={featuredProduct} onBuy={setSelectedProduct}/>
+      <Hero settings={data.settings} advertisements={data.advertisements} products={data.products} onBuy={setSelectedProduct}/>
       <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>
-      <Campaigns advertisements={data.advertisements}/>
+      <Campaigns advertisements={data.advertisements} products={data.products} onBuy={setSelectedProduct}/>
       <Approach />
       <Reviews reviews={data.reviews} loading={loading} />
       <Footer settings={data.settings} />

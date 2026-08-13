@@ -42,6 +42,10 @@ export function ChatWidget() {
   const customerId = useMemo(getVisitorId, []);
 
   useEffect(() => { openRef.current = open; if (open) setUnread(0); }, [open]);
+  useEffect(() => {
+    document.body.classList.toggle("chat-open", open);
+    return () => document.body.classList.remove("chat-open");
+  }, [open]);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }); }, [messages, open, reduceMotion]);
 
   useEffect(() => {
