@@ -5,13 +5,26 @@ const LanguageContext = createContext(null);
 const LANGUAGE_KEY = "nova_language";
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguageState] = useState(() => localStorage.getItem(LANGUAGE_KEY) || "uz");
+  const [language, setLanguageState] = useState(() => {
+    const stored = localStorage.getItem(LANGUAGE_KEY);
+    return copy[stored] ? stored : "uz";
+  });
   const setLanguage = (value) => {
     if (!copy[value]) return;
     localStorage.setItem(LANGUAGE_KEY, value);
     setLanguageState(value);
   };
-  useEffect(() => { document.documentElement.lang = language; }, [language]);
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dataset.language = language;
+  }, [language]);
+  useEffect(() => {
+    const syncLanguage = (event) => {
+      if (event.key === LANGUAGE_KEY && copy[event.newValue]) setLanguageState(event.newValue);
+    };
+    window.addEventListener("storage", syncLanguage);
+    return () => window.removeEventListener("storage", syncLanguage);
+  }, []);
   const value = useMemo(() => ({ language, setLanguage, t: copy[language] || copy.uz }), [language]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }

@@ -31,12 +31,12 @@ export function ProductPage() {
       <Header />
       <main className="product-page container">
         <Link className="back-link" to="/">
-          <ArrowLeft size={17} /> Bosh sahifa
+          <ArrowLeft size={17} /> {t.backHome}
         </Link>
         {state.loading && <div className="product-loading" />}
         {state.error && (
           <div className="inline-state">
-            <h1>Xizmat topilmadi</h1>
+            <h1>{t.productNotFound}</h1>
             <p>{state.error}</p>
           </div>
         )}
