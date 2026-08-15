@@ -33,30 +33,13 @@ async function main() {
     });
   }
 
-  const products = [
-    { title: "Brand System", slug: "brand-system", shortDescription: "Brendning ovozi, ko‘rinishi va bozordagi o‘rnini yagona premium tizimga aylantiramiz.", longDescription: "Strategiya, identika va amaliy qo‘llanmalardan iborat to‘liq brend tizimi.", price: 12000000, oldPrice: 14500000, category: "Branding", featured: true, sortOrder: 1 },
-    { title: "Digital Experience", slug: "digital-experience", shortDescription: "Tez, ta’sirchan va sotuvga yo‘naltirilgan raqamli mahsulotlar yaratamiz.", longDescription: "Tadqiqotdan ishga tushirishgacha bo‘lgan premium veb tajriba.", price: 18500000, category: "Digital", featured: true, sortOrder: 2 },
-    { title: "Growth Direction", slug: "growth-direction", shortDescription: "Aniq ma’lumot va kuchli kreativ asosida o‘sish strategiyasini tuzamiz.", longDescription: "Pozitsiyalash, kampaniya tizimi va o‘sish xaritasi.", price: 8500000, category: "Strategy", featured: false, sortOrder: 3 }
-  ];
-  for (const product of products) await prisma.product.upsert({ where: { slug: product.slug }, update: product, create: product });
-
-  await prisma.advertisement.deleteMany({ where: { title: "Yozgi strategiya sessiyasi" } });
-  await prisma.advertisement.create({ data: { title: "Yozgi strategiya sessiyasi", description: "Avgust uchun 4 ta yangi hamkorlik o‘rni. 30 daqiqalik auditni bepul oling.", ctaLabel: "Sessiyani band qilish", ctaUrl: "#contact", placement: "AFTER_HERO", enabled: true, sortOrder: 1 } });
-
-  const reviews = [
-    { customerName: "Akmal R.", rating: 5, comment: "NOVA jamoasi murakkab g‘oyamizni ravshan va ishonchli mahsulotga aylantirdi.", status: "APPROVED" },
-    { customerName: "Madina S.", rating: 5, comment: "Jarayon juda tartibli, natija esa kutganimizdan ham kuchli bo‘ldi.", status: "APPROVED" },
-    { customerName: "Temur K.", rating: 5, comment: "Birinchi haftadanoq yangi pozitsiyalashning biznesga ta’sirini sezdik.", status: "APPROVED" }
-  ];
-  if (await prisma.review.count() === 0) await prisma.review.createMany({ data: reviews });
-
-  const settings = {
-    company: { name: "NOVA", descriptor: "Independent digital studio" },
-    hero: { eyebrow: "Toshkent · Global hamkorlik", title: "Yaxshi brend ko‘rinadi. Buyuk brend seziladi.", subtitle: "Biz ambitsiyali kompaniyalar uchun strategiya, dizayn va raqamli tajribani yagona kuchli tizimga birlashtiramiz.", primaryCta: "Loyihani boshlash", secondaryCta: "Ishlarimizni ko‘rish" },
-    contact: { phone: "+998 90 000 00 00", email: "hello@nova.uz", telegramUrl: "https://t.me/nova_studio", address: "Toshkent, O‘zbekiston" },
-    stats: [{ value: "42+", label: "ishga tushirilgan loyiha" }, { value: "91%", label: "qayta hamkorlik" }, { value: "4.9", label: "mijozlar bahosi" }]
-  };
-  for (const [key, value] of Object.entries(settings)) await prisma.siteSetting.upsert({ where: { key }, update: { value }, create: { key, value } });
+  // Public catalogue and contact content are installed by the production-safe
+  // 20260815190000_import_xion_catalog migration. Keep sample services hidden if
+  // this development seed is run against an older local database.
+  await prisma.product.updateMany({
+    where: { slug: { in: ["brand-system", "digital-experience", "growth-direction"] } },
+    data: { active: false }
+  });
   const replies = [
     { trigger: "CHAT_OPEN", text: "Assalomu alaykum! Sizga qanday yordam bera olamiz?" },
     { trigger: "FIRST_MESSAGE", text: "Xabaringizni oldik. Operatorimiz tez orada javob beradi." },

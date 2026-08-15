@@ -22,6 +22,13 @@ publicRouter.get("/landing", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+publicRouter.get("/settings", async (req, res, next) => {
+  try {
+    const settings = await prisma.siteSetting.findMany();
+    res.json({ success: true, data: Object.fromEntries(settings.map(({ key, value }) => [key, value])) });
+  } catch (error) { next(error); }
+});
+
 publicRouter.get("/products/:slug", async (req, res, next) => {
   try {
     const product = await prisma.product.findFirst({ where: { slug: req.params.slug, active: true }, include: { images: true } });

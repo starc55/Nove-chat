@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./App.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
 import "./styles/index.css";
+import "./styles/xion-content.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
