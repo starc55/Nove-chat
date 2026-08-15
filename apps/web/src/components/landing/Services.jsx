@@ -4,6 +4,7 @@ import { Reveal } from "../common/Reveal.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useHorizontalScroller } from "../../hooks/useHorizontalScroller.js";
 import { localeFor } from "../../i18n/landing.js";
+import { localizeProduct } from "../../utils/localize-product.js";
 
 function money(value, fallback, language, currency) {
   if (value == null) return fallback;
@@ -18,9 +19,9 @@ export function Services({ products, loading, error, onBuy }) {
     {loading ? <div className="product-grid">{[1,2,3].map((n) => <div className="product-card product-skeleton" key={n}/>)}</div> : null}
     {error ? <div className="inline-state"><p>{error}</p></div> : null}
     {!loading && !error && products.length === 0 ? <div className="inline-state"><p>{t.noProducts}</p></div> : null}
-    {!loading && !error && products.length ? <div className="product-grid" ref={trackRef}>{products.map((product, index) => <Reveal className={`product-card ${product.image ? "has-catalog-media" : ""} ${index === 0 ? "is-featured" : ""}`} delay={index * .05} key={product.id}>
+    {!loading && !error && products.length ? <div className="product-grid" ref={trackRef}>{products.map((sourceProduct, index) => { const product = localizeProduct(sourceProduct, language); return <Reveal className={`product-card ${product.image ? "has-catalog-media" : ""} ${index === 0 ? "is-featured" : ""}`} delay={index * .05} key={product.id}>
       <div className="product-accent"/><div className="product-index">{String(index + 1).padStart(2, "0")}</div>{product.image ? <div className="product-catalog-media"><img src={product.image} alt="" loading="lazy"/></div> : null}<div className="product-card-copy"><small>{product.category || "NOVA PRODUCT"}</small><h3>{product.title}</h3><p>{product.shortDescription}</p><ul>{t.productBenefits.map((benefit) => <li key={benefit}>{benefit}</li>)}</ul><div className="product-price"><strong>{money(product.price, t.priceOnRequest, language, t.currency)}</strong>{product.oldPrice ? <del>{money(product.oldPrice, t.priceOnRequest, language, t.currency)}</del> : null}</div></div>
       <footer><button type="button" onClick={() => onBuy(product)}><ShoppingBag size={16}/>{t.buy}</button><Link to={`/products/${product.slug}`} aria-label={`${product.title} ${t.details}`}>{t.details}<ArrowUpRight size={16}/></Link></footer>
-    </Reveal>)}</div> : null}
+    </Reveal>; })}</div> : null}
   </div></section>;
 }

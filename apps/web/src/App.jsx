@@ -8,6 +8,8 @@ import "./styles/chat.css";
 import { ADMIN_BASE } from "./config/admin.js";
 
 const ProductPage = lazy(() => import("./pages/ProductPage.jsx").then((module) => ({ default: module.ProductPage })));
+const CatalogPage = lazy(() => import("./pages/CatalogPage.jsx").then((module) => ({ default: module.CatalogPage })));
+const InfoPage = lazy(() => import("./pages/InfoPage.jsx").then((module) => ({ default: module.InfoPage })));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout.jsx").then((module) => ({ default: module.AdminLayout })));
 const AdminLoginPage = lazy(() => import("./pages/admin/AdminLoginPage.jsx").then((module) => ({ default: module.AdminLoginPage })));
 const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage.jsx").then((module) => ({ default: module.AdminDashboardPage })));
@@ -17,6 +19,7 @@ const AdminOperatorsPage = lazy(() => import("./pages/admin/AdminOperatorsPage.j
 const AdminLeadsPage = lazy(() => import("./pages/admin/AdminRecordsPage.jsx").then((module) => ({ default: module.AdminLeadsPage })));
 const AdminOrdersPage = lazy(() => import("./pages/admin/AdminRecordsPage.jsx").then((module) => ({ default: module.AdminOrdersPage })));
 const AdminReviewsPage = lazy(() => import("./pages/admin/AdminRecordsPage.jsx").then((module) => ({ default: module.AdminReviewsPage })));
+const AdminContentPagesPage = lazy(() => import("./pages/admin/AdminContentPagesPage.jsx").then((module) => ({ default: module.AdminContentPagesPage })));
 const OperatorAppPage = lazy(() => import("./pages/OperatorAppPage.jsx").then((module) => ({ default: module.OperatorAppPage })));
 
 function RouteFallback() {
@@ -30,6 +33,17 @@ export function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/products/:slug" element={<ProductPage />} />
+          <Route path="/catalog" element={<CatalogPage />} />
+          <Route path="/company" element={<InfoPage slug="about"/>} />
+          <Route path="/simurg" element={<InfoPage slug="simurg"/>} />
+          <Route path="/medical-institutions" element={<InfoPage slug="medical-institutions"/>} />
+          <Route path="/manufacturers" element={<InfoPage slug="manufacturers"/>} />
+          <Route path="/news" element={<InfoPage slug="news"/>} />
+          <Route path="/career" element={<InfoPage slug="career"/>} />
+          <Route path="/contact" element={<InfoPage slug="contact"/>} />
+          <Route path="/warranty-return" element={<InfoPage slug="warranty-return"/>} />
+          <Route path="/terms" element={<InfoPage slug="terms"/>} />
+          <Route path="/privacy" element={<InfoPage slug="privacy"/>} />
           <Route path="/operator" element={<OperatorAppPage />} />
           <Route path={`${ADMIN_BASE}/sign-in`} element={<AdminLoginPage />} />
           <Route path={ADMIN_BASE} element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
@@ -40,6 +54,7 @@ export function App() {
             <Route path="leads" element={<AdminLeadsPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="reviews" element={<AdminReviewsPage />} />
+            <Route path="content" element={<AdminContentPagesPage />} />
           </Route>
           <Route path="/admin/*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Bot, ChevronLeft, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, X } from "lucide-react";
+import { ArrowUpRight, Bot, ChevronLeft, ClipboardList, FileText, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, X } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { AdminUiProvider, useAdminUi } from "./AdminUi.jsx";
@@ -35,6 +35,7 @@ function AdminLayoutContent() {
           <NavLink to={ADMIN_BASE} end onClick={() => setSidebarOpen(false)}><LayoutDashboard size={18}/><b>Dashboard</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/products`} onClick={() => setSidebarOpen(false)}><Package size={18}/><b>Mahsulotlar</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/advertisements`} onClick={() => setSidebarOpen(false)}><Megaphone size={18}/><b>Landing bannerlari</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/content`} onClick={() => setSidebarOpen(false)}><FileText size={18}/><b>Kontent sahifalari</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/reviews`} onClick={() => setSidebarOpen(false)}><Star size={18}/><b>Sharhlar</b></NavLink>
           <span>Operatsiyalar</span>
           <NavLink to={`${ADMIN_BASE}/leads`} onClick={() => setSidebarOpen(false)}><ClipboardList size={18}/><b>Murojaatlar</b></NavLink>

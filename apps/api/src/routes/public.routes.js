@@ -29,6 +29,21 @@ publicRouter.get("/settings", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+publicRouter.get("/pages", async (_req, res, next) => {
+  try {
+    const pages = await prisma.contentPage.findMany({ where: { active: true }, select: { slug: true, title: true, content: true, sortOrder: true }, orderBy: { sortOrder: "asc" } });
+    res.json({ success: true, data: pages });
+  } catch (error) { next(error); }
+});
+
+publicRouter.get("/pages/:slug", async (req, res, next) => {
+  try {
+    const page = await prisma.contentPage.findFirst({ where: { slug: req.params.slug, active: true } });
+    if (!page) throw new ApiError(404, "CONTENT_PAGE_NOT_FOUND", "Sahifa topilmadi.");
+    res.json({ success: true, data: page });
+  } catch (error) { next(error); }
+});
+
 publicRouter.get("/products/:slug", async (req, res, next) => {
   try {
     const product = await prisma.product.findFirst({ where: { slug: req.params.slug, active: true }, include: { images: true } });
@@ -111,5 +126,35 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
       return created;
     });
     res.status(201).json({ success: true, data: order });
+  } catch (error) { next(error); }
+});
+
+publicRouter.post("/inquiries", submissionLimiter, async (req, res, next) => {
+  try {
+    const input = z.object({
+      visitorId: visitorSchema,
+      name: z.string().trim().min(2).max(100),
+      phone: phoneSchema,
+      email: z.union([z.string().trim().email().max(200), z.literal("")]).optional().default(""),
+      company: z.string().trim().max(180).optional().default(""),
+      message: z.string().trim().min(5).max(2000),
+      source: z.enum(["contact", "medical_institutions", "manufacturers", "career"]).default("contact")
+    }).parse(req.body);
+    const lead = await prisma.$transaction(async (tx) => {
+      const customer = await tx.customer.upsert({
+        where: { visitorId: input.visitorId },
+        update: { name: input.name, phone: input.phone, email: input.email || null },
+        create: { visitorId: input.visitorId, name: input.name, phone: input.phone, email: input.email || null }
+      });
+      return tx.lead.create({ data: {
+        customerId: customer.id,
+        name: input.name,
+        phone: input.phone,
+        email: input.email || null,
+        message: [input.company ? `Tashkilot: ${input.company}` : "", input.message].filter(Boolean).join("\n"),
+        source: input.source
+      }, select: { id: true, status: true, createdAt: true } });
+    });
+    res.status(201).json({ success: true, data: lead });
   } catch (error) { next(error); }
 });

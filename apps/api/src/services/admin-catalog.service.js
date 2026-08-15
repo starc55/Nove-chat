@@ -3,8 +3,13 @@ import { ApiError } from "../utils/api-error.js";
 
 function productData(input) {
   const data = { ...input };
+  delete data.gallery;
   if (data.slug) data.slug = data.slug.toLowerCase();
   return data;
+}
+
+function galleryData(gallery = []) {
+  return gallery.map((url, index) => ({ url, sortOrder: index + 1 }));
 }
 
 export async function listProducts({ page, limit, q }) {
@@ -19,13 +24,17 @@ export async function listProducts({ page, limit, q }) {
 }
 
 export async function createProduct(input) {
-  return prisma.product.create({ data: productData(input), include: { images: true } });
+  const data = productData(input);
+  if (input.gallery?.length) data.images = { create: galleryData(input.gallery) };
+  return prisma.product.create({ data, include: { images: true } });
 }
 
 export async function updateProduct(id, input) {
   const existing = await prisma.product.findUnique({ where: { id }, select: { id: true } });
   if (!existing) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
-  return prisma.product.update({ where: { id }, data: productData(input), include: { images: true } });
+  const data = productData(input);
+  if (input.gallery) data.images = { deleteMany: {}, create: galleryData(input.gallery) };
+  return prisma.product.update({ where: { id }, data, include: { images: true } });
 }
 
 export async function deleteProduct(id) {

@@ -269,6 +269,10 @@ model Product {
   price            Decimal?       @db.Decimal(15, 2)
   oldPrice         Decimal?       @db.Decimal(15, 2)
   image            String?
+  sourceUrl        String?
+  documents        Json?
+  specifications   Json?
+  translations     Json?
   category         String?
   active           Boolean        @default(true)
   featured         Boolean        @default(false)
@@ -278,6 +282,19 @@ model Product {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   @@index([active, featured, sortOrder])
+}
+
+model ContentPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   Json
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, sortOrder])
 }
 
 model ProductImage {

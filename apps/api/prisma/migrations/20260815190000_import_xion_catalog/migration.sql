@@ -165,7 +165,7 @@ VALUES
   ('xion-setting-company', 'company', '{"name":"NOVA","descriptor":"Ayollar salomatligi uchun tibbiy buyumlar"}'::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   ('xion-setting-hero', 'hero', '{"eyebrow":"NOVA · RASMIY TIBBIY YECHIMLAR","title":"Ayollar salomatligi uchun ishonchli tibbiy buyumlar","subtitle":"Akusherlik, ginekologiya va urologiya uchun mahsulotlar. O‘zbekiston bo‘ylab yetkazib berish va mutaxassis yordami.","primaryCta":"Katalogni ko‘rish","secondaryCta":"Mutaxassis bilan bog‘lanish"}'::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   ('xion-setting-contact', 'contact', '{"phone":"+998 99 556 06 60","phones":["+998 99 556 06 60","+998 71 230 04 40","+998 88 159 05 50"],"email":"info@xion.uz","emails":[{"label":"Umumiy savollar","value":"info@xion.uz"},{"label":"Savdo bo‘limi","value":"sales@xion.uz"},{"label":"Ofis","value":"office@xion.uz"}],"telegramUrl":"https://t.me/xionuzb","address":"Toshkent shahri, Olmazor tumani, Allon ko‘chasi 141A","workingHours":"Dushanba–Juma, 08:00–17:00"}'::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('xion-setting-stats', 'stats', '[{"value":"10+","label":"yillik tajriba"},{"value":"45+","label":"katalog mahsuloti"},{"value":"25+","label":"eksport mamlakati"}]'::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+  ('xion-setting-stats', 'stats', '[{"value":"10+","label":"yillik tajriba"},{"value":"47","label":"ochiq katalog mahsuloti"},{"value":"25+","label":"eksport mamlakati"}]'::jsonb, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT ("key") DO UPDATE SET
   "value" = EXCLUDED."value",
   "updatedAt" = CURRENT_TIMESTAMP;

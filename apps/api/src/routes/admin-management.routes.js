@@ -9,10 +9,11 @@ import {
   deleteLead, deleteOrder, deleteReview, listLeads, listOrders, listReviews,
   updateLead, updateOrder, updateReview
 } from "../services/admin-operations.service.js";
+import { createContentPage, deleteContentPage, listContentPages, updateContentPage } from "../services/content-page.service.js";
 
 export const adminManagementRouter = Router();
 
-const idSchema = z.string().cuid();
+const idSchema = z.string().trim().regex(/^[A-Za-z0-9_-]{8,80}$/);
 const nullableText = (max) => z.union([z.string().trim().max(max), z.null()]).transform((value) => value || null);
 const nullableUrl = z.union([z.string().trim().url().max(1000), z.literal(""), z.null()]).transform((value) => value || null);
 const MAX_PRODUCT_PRICE = 9_999_999_999_999.99;
@@ -37,9 +38,22 @@ const productBaseSchema = z.object({
   price: nullablePrice,
   oldPrice: nullablePrice,
   image: nullableUrl,
+  sourceUrl: nullableUrl,
+  documents: z.array(z.object({ label: z.string().trim().min(2).max(180), url: z.string().trim().url().max(1000) }).strict()).max(20).nullable().optional(),
+  specifications: z.record(z.string(), z.unknown()).nullable().optional(),
+  translations: z.record(z.string(), z.unknown()).nullable().optional(),
+  gallery: z.array(z.string().trim().url().max(1000)).max(20).optional(),
   category: nullableText(80),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
+  sortOrder: z.coerce.number().int().min(-10000).max(10000).default(0)
+}).strict();
+
+const contentPageSchema = z.object({
+  slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(140),
+  title: z.string().trim().min(2).max(180),
+  content: z.record(z.string(), z.unknown()),
+  active: z.boolean().default(true),
   sortOrder: z.coerce.number().int().min(-10000).max(10000).default(0)
 }).strict();
 const productSchema = productBaseSchema.superRefine((value, ctx) => {
@@ -106,6 +120,20 @@ adminManagementRouter.patch("/advertisements/:id", route(async (req, res) => {
 }));
 adminManagementRouter.delete("/advertisements/:id", route(async (req, res) => {
   await deleteAdvertisement(idSchema.parse(req.params.id));
+  res.status(204).end();
+}));
+
+adminManagementRouter.get("/content-pages", route(async (req, res) => {
+  res.json({ success: true, data: await listContentPages(paginationSchema.parse(req.query)) });
+}));
+adminManagementRouter.post("/content-pages", route(async (req, res) => {
+  res.status(201).json({ success: true, data: await createContentPage(contentPageSchema.parse(req.body)) });
+}));
+adminManagementRouter.patch("/content-pages/:id", route(async (req, res) => {
+  res.json({ success: true, data: await updateContentPage(idSchema.parse(req.params.id), contentPageSchema.partial().strict().parse(req.body)) });
+}));
+adminManagementRouter.delete("/content-pages/:id", route(async (req, res) => {
+  await deleteContentPage(idSchema.parse(req.params.id));
   res.status(204).end();
 }));
 
