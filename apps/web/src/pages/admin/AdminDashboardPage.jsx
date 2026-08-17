@@ -34,7 +34,7 @@ export function AdminDashboardPage() {
 
   return (
     <motion.main className="admin-content" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }}>
-      <div className="admin-page-head"><div><p>{todayLabel} · LIVE OVERVIEW</p><h1>Xayrli kun, {user?.name?.split(" ")[0]}.</h1><span>NOVA platformasining bugungi holati.</span></div><button onClick={load} disabled={state.loading}>Yangilash</button></div>
+      <div className="admin-page-head"><div><p>{todayLabel} · LIVE OVERVIEW</p><h1>Xayrli kun, {user?.name?.split(" ")[0]}.</h1><span>XION platformasining bugungi holati.</span></div><button onClick={load} disabled={state.loading}>Yangilash</button></div>
       <section className="admin-content-map" aria-label="Landing boshqaruvi">
         <Link to={`${ADMIN_BASE}/products`}><Package/><span><small>LANDING</small><strong>Mahsulotlar</strong><i>Tarif va sotib olish kartalari</i></span></Link>
         <Link to={`${ADMIN_BASE}/advertisements`}><Megaphone/><span><small>SWIPERS</small><strong>Bannerlar</strong><i>Hero va aksiyalar slaydlari</i></span></Link>

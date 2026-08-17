@@ -34,7 +34,7 @@ export function ProductPage() {
   const specifications = product?.specifications && typeof product.specifications === "object" ? Object.entries(product.specifications) : [];
   return (
     <div className="site-shell">
-      <Header company={state.settings.company?.name} contact={state.settings.contact}/>
+      <Header contact={state.settings.contact}/>
       <main className="product-page container">
         <Link className="back-link" to="/">
           <ArrowLeft size={17} /> {t.backHome}

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, Eye, Map, Menu, Phone, Search, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { BrandLogo } from "../common/BrandLogo.jsx";
 
-export function Header({ company = "NOVA", contact = {} }) {
+export function Header({ contact = {} }) {
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
   const [contrast, setContrast] = useState(false);
@@ -38,7 +39,7 @@ export function Header({ company = "NOVA", contact = {} }) {
   const closeMenu = () => setOpen(false);
   return <motion.header className={`site-header ${compact ? "is-compact" : ""}`} initial={reduceMotion ? false : { opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .5, ease: [0.22, 1, 0.36, 1] }}>
     <div className="container header-top">
-      <a className="wordmark" href="/" aria-label={`${company} ${t.homeLabel}`}>{company}<i>.</i></a>
+      <a className="wordmark" href="/" aria-label={`XION ${t.homeLabel}`}><BrandLogo /></a>
       <nav className="desktop-nav" aria-label={t.mainNavigation}>{primary.map(([label, href], index) => <a className={index === 0 ? "is-active" : ""} key={`${href}-${index}`} href={href}>{label}</a>)}</nav>
       <div className="nav-actions">
         <label className="language-select"><span className="sr-only">{t.language}</span><select value={language} onChange={(event) => setLanguage(event.target.value)}><option value="uz">O‘z</option><option value="ru">Рус</option><option value="en">Eng</option></select><ChevronDown size={13}/></label>

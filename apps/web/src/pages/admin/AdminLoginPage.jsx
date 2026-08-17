@@ -28,7 +28,7 @@ export function AdminLoginPage() {
       <Link className="admin-login-back" to="/"><ArrowLeft size={17}/> Saytga qaytish</Link>
       <motion.section className="admin-login-panel" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65, ease: [0.22, 1, 0.36, 1] }}>
         <div className="admin-login-mark"><span>N</span><small>Private<br/>Workspace</small></div>
-        <div className="admin-login-copy"><p className="eyebrow"><span/>NOVA Control</p><h1>Boshqaruv<br/><em>markaziga</em> kirish.</h1><p>Mahsulotlar, suhbatlar va biznes ko‘rsatkichlarini xavfsiz boshqaring.</p></div>
+        <div className="admin-login-copy"><p className="eyebrow"><span/>XION Control</p><h1>Boshqaruv<br/><em>markaziga</em> kirish.</h1><p>Mahsulotlar, suhbatlar va biznes ko‘rsatkichlarini xavfsiz boshqaring.</p></div>
         <form className="admin-login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="login-secure"><LockKeyhole size={15}/> Himoyalangan admin sessiyasi</div>
           <label>Email manzil<input type="email" autoComplete="username" aria-invalid={!!errors.email} {...register("email", { required: "Email manzilni kiriting.", pattern: { value: /^\S+@\S+\.\S+$/, message: "Email formati noto‘g‘ri." } })}/>{errors.email && <small>{errors.email.message}</small>}</label>

@@ -22,7 +22,7 @@ export function LandingPage() {
   useDesktopLocomotiveScroll(`${language}-${loading}-${data.products.length}-${data.advertisements.length}-${data.reviews.length}`);
   return (
     <div className="site-shell">
-      <Header company={data.settings.company?.name} contact={data.settings.contact} />
+      <Header contact={data.settings.contact} />
       <LanguageMotion language={language}>
         <Hero settings={data.settings} advertisements={heroAdvertisements} products={data.products} onBuy={setSelectedProduct}/>
         <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>

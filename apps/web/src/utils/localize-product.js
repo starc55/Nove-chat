@@ -20,8 +20,8 @@ const categories = {
 };
 
 const descriptions = {
-  ru: "Профессиональное медицинское изделие. Размер, модификацию, наличие и условия поставки уточняет специалист NOVA.",
-  en: "A professional medical product. A NOVA specialist will confirm sizing, modification, availability and supply terms."
+  ru: "Профессиональное медицинское изделие. Размер, модификацию, наличие и условия поставки уточняет специалист XION.",
+  en: "A professional medical product. A XION specialist will confirm sizing, modification, availability and supply terms."
 };
 
 const titleRules = {

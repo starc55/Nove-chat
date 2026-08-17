@@ -23,7 +23,7 @@ const AdminContentPagesPage = lazy(() => import("./pages/admin/AdminContentPages
 const OperatorAppPage = lazy(() => import("./pages/OperatorAppPage.jsx").then((module) => ({ default: module.OperatorAppPage })));
 
 function RouteFallback() {
-  return <div className="admin-auth-loading" role="status"><span>NOVA.</span><p>Sahifa yuklanmoqda...</p></div>;
+  return <div className="admin-auth-loading" role="status"><span>XION.</span><p>Sahifa yuklanmoqda...</p></div>;
 }
 
 export function App() {
