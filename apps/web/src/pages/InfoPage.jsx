@@ -37,7 +37,7 @@ export function InfoPage({ slug }) {
   };
 
   return <div className="site-shell">
-    <Header contact={state.settings.contact}/>
+    <Header contact={state.settings.contact} loading={state.loading}/>
     <main className="info-page">
       {state.loading ? <div className="info-loading"><LoaderCircle className="admin-spin"/>{t.loading}</div> : null}
       {state.error ? <div className="container inline-state"><h1>{t.pageNotFound}</h1><p>{state.error}</p><Link className="back-link" to="/"><ArrowLeft size={17}/>{t.backHome}</Link></div> : null}
@@ -56,6 +56,6 @@ export function InfoPage({ slug }) {
         </form></div></section> : null}
       </> : null}
     </main>
-    <Footer settings={state.settings}/><ChatWidget/>
+    <Footer settings={state.settings} loading={state.loading}/><ChatWidget/>
   </div>;
 }

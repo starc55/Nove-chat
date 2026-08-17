@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Check, CheckCheck, ChevronRight, CircleDot, Clock3, LoaderCircle, LockKeyhole, MessageCircle, Power, RefreshCw, Send, Sparkles, UsersRound, X } from "lucide-react";
 import { io } from "socket.io-client";
 import { operatorApi, telegramInitData } from "../services/operator-api.js";
+import { BrandLogo } from "../components/common/BrandLogo.jsx";
 import "../styles/operator-app.css";
 
 const statusLabels = { ONLINE: "Online", AWAY: "Tanaffus", OFFLINE: "Offline" };
@@ -222,13 +223,13 @@ export function OperatorAppPage() {
     } catch (requestError) { showNotice(requestError.message, "danger"); }
   };
 
-  if (loading) return <main className="ops-app ops-center"><div className="ops-loader"><span>XION<i>.</i></span><LoaderCircle className="ops-spin"/><p>Operator workspace tayyorlanmoqda</p></div></main>;
+  if (loading) return <main className="ops-app ops-center"><div className="ops-loader"><BrandLogo/><LoaderCircle className="ops-spin"/><p>Operator workspace tayyorlanmoqda</p></div></main>;
   if (error && !workspace) return <main className="ops-app ops-center"><div className="ops-gate"><span><LockKeyhole/></span><p>SECURE OPERATOR ACCESS</p><h1>Panel Telegram ichida ochiladi.</h1><small>{error}</small><button type="button" onClick={() => loadWorkspace()}><RefreshCw size={16}/> Qayta tekshirish</button></div></main>;
 
   return (
     <main className="ops-app">
       <div className="ops-ambient"/>
-      <header className="ops-header"><div className="ops-brand"><span>XION<i>.</i></span><small>OPERATOR SYSTEM</small></div><button type="button" className="ops-refresh" onClick={() => loadWorkspace({ quiet: true })} aria-label="Navbatni yangilash"><RefreshCw size={17}/></button></header>
+      <header className="ops-header"><div className="ops-brand"><BrandLogo/><small>OPERATOR SYSTEM</small></div><button type="button" className="ops-refresh" onClick={() => loadWorkspace({ quiet: true })} aria-label="Navbatni yangilash"><RefreshCw size={17}/></button></header>
       <section className="ops-profile"><div className="ops-profile-main"><span className="ops-profile-avatar">{workspace.operator.name.charAt(0)}</span><div><p>ASSALOMU ALAYKUM</p><h1>{workspace.operator.name}</h1><small>@{workspace.operator.telegramUsername || "operator"}</small></div></div><div className="ops-presence" aria-label="Operator holati">{Object.entries(statusLabels).map(([status, label]) => <button type="button" key={status} className={workspace.operator.status === status ? "is-active" : ""} onClick={() => changePresence(status)}><i className={`is-${status.toLowerCase()}`}/>{label}</button>)}</div></section>
       <section className="ops-metrics"><article><span><Clock3 size={17}/></span><div><strong>{workspace.stats.waiting}</strong><small>Navbatda</small></div></article><article><span><MessageCircle size={17}/></span><div><strong>{workspace.stats.mine}</strong><small>Mening chatlarim</small></div></article><article><span><CircleDot size={17}/></span><div><strong>{workspace.operator.status === "ONLINE" ? "Live" : statusLabels[workspace.operator.status]}</strong><small>Joriy holat</small></div></article></section>
       <nav className="ops-tabs"><button type="button" className={tab === "waiting" ? "is-active" : ""} onClick={() => setTab("waiting")}><UsersRound size={16}/> Umumiy navbat <b>{workspace.stats.waiting}</b></button><button type="button" className={tab === "mine" ? "is-active" : ""} onClick={() => setTab("mine")}><MessageCircle size={16}/> Mening chatlarim <b>{workspace.stats.mine}</b></button></nav>

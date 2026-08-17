@@ -4,7 +4,7 @@ import { ChevronDown, Eye, Map, Menu, Phone, Search, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 
-export function Header({ contact = {} }) {
+export function Header({ contact = {}, loading = false }) {
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
   const [contrast, setContrast] = useState(false);
@@ -35,7 +35,7 @@ export function Header({ contact = {} }) {
     };
   }, [open]);
 
-  const phone = contact.phone || "+998 90 000 00 00";
+  const phone = contact.phone?.trim() || "";
   const closeMenu = () => setOpen(false);
   return <motion.header className={`site-header ${compact ? "is-compact" : ""}`} initial={reduceMotion ? false : { opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .5, ease: [0.22, 1, 0.36, 1] }}>
     <div className="container header-top">
@@ -51,7 +51,7 @@ export function Header({ contact = {} }) {
     </div>
     <div className="header-subbar"><div className="container header-subbar-inner">
       <nav className="secondary-nav" aria-label={t.sectionsNavigation}>{secondary.map(([label, href]) => <a key={href} href={href}>{label}<ChevronDown size={12}/></a>)}<a href="/simurg">{t.navServices}<ChevronDown size={12}/></a></nav>
-      <div className="header-contact"><a href={`tel:${phone.replace(/\s/g, "")}`}><Phone size={16}/><strong>{phone}</strong></a><a href="/contact">{t.contactPrompt}</a><a className="header-search-link" href="/catalog" aria-label={t.searchProducts}><Search size={18}/></a></div>
+      <div className={`header-contact ${loading ? "is-loading" : ""}`}>{loading ? <><span className="contact-skeleton is-phone"/><span className="contact-skeleton is-link"/></> : <>{phone ? <a href={`tel:${phone.replace(/\s/g, "")}`}><Phone size={16}/><strong>{phone}</strong></a> : null}<a href="/contact">{t.contactPrompt}</a></>}<a className="header-search-link" href="/catalog" aria-label={t.searchProducts}><Search size={18}/></a></div>
     </div></div>
     {open ? <motion.div className="mega-menu-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeMenu()} initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}><nav id="mega-menu" className="mega-menu" aria-label={t.allSections}><div className="container mega-menu-shell"><button className="mega-close" type="button" onClick={closeMenu} aria-label={t.closeMenu}><X/></button>{t.megaColumns.map((column, columnIndex) => <section className="mega-column" key={column.title}><h2>{column.title}</h2>{column.groups.map((group) => <div className="mega-group" key={group.label}><a className="mega-group-title" href={columnIndex === 0 ? "/catalog" : columnIndex === 1 ? "/medical-institutions" : "/contact"} onClick={closeMenu}><ChevronDown size={11}/>{group.label}</a>{group.links.map((link, index) => <a key={link} href={columnIndex === 0 ? "/catalog" : columnIndex === 1 ? (index === 1 ? "/manufacturers" : "/medical-institutions") : index === 0 ? "/contact" : index === 1 ? "/news" : "/contact"} onClick={closeMenu}>{link}</a>)}</div>)}</section>)}</div></nav></motion.div> : null}
   </motion.header>;

@@ -22,14 +22,14 @@ export function LandingPage() {
   useDesktopLocomotiveScroll(`${language}-${loading}-${data.products.length}-${data.advertisements.length}-${data.reviews.length}`);
   return (
     <div className="site-shell">
-      <Header contact={data.settings.contact} />
+      <Header contact={data.settings.contact} loading={loading} />
       <LanguageMotion language={language}>
-        <Hero settings={data.settings} advertisements={heroAdvertisements} products={data.products} onBuy={setSelectedProduct}/>
+        <Hero settings={data.settings} advertisements={heroAdvertisements} products={data.products} onBuy={setSelectedProduct} loading={loading}/>
         <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>
         <Campaigns advertisements={campaignAdvertisements} products={data.products} onBuy={setSelectedProduct}/>
-        <Approach settings={data.settings} />
+        <Approach settings={data.settings} loading={loading} />
         <Reviews reviews={data.reviews} loading={loading} />
-        <Footer settings={data.settings} />
+        <Footer settings={data.settings} loading={loading} />
       </LanguageMotion>
       <ChatWidget />
       <PurchaseModal product={selectedProduct} onClose={() => setSelectedProduct(null)}/>

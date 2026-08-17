@@ -12,12 +12,12 @@ export function CatalogPage() {
   const { t } = useLanguage();
   const [selectedProduct, setSelectedProduct] = useState(null);
   return <div className="site-shell">
-    <Header contact={data.settings.contact}/>
+    <Header contact={data.settings.contact} loading={loading}/>
     <main className="catalog-page">
       <section className="info-hero"><div className="container"><p className="eyebrow"><span/>{t.productsEyebrow}</p><h1>{t.catalogTitle}</h1><p>{t.catalogIntro}</p></div></section>
       <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>
     </main>
-    <Footer settings={data.settings}/>
+    <Footer settings={data.settings} loading={loading}/>
     <ChatWidget/>
     <PurchaseModal product={selectedProduct} onClose={() => setSelectedProduct(null)}/>
   </div>;

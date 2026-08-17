@@ -6,6 +6,7 @@ import { api } from "../../services/api.js";
 import { getVisitorId, getVisitorProfile, saveVisitorProfile } from "../../services/visitor.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { localeFor } from "../../i18n/landing.js";
+import { BrandLogo } from "../common/BrandLogo.jsx";
 
 function mergeMessages(current, incoming) {
   const list = Array.isArray(incoming) ? incoming : [incoming];
@@ -95,7 +96,7 @@ export function ChatWidget() {
   };
 
   return <div className="chat-widget" data-lenis-prevent><AnimatePresence>{open ? <motion.section className="chat-panel" aria-label={t.liveChatLabel} initial={reduceMotion ? false : { opacity: 0, y: 22, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: .98 }}>
-    <header className="chat-head"><div className="chat-operator-avatar"><span>N</span><i className={`presence-${presence.status?.toLowerCase()}`}/></div><div><strong>{presence.name || t.chatCenter}</strong><p>{presence.chatMode === "WAITING" ? t.chatWaiting : presence.status === "ONLINE" ? t.chatLive : t.chatOffline}</p></div><button type="button" onClick={() => setOpen(false)} aria-label={t.close}><ChevronDown size={20}/></button></header>
+    <header className="chat-head"><div className="chat-operator-avatar"><BrandLogo symbolOnly/><i className={`presence-${presence.status?.toLowerCase()}`}/></div><div><strong>{presence.name || t.chatCenter}</strong><p>{presence.chatMode === "WAITING" ? t.chatWaiting : presence.status === "ONLINE" ? t.chatLive : t.chatOffline}</p></div><button type="button" onClick={() => setOpen(false)} aria-label={t.close}><ChevronDown size={20}/></button></header>
     <div className="chat-context"><span className={presence.chatMode === "LIVE" ? "is-live" : "is-waiting"}>{presence.chatMode === "LIVE" ? t.chatLiveSupport : t.chatQueue}</span><small>#{session?.publicId || "XION"}</small></div>
     <div className="chat-messages" aria-live="polite" data-lenis-prevent>
       {!session && !loading ? <form className="chat-identity" onSubmit={submitIdentity}><span><UserRound size={21}/></span><h2>{t.chatWelcome}</h2><p>{t.chatIdentity}</p><label><small>{t.name}</small><input required minLength="2" maxLength="100" autoComplete="name" value={identity.name} onChange={(event) => setIdentity((current) => ({ ...current, name: event.target.value }))}/></label><label><small>{t.phone}</small><input required type="tel" pattern="[+0-9 ()-]{7,24}" autoComplete="tel" placeholder="+998 90 123 45 67" value={identity.phone} onChange={(event) => setIdentity((current) => ({ ...current, phone: event.target.value }))}/></label><button type="submit">{t.chatContinue}</button></form> : null}

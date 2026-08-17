@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./components/admin/ProtectedRoute.jsx";
 import "./styles/admin.css";
 import "./styles/chat.css";
 import { ADMIN_BASE } from "./config/admin.js";
+import { BrandLogo } from "./components/common/BrandLogo.jsx";
 
 const ProductPage = lazy(() => import("./pages/ProductPage.jsx").then((module) => ({ default: module.ProductPage })));
 const CatalogPage = lazy(() => import("./pages/CatalogPage.jsx").then((module) => ({ default: module.CatalogPage })));
@@ -23,7 +24,7 @@ const AdminContentPagesPage = lazy(() => import("./pages/admin/AdminContentPages
 const OperatorAppPage = lazy(() => import("./pages/OperatorAppPage.jsx").then((module) => ({ default: module.OperatorAppPage })));
 
 function RouteFallback() {
-  return <div className="admin-auth-loading" role="status"><span>XION.</span><p>Sahifa yuklanmoqda...</p></div>;
+  return <div className="admin-auth-loading" role="status"><BrandLogo/><p>Sahifa yuklanmoqda...</p></div>;
 }
 
 export function App() {

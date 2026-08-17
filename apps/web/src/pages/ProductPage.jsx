@@ -34,7 +34,7 @@ export function ProductPage() {
   const specifications = product?.specifications && typeof product.specifications === "object" ? Object.entries(product.specifications) : [];
   return (
     <div className="site-shell">
-      <Header contact={state.settings.contact}/>
+      <Header contact={state.settings.contact} loading={state.loading}/>
       <main className="product-page container">
         <Link className="back-link" to="/">
           <ArrowLeft size={17} /> {t.backHome}
@@ -54,7 +54,7 @@ export function ProductPage() {
           {specifications.length || documents.length ? <section className="product-data-grid">{specifications.length ? <article><p className="eyebrow"><span/>{t.productSpecs}</p><h2>{t.productSpecsTitle}</h2><dl>{specifications.map(([key, value]) => <div key={key}><dt>{t.specLabels?.[key] || key}</dt><dd>{String(value)}</dd></div>)}</dl></article> : null}{documents.length ? <article><p className="eyebrow"><span/>{t.documents}</p><h2>{t.documentsTitle}</h2><div className="product-documents">{documents.map((document) => <a href={document.url} target="_blank" rel="noreferrer" key={document.url}><FileText/><span><strong>{document.label}</strong><small>PDF</small></span><Download size={17}/></a>)}</div>{product.sourceUrl ? <a className="product-source" href={product.sourceUrl} target="_blank" rel="noreferrer">{t.officialSource}<ExternalLink size={15}/></a> : null}</article> : null}</section> : null}
         </> : null}
       </main>
-      <Footer settings={state.settings}/>
+      <Footer settings={state.settings} loading={state.loading}/>
       <PurchaseModal product={buying ? product : null} onClose={() => setBuying(false)}/>
     </div>
   );
