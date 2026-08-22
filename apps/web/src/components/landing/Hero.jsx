@@ -13,6 +13,7 @@ import {
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 import { localizeProduct } from "../../utils/localize-product.js";
+import { landingAdvertisementImage, landingProductImage } from "../../utils/landing-assets.js";
 
 export function Hero({
   settings = {},
@@ -29,6 +30,7 @@ export function Hero({
   const slides = useMemo(() => {
     const ads = advertisements.map((item) => ({
       ...item,
+      image: landingAdvertisementImage(item),
       kind: "advertisement",
     }));
     const productSlides = products.slice(0, 3).map((sourceProduct) => {
@@ -37,7 +39,7 @@ export function Hero({
         id: `product-${item.id}`,
         title: item.title,
         description: item.shortDescription,
-        image: item.image,
+        image: landingProductImage(item),
         product: item,
         kind: "product",
       };
@@ -112,7 +114,6 @@ export function Hero({
           tabIndex="0"
           aria-roledescription="carousel"
           aria-label={t.heroCarousel}
-          data-scroll
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocus={() => setPaused(true)}
@@ -139,13 +140,6 @@ export function Hero({
               animate={{ opacity: 1, x: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -28 }}
               transition={{ duration: 0.42 }}
-              style={
-                slide.image
-                  ? {
-                      backgroundImage: `linear-gradient(90deg,rgba(5,55,132,.98) 0%,rgba(13,110,253,.86) 48%,rgba(13,110,253,.08) 100%),url(${slide.image})`,
-                    }
-                  : undefined
-              }
             >
               <div className="hero-banner-copy">
                 <p>
@@ -158,12 +152,14 @@ export function Hero({
                   <ArrowRight size={17} />
                 </button>
               </div>
-              {!slide.image ? (
+              {slide.image ? (
+                <div className="hero-slide-media" aria-hidden="true">
+                  <img src={slide.image} alt="" width="694" height="614" decoding="async" />
+                </div>
+              ) : (
                 <div
                   className="hero-art"
                   aria-hidden="true"
-                  data-scroll
-                  data-scroll-speed="0.08"
                 >
                   <div className="hero-device">
                     <BrandLogo className="hero-device-logo" />
@@ -173,7 +169,7 @@ export function Hero({
                   <div className="hero-sphere sphere-two" />
                   <Wifi className="hero-wifi" />
                 </div>
-              ) : null}
+              )}
             </motion.article>
           </AnimatePresence>
           {slides.length > 1 ? (

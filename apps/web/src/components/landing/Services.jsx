@@ -5,6 +5,7 @@ import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useHorizontalScroller } from "../../hooks/useHorizontalScroller.js";
 import { localeFor } from "../../i18n/landing.js";
 import { localizeProduct } from "../../utils/localize-product.js";
+import { landingProductImage } from "../../utils/landing-assets.js";
 
 const productBackgrounds = [
   "/media/products/product-1.jpg",
@@ -29,7 +30,7 @@ export function Services({ products, loading, error, onBuy }) {
     {error ? <div className="inline-state"><p>{error}</p></div> : null}
     {!loading && !error && products.length === 0 ? <div className="inline-state"><p>{t.noProducts}</p></div> : null}
     {!loading && !error && products.length ? <div className="product-grid" ref={trackRef}>{products.map((sourceProduct, index) => { const product = localizeProduct(sourceProduct, language); const background = productBackgrounds[index % productBackgrounds.length]; return <Reveal className={`product-card has-catalog-media ${index === 0 ? "is-featured" : ""}`} delay={index * .05} key={product.id} style={{ "--product-backdrop": `url("${background}")` }}>
-      <div className="product-accent"/><div className="product-index">{String(index + 1).padStart(2, "0")}</div><div className="product-catalog-media"><img src={product.image || background} alt={product.title} width="1600" height="1200" loading={index < 3 ? "eager" : "lazy"} decoding="async"/></div><div className="product-card-copy"><small>{product.category || "XION PRODUCT"}</small><h3>{product.title}</h3><p>{product.shortDescription}</p><ul>{t.productBenefits.map((benefit) => <li key={benefit}>{benefit}</li>)}</ul><div className="product-price"><strong>{money(product.price, t.priceOnRequest, language, t.currency)}</strong>{product.oldPrice ? <del>{money(product.oldPrice, t.priceOnRequest, language, t.currency)}</del> : null}</div></div>
+      <div className="product-accent"/><div className="product-index">{String(index + 1).padStart(2, "0")}</div><div className="product-catalog-media"><img src={landingProductImage(product) || background} alt={product.title} width="640" height="566" loading={index < 3 ? "eager" : "lazy"} decoding="async"/></div><div className="product-card-copy"><small>{product.category || "XION PRODUCT"}</small><h3>{product.title}</h3><p>{product.shortDescription}</p><ul>{t.productBenefits.map((benefit) => <li key={benefit}>{benefit}</li>)}</ul><div className="product-price"><strong>{money(product.price, t.priceOnRequest, language, t.currency)}</strong>{product.oldPrice ? <del>{money(product.oldPrice, t.priceOnRequest, language, t.currency)}</del> : null}</div></div>
       <footer><button type="button" onClick={() => onBuy(product)}><ShoppingBag size={16}/>{t.buy}</button><Link to={`/products/${product.slug}`} aria-label={`${product.title} ${t.details}`}>{t.details}<ArrowUpRight size={16}/></Link></footer>
     </Reveal>; })}</div> : null}
   </div></section>;
