@@ -27,7 +27,7 @@ export function LandingPage() {
         <Hero settings={data.settings} advertisements={heroAdvertisements} products={data.products} onBuy={setSelectedProduct} loading={loading}/>
         <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>
         <Campaigns advertisements={campaignAdvertisements} products={data.products} onBuy={setSelectedProduct}/>
-        <Approach settings={data.settings} loading={loading} />
+        <Approach newsItems={[...campaignAdvertisements, ...data.products]} loading={loading} />
         <Reviews reviews={data.reviews} loading={loading} />
         <Footer settings={data.settings} loading={loading} />
       </LanguageMotion>

@@ -28,7 +28,7 @@ export function Reviews({ reviews = [], loading }) {
   return (
     <section id="reviews" className="section reviews-section"><div className="container">
       <div className="section-line reviews-heading"><div><p className="eyebrow">{t.reviewsEyebrow}</p><h2>{t.reviewsTitle}</h2><span>{t.reviewText}</span></div><div className="slider-controls"><button type="button" onClick={() => scroll(-1)} disabled={!canPrev} aria-label={t.previousReview}><ChevronLeft/></button><button type="button" onClick={() => scroll(1)} disabled={!canNext} aria-label={t.nextReview}><ChevronRight/></button></div></div>
-      <div className="reviews-layout"><div className="review-stream" ref={ref} data-lenis-prevent>
+      <div className="reviews-layout"><div className="review-stream" ref={ref}>
         {loading ? [1,2].map((item) => <div className="review-card review-skeleton" key={item}/>) : null}
         {!loading && !reviews.length ? <div className="inline-state"><p>{t.noReviews}</p></div> : null}
         {reviews.slice(0, 4).map((review) => <article className="review-card" key={review.id}><Quote className="review-quote" size={28}/><div className="stars" aria-label={`${review.rating} ${t.starsLabel}`}>{Array.from({ length: 5 }).map((_, index) => <Star key={index} size={14} fill={index < review.rating ? "currentColor" : "none"}/>)}</div><blockquote>{review.comment}</blockquote><footer><span className="review-avatar">{review.customerName.charAt(0)}</span><div><strong>{review.customerName}</strong><time>{new Intl.DateTimeFormat(language === "uz" ? "uz-UZ" : language === "ru" ? "ru-RU" : "en-US", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(review.createdAt))}</time></div></footer></article>)}

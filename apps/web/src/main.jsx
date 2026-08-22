@@ -5,6 +5,7 @@ import { App } from "./App.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
 import "./styles/index.css";
 import "./styles/xion-content.css";
+import "./styles/landing-mobiuz.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
