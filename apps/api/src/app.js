@@ -15,6 +15,7 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
 import { telegramRouter } from "./routes/telegram.routes.js";
 import { operatorAppRouter } from "./routes/operator-app.routes.js";
+import { internalDeployRouter } from "./routes/internal-deploy.routes.js";
 import { errorHandler, notFound } from "./middleware/error-handler.js";
 
 export const app = express();
@@ -44,6 +45,7 @@ app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/telegram", telegramRouter);
 app.use("/api/v1/operator-app", operatorAppRouter);
+app.use("/api/v1/internal", internalDeployRouter);
 if (env.NODE_ENV === "production" && existsSync(webDist)) {
   app.use(express.static(webDist, { maxAge: "1h", index: false }));
   app.get("*", (req, res, next) => req.path.startsWith("/api/") ? next() : res.sendFile(resolve(webDist, "index.html")));
