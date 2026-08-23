@@ -41,6 +41,8 @@ const configuredClientOrigins = env.CLIENT_URL.split(",").map((origin) => origin
 export const clientOrigins = [...new Set([
   ...configuredClientOrigins,
   "https://nove-chat-web.vercel.app",
+  "https://xion.uz",
+  "https://www.xion.uz",
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ])];

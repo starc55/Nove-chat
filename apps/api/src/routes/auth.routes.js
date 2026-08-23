@@ -9,13 +9,20 @@ const router = Router();
 const credentialsSchema = z.object({ email: z.string().email().max(160), password: z.string().min(8).max(128) });
 const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 12, standardHeaders: true, legacyHeaders: false, message: { success: false, error: { code: "TOO_MANY_ATTEMPTS", message: "Juda ko‘p urinish. Keyinroq qayta urinib ko‘ring." } } });
 
+function refreshCookieOptions() {
+  const production = env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: production,
+    sameSite: production ? "none" : "lax",
+    path: "/api/v1/auth"
+  };
+}
+
 function setRefreshCookie(res, session) {
   res.cookie(REFRESH_COOKIE, session.refreshToken, {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "strict",
-    expires: session.refreshExpiresAt,
-    path: "/api/v1/auth"
+    ...refreshCookieOptions(),
+    expires: session.refreshExpiresAt
   });
 }
 
@@ -34,7 +41,7 @@ router.post("/refresh", async (req, res, next) => {
     setRefreshCookie(res, session);
     res.json({ success: true, data: { accessToken: session.accessToken, user: session.user } });
   } catch (error) {
-    res.clearCookie(REFRESH_COOKIE, { path: "/api/v1/auth" });
+    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions());
     next(error);
   }
 });
@@ -42,7 +49,7 @@ router.post("/refresh", async (req, res, next) => {
 router.post("/logout", async (req, res, next) => {
   try {
     await logout(req.cookies[REFRESH_COOKIE]);
-    res.clearCookie(REFRESH_COOKIE, { path: "/api/v1/auth" });
+    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions());
     res.json({ success: true, data: { loggedOut: true } });
   } catch (error) { next(error); }
 });

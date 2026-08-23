@@ -2,6 +2,8 @@ node_modules/
 dist/
 .env
 .env.local
+.ftp-deploy.env
+.ftp-backup/
 apps/*/.env
 apps/*/dist/
 apps/api/uploads/*
@@ -9,4 +11,3 @@ apps/api/uploads/*
 .wrangler/
 *.log
 .DS_Store
-
