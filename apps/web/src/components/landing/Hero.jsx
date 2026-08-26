@@ -170,6 +170,10 @@ export function Hero({
                   <Wifi className="hero-wifi" />
                 </div>
               )}
+              <button className="hero-mobile-action" type="button" onClick={runAction}>
+                {slide.product ? t.buy : slide.ctaLabel || t.heroPrimary}
+                <ArrowRight size={17} />
+              </button>
             </motion.article>
           </AnimatePresence>
           {slides.length > 1 ? (

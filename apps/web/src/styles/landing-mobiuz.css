@@ -64,6 +64,10 @@
   font-size: 15px;
 }
 
+.site-shell .hero-mobile-action {
+  display: none;
+}
+
 .site-shell .hero-benefits > div {
   min-height: 112px;
   padding-inline: clamp(24px, 2.5vw, 44px);
@@ -1224,6 +1228,7 @@
   flex: 0 0 148px;
   margin: -4px 0 2px;
   place-items: center;
+  background: #fff;
   transition: height 0.28s ease, flex-basis 0.28s ease, transform 0.28s ease;
 }
 
@@ -1231,7 +1236,7 @@
   width: 132px;
   height: 132px;
   object-fit: contain;
-  filter: drop-shadow(0 12px 18px rgba(19, 60, 105, 0.13));
+  filter: brightness(1.09) saturate(1.08) drop-shadow(0 12px 18px rgba(19, 60, 105, 0.13));
   transition: transform 0.32s ease;
 }
 
@@ -1311,7 +1316,7 @@
 @media (max-width: 760px) {
   .site-shell .hero-swiper,
   .site-shell .hero-banner {
-    height: 520px;
+    height: 590px;
   }
 
   .site-shell .hero-banner,
@@ -1321,10 +1326,10 @@
 
   .site-shell .hero-slide-media {
     top: auto;
-    bottom: 0;
+    bottom: 82px;
     width: 100%;
-    height: 42%;
-    opacity: 0.78;
+    height: 36%;
+    opacity: 0.9;
     background: linear-gradient(180deg, rgba(13, 110, 253, 0), rgba(219, 236, 255, 0.52));
   }
 
@@ -1333,7 +1338,39 @@
   }
 
   .site-shell .hero-slide-media img {
-    padding: 10px 42px 18px;
+    padding: 8px 38px 12px;
+  }
+
+  .site-shell .hero-banner-copy button {
+    display: none;
+  }
+
+  .site-shell .hero-mobile-action {
+    position: absolute;
+    z-index: 9;
+    right: 26px;
+    bottom: 20px;
+    left: 26px;
+    display: inline-flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 0;
+    background: #fff;
+    color: #212529;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .site-shell .hero-controls {
+    right: 18px;
+    bottom: 88px;
+  }
+
+  .site-shell .hero-dots {
+    bottom: 94px;
   }
 
   .site-shell .hero-banner-copy > span {
@@ -1392,5 +1429,10 @@
 
   .site-shell .xion-category-card {
     height: 300px;
+  }
+
+  .site-shell .xion-category-image {
+    overflow: hidden;
+    border-radius: 4px;
   }
 }
