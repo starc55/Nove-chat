@@ -1,10 +1,12 @@
 import axios from "axios";
 
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+
 export const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: configuredApiUrl ? configuredApiUrl.replace(/\/$/, "") : "/api/v1",
   timeout: 10_000,
   withCredentials: true,
-  headers: { "Content-Type": "application/json" }
+  headers: { "Content-Type": "application/json" },
 });
 
 let accessToken = "";
@@ -24,10 +26,19 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
     const isAuthRoute = original?.url?.includes("/auth/");
-    if (error.response?.status === 401 && original && !original._retried && !isAuthRoute) {
+    if (
+      error.response?.status === 401 &&
+      original &&
+      !original._retried &&
+      !isAuthRoute
+    ) {
       original._retried = true;
       try {
-        refreshPromise ||= axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+        refreshPromise ||= axios.post(
+          `${api.defaults.baseURL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
         const response = await refreshPromise;
         setAccessToken(response.data.data.accessToken);
         original.headers.Authorization = `Bearer ${response.data.data.accessToken}`;
@@ -39,7 +50,9 @@ api.interceptors.response.use(
         refreshPromise = null;
       }
     }
-    const apiError = new Error(error.response?.data?.error?.message || "Server bilan aloqa o‘rnatilmadi.");
+    const apiError = new Error(
+      error.response?.data?.error?.message || "Server bilan aloqa o‘rnatilmadi."
+    );
     apiError.status = error.response?.status;
     apiError.code = error.response?.data?.error?.code;
     return Promise.reject(apiError);

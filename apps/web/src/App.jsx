@@ -73,6 +73,11 @@ const AdminContentPagesPage = lazy(() =>
     default: module.AdminContentPagesPage,
   }))
 );
+const AdminConversationArchivePage = lazy(() =>
+  import("./pages/admin/AdminConversationArchivePage.jsx").then((module) => ({
+    default: module.AdminConversationArchivePage,
+  }))
+);
 const OperatorAppPage = lazy(() =>
   import("./pages/OperatorAppPage.jsx").then((module) => ({
     default: module.OperatorAppPage,
@@ -136,6 +141,7 @@ export function App() {
             <Route path="orders" element={<AdminOrdersPage />} />
             <Route path="reviews" element={<AdminReviewsPage />} />
             <Route path="content" element={<AdminContentPagesPage />} />
+            <Route path="archive" element={<AdminConversationArchivePage />} />
           </Route>
           <Route path="/admin/*" element={<Navigate to="/" replace />} />
         </Routes>

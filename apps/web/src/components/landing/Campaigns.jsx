@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { localizeProduct } from "../../utils/localize-product.js";
-import { landingProductImage } from "../../utils/landing-assets.js";
+import { landingAdvertisementImage, landingProductImage } from "../../utils/landing-assets.js";
 
 export function Campaigns({ advertisements = [], products = [], onBuy }) {
   const { language, t } = useLanguage();
@@ -11,7 +11,11 @@ export function Campaigns({ advertisements = [], products = [], onBuy }) {
     const product = localizeProduct(sourceProduct, language);
     return { id: `offer-${product.id}`, title: product.title, description: product.shortDescription, image: landingProductImage(product), createdAt: product.createdAt, product };
   });
-  const visible = [...advertisements, ...productOffers].slice(0, 7);
+  const campaignAdvertisements = advertisements.map((item) => ({
+    ...item,
+    image: landingAdvertisementImage(item),
+  }));
+  const visible = [...campaignAdvertisements, ...productOffers].slice(0, 7);
   const pageCount = Math.max(1, Math.ceil(visible.length / 4));
   const pageItems = visible.slice(page * 4, page * 4 + 4);
   useEffect(() => { if (page >= pageCount) setPage(pageCount - 1); }, [page, pageCount]);

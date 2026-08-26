@@ -10,5 +10,5 @@ export default defineConfig({
       "/socket.io": { target: "ws://localhost:4000", ws: true }
     }
   },
-  build: { sourcemap: true }
+  build: { sourcemap: false }
 });

@@ -108,7 +108,7 @@ export async function openChatSession({ visitorId, sourcePath, name, phone }) {
   });
   const messages = await prisma.message.findMany({
     where: { conversationId: conversation.id },
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: "desc" },
     take: 120
   });
 
@@ -118,7 +118,7 @@ export async function openChatSession({ visitorId, sourcePath, name, phone }) {
     status: conversation.status,
     chatMode: presence.chatMode,
     operator: { name: presence.name, avatarUrl: presence.avatarUrl, status: presence.status, lastSeenAt: presence.lastSeenAt },
-    messages: messages.map(serializeMessage),
+    messages: [...messages].reverse().map(serializeMessage),
     initialMessage: initialMessage ? serializeMessage(initialMessage) : null
   };
 }
@@ -183,7 +183,7 @@ export async function getConversationPresence(conversationId) {
   const available = await hasAvailableOperator();
   return {
     status: available ? "ONLINE" : "OFFLINE",
-    name: "NOVA yordam markazi",
+    name: "XION yordam markazi",
     avatarUrl: null,
     lastSeenAt: null,
     chatMode: "WAITING"
@@ -196,7 +196,7 @@ export async function getConversationForAdmin(publicId) {
     include: {
       customer: { select: { id: true, name: true, phone: true, email: true, telegram: true, visitorId: true } },
       assignedOperator: { select: { id: true, displayName: true, status: true } },
-      messages: { orderBy: { createdAt: "asc" }, take: 200 }
+      messages: { orderBy: { createdAt: "desc" }, take: 200 }
     }
   });
   if (!conversation) throw new ApiError(404, "CONVERSATION_NOT_FOUND", "Suhbat topilmadi.");
@@ -207,7 +207,7 @@ export async function getConversationForAdmin(publicId) {
     customer: conversation.customer,
     operator: conversation.assignedOperator,
     startedAt: conversation.startedAt,
-    messages: conversation.messages.map(serializeMessage)
+    messages: [...conversation.messages].reverse().map(serializeMessage)
   };
 }
 

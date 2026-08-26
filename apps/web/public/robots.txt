@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nova.uz/sitemap.xml
+Sitemap: https://xion.uz/sitemap.xml

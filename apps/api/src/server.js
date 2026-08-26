@@ -18,7 +18,7 @@ io.on("connection", (socket) => {
   registerOperatorSocket(socket);
 });
 
-httpServer.listen(env.PORT, () => console.log(`NOVA API http://localhost:${env.PORT}`));
+httpServer.listen(env.PORT, () => console.log(`XION API http://localhost:${env.PORT}`));
 const telegramWorker = startTelegramDeliveryWorker();
 
 function shutdown(signal) {

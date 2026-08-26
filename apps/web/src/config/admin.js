@@ -1,1 +1,1 @@
-export const ADMIN_BASE = "/nova-ops-a7f4";
+export const ADMIN_BASE = "/xion-control-a7f4";

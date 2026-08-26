@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getConversationForAdmin, sendAdminReply } from "../services/chat.service.js";
 import { adminManagementRouter } from "./admin-management.routes.js";
 import { getTelegramStatus, setupTelegramWebhook } from "../services/telegram.service.js";
+import { getArchivedConversation, listConversationArchive } from "../services/conversation-archive.service.js";
 
 export const adminRouter = Router();
 adminRouter.use(authenticate, requireRole("ADMIN"));
@@ -13,6 +14,28 @@ adminRouter.use(adminManagementRouter);
 adminRouter.get("/dashboard", async (req, res, next) => {
   try {
     res.json({ success: true, data: await getDashboard() });
+  } catch (error) { next(error); }
+});
+
+const archiveListSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(25),
+  q: z.string().trim().max(100).default("")
+});
+const archiveMessageSchema = z.object({
+  cursor: z.string().trim().min(8).max(80).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(50)
+});
+
+adminRouter.get("/conversation-archive", async (req, res, next) => {
+  try {
+    res.json({ success: true, data: await listConversationArchive(archiveListSchema.parse(req.query)) });
+  } catch (error) { next(error); }
+});
+
+adminRouter.get("/conversation-archive/:publicId", async (req, res, next) => {
+  try {
+    res.json({ success: true, data: await getArchivedConversation(req.params.publicId, archiveMessageSchema.parse(req.query)) });
   } catch (error) { next(error); }
 });
 

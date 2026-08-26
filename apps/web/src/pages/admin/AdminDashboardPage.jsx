@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Activity, Award, CircleDot, Clock3, Layers3, Megaphone, MessageCircle, Package, ShoppingBag, Star, UsersRound } from "lucide-react";
+import { Activity, Archive, Award, CircleDot, Clock3, Layers3, Megaphone, MessageCircle, Package, ShoppingBag, Star, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../../services/api.js";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -11,7 +11,8 @@ const kpiMeta = [
   ["waitingChats", "Kutilayotgan chatlar", Clock3], ["offlineLeads", "Yangi offline lead", UsersRound],
   ["onlineOperators", "Online operatorlar", Activity], ["totalProducts", "Faol mahsulotlar", Package],
   ["activeAdvertisements", "Faol reklamalar", Megaphone], ["averageRating", "O‘rtacha baho", Star],
-  ["newReviews", "Yangi sharhlar", Award], ["newOrders", "Yangi buyurtmalar", ShoppingBag]
+  ["newReviews", "Yangi sharhlar", Award], ["newOrders", "Yangi buyurtmalar", ShoppingBag],
+  ["archivedChats", "Arxiv suhbatlari", Archive]
 ];
 const statusLabels = { OPEN: "Ochiq", WAITING: "Kutilmoqda", ASSIGNED: "Biriktirilgan", CLOSED: "Yopilgan", NEW: "Yangi", CONTACTED: "Bog‘lanilgan", QUALIFIED: "Malakali", APPROVED: "Tasdiqlangan", PENDING: "Kutilmoqda", REJECTED: "Rad etilgan", ONLINE: "Online", AWAY: "Tanaffus", OFFLINE: "Offline" };
 const todayLabel = new Intl.DateTimeFormat("uz-UZ", { day: "2-digit", month: "short" }).format(new Date()).toUpperCase();
@@ -42,7 +43,7 @@ export function AdminDashboardPage() {
         <Link to={`${ADMIN_BASE}/orders`}><ShoppingBag/><span><small>SALES</small><strong>Buyurtmalar</strong><i>Landing orqali kelgan arizalar</i></span></Link>
       </section>
       {state.error && <div className="admin-error" role="alert"><div><strong>Dashboard yuklanmadi</strong><p>{state.error}</p></div><button onClick={load}>Qayta urinish</button></div>}
-      {state.loading && <div className="admin-kpi-grid" aria-label="Dashboard yuklanmoqda">{Array.from({ length: 9 }).map((_, index) => <div className="admin-kpi-skeleton" key={index}/>)}</div>}
+      {state.loading && <div className="admin-kpi-grid" aria-label="Dashboard yuklanmoqda">{Array.from({ length: kpiMeta.length }).map((_, index) => <div className="admin-kpi-skeleton" key={index}/>)}</div>}
       {state.data && <>
         <section className="admin-kpi-grid" aria-label="Asosiy ko‘rsatkichlar">
           {kpiMeta.map(([key, label, Icon], index) => <motion.article className="admin-kpi" key={key} initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * .035 }}><div><span>{label}</span><Icon size={18}/></div><strong>{key === "averageRating" && state.data.kpis[key] ? `${state.data.kpis[key]} / 5` : state.data.kpis[key]}</strong><small>{index < 5 ? "Real vaqt holati" : "Bazadagi faol yozuvlar"}</small></motion.article>)}

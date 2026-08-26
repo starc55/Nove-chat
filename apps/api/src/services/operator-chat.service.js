@@ -5,7 +5,7 @@ import { sendOperatorReply } from "./chat.service.js";
 const conversationInclude = {
   customer: { select: { name: true, visitorId: true, phone: true, email: true, telegram: true } },
   assignedOperator: { select: { id: true, displayName: true, status: true } },
-  messages: { orderBy: { createdAt: "asc" }, take: 250 }
+  messages: { orderBy: { createdAt: "desc" }, take: 200 }
 };
 
 function customerName(customer) {
@@ -39,7 +39,7 @@ function serializeConversation(conversation) {
       telegram: conversation.customer.telegram
     },
     operator: conversation.assignedOperator,
-    messages: conversation.messages.map(serializeMessage)
+    messages: [...conversation.messages].reverse().map(serializeMessage)
   };
 }
 

@@ -9,16 +9,16 @@ async function main() {
   if (process.env.NODE_ENV === "production") {
     throw new Error("Development seed productionda bloklangan. ADMIN_EMAIL, ADMIN_PASSWORD va ADMIN_NAME bilan npm run admin:create -w @nova/api buyrug‘ini ishlating.");
   }
-  const passwordHash = await bcrypt.hash("NovaDev2026!", 12);
+  const passwordHash = await bcrypt.hash("XionDev2026!", 12);
   const user = await prisma.user.upsert({
-    where: { email: "admin@nova.uz" },
+    where: { email: "admin@xion.uz" },
     update: {},
-    create: { email: "admin@nova.uz", passwordHash, role: "ADMIN", admin: { create: { name: "NOVA Admin" } } }
+    create: { email: "admin@xion.uz", passwordHash, role: "ADMIN", admin: { create: { name: "XION Admin" } } }
   });
 
   const operatorSeeds = [
-    { email: "dilshod@nova.uz", displayName: "Dilshod Karimov", status: "ONLINE" },
-    { email: "aziza@nova.uz", displayName: "Aziza Nur", status: "AWAY" }
+    { email: "dilshod@xion.uz", displayName: "Dilshod Karimov", status: "ONLINE" },
+    { email: "aziza@xion.uz", displayName: "Aziza Nur", status: "AWAY" }
   ];
   for (const operator of operatorSeeds) {
     const operatorUser = await prisma.user.upsert({
@@ -46,7 +46,7 @@ async function main() {
     { trigger: "OFFLINE", text: "Hozir barcha operatorlar offline. Xabaringizni qoldiring, siz bilan tez orada bog‘lanamiz." }
   ];
   for (const reply of replies) await prisma.autoReply.upsert({ where: { trigger: reply.trigger }, update: reply, create: reply });
-  console.log(`Seed tayyor. Development admin: ${user.email} / NovaDev2026!`);
+  console.log(`Seed tayyor. Development admin: ${user.email} / XionDev2026!`);
 }
 
 main().finally(() => prisma.$disconnect());

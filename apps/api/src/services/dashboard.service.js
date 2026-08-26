@@ -13,7 +13,7 @@ export async function getDashboard() {
 
   const [
     conversationsToday, openChats, waitingChats, offlineLeads, onlineOperators,
-    totalProducts, activeAdvertisements, ratingAggregate, newReviews, newOrders,
+    totalProducts, activeAdvertisements, ratingAggregate, newReviews, newOrders, archivedChats,
     recentConversations, recentLeads, recentReviews, operators
   ] = await Promise.all([
     prisma.conversation.count({ where: { startedAt: { gte: today } } }),
@@ -26,6 +26,7 @@ export async function getDashboard() {
     prisma.rating.aggregate({ _avg: { rating: true } }),
     prisma.review.count({ where: { status: "PENDING" } }),
     prisma.purchaseRequest.count({ where: { status: "NEW" } }),
+    prisma.conversation.count({ where: { status: "CLOSED" } }),
     prisma.conversation.findMany({
       take: 6,
       orderBy: { lastMessageAt: "desc" },
@@ -51,7 +52,8 @@ export async function getDashboard() {
       activeAdvertisements,
       averageRating: Number((ratingAggregate._avg.rating || 0).toFixed(1)),
       newReviews,
-      newOrders
+      newOrders,
+      archivedChats
     },
     recentConversations: recentConversations.map((item) => ({
       id: item.id,

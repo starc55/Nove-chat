@@ -5,7 +5,7 @@ import { ApiError } from "../utils/api-error.js";
 
 const COMMANDS = [
   { command: "start", description: "Operator panelini ulash" },
-  { command: "panel", description: "NOVA operator panelini ochish" },
+  { command: "panel", description: "XION operator panelini ochish" },
   { command: "help", description: "Panelni ochish bo‘yicha yordam" }
 ];
 
@@ -37,11 +37,11 @@ function webAppKeyboard(text = "Operator panelini ochish") {
   return telegramWebAppUrl ? { inline_keyboard: [[{ text, web_app: { url: telegramWebAppUrl } }]] } : undefined;
 }
 
-async function sendOperatorPanel(chatId, operatorName, text = "Navbat, faol chatlar va mijozlarga javob berish — barchasi NOVA Operator Panel ichida.") {
+async function sendOperatorPanel(chatId, operatorName, text = "Navbat, faol chatlar va mijozlarga javob berish — barchasi XION Operator Panel ichida.") {
   await telegramRequest("sendMessage", {
     chat_id: chatId,
-    text: `NOVA OPS · ${operatorName}\n\n${text}`,
-    reply_markup: webAppKeyboard("NOVA Operator Panel")
+    text: `XION OPS · ${operatorName}\n\n${text}`,
+    reply_markup: webAppKeyboard("XION Operator Panel")
   });
 }
 
@@ -245,7 +245,7 @@ export async function setupTelegramWebhook() {
     max_connections: 20
   });
   await telegramRequest("setMyCommands", { commands: COMMANDS });
-  await telegramRequest("setChatMenuButton", { menu_button: { type: "web_app", text: "NOVA Operator", web_app: { url: telegramWebAppUrl } } });
+  await telegramRequest("setChatMenuButton", { menu_button: { type: "web_app", text: "XION Operator", web_app: { url: telegramWebAppUrl } } });
   return { webhook, url: env.TELEGRAM_WEBHOOK_URL, webAppUrl: telegramWebAppUrl };
 }
 

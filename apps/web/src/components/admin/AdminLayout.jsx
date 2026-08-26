@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Bot, ChevronLeft, ClipboardList, FileText, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, X } from "lucide-react";
+import { Archive, ArrowUpRight, Bot, ChevronLeft, ClipboardList, FileText, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, X } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { AdminUiProvider, useAdminUi } from "./AdminUi.jsx";
@@ -41,6 +41,7 @@ function AdminLayoutContent() {
           <span>Operatsiyalar</span>
           <NavLink to={`${ADMIN_BASE}/leads`} onClick={() => setSidebarOpen(false)}><ClipboardList size={18}/><b>Murojaatlar</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/orders`} onClick={() => setSidebarOpen(false)}><ShoppingBag size={18}/><b>Buyurtmalar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/archive`} onClick={() => setSidebarOpen(false)}><Archive size={18}/><b>Chat arxivi</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/operators`} onClick={() => setSidebarOpen(false)}><Bot size={18}/><b>Operatorlar</b></NavLink>
         </nav>
         <div className="admin-sidebar-foot">
