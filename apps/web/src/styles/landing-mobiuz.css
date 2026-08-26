@@ -1224,7 +1224,7 @@
 
 .site-shell .xion-category-image {
   display: grid;
-  height: 148px;
+  height: 120px;
   flex: 0 0 148px;
   margin: -4px 0 2px;
   place-items: center;
@@ -1395,11 +1395,13 @@
   }
 
   .site-shell .xion-catalog-heading > a {
-    width: 44px;
-    min-height: 44px;
+    width: auto;
+    min-height: auto;
     justify-content: center;
     overflow: hidden;
-    padding: 0;
+    padding: 8px;
+    border: 0;
+    background: transparent;
     color: transparent;
     white-space: nowrap;
   }
@@ -1407,6 +1409,12 @@
   .site-shell .xion-catalog-heading > a svg {
     flex: 0 0 auto;
     color: #fff;
+  }
+
+  .site-shell .xion-catalog-heading > a:hover {
+    color: transparent;
+    background: transparent;
+    transform: none;
   }
 
   .site-shell .xion-category-grid {
