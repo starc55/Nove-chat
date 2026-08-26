@@ -1224,11 +1224,11 @@
 
 .site-shell .xion-category-image {
   display: grid;
-  height: 120px;
-  flex: 0 0 148px;
-  margin: -4px 0 2px;
+  height: 70px;
+  flex: 0 0 80px;
+  margin: 18px 0 12px;
   place-items: center;
-  background: #fff;
+  background: transparent;
   transition: height 0.28s ease, flex-basis 0.28s ease, transform 0.28s ease;
 }
 
@@ -1236,7 +1236,7 @@
   width: 132px;
   height: 132px;
   object-fit: contain;
-  filter: brightness(1.09) saturate(1.08) drop-shadow(0 12px 18px rgba(19, 60, 105, 0.13));
+  filter: drop-shadow(0 12px 18px rgba(19, 60, 105, 0.13));
   transition: transform 0.32s ease;
 }
 
@@ -1440,7 +1440,7 @@
   }
 
   .site-shell .xion-category-image {
-    overflow: hidden;
-    border-radius: 4px;
+    overflow: visible;
+    border-radius: 0;
   }
 }

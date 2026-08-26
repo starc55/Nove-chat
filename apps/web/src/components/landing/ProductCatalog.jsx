@@ -6,7 +6,7 @@ import { Reveal } from "../common/Reveal.jsx";
 const categories = [
   {
     count: 2,
-    image: "/media/catalog/obstetric-pessaries-cutout.webp",
+    image: "/media/catalog/c5.png",
     title: {
       uz: "Akusherlik pessariylari",
       ru: "Акушерские пессарии",
@@ -20,7 +20,7 @@ const categories = [
   },
   {
     count: 11,
-    image: "/media/catalog/gynecological-pessaries-cutout.webp",
+    image: "/media/catalog/c2.png",
     title: {
       uz: "Ginekologik pessariylar",
       ru: "Гинекологические пессарии",
@@ -34,7 +34,7 @@ const categories = [
   },
   {
     count: 26,
-    image: "/media/catalog/instruments-cutout.webp",
+    image: "/media/catalog/c3.png",
     title: { uz: "Tibbiy instrumentlar", ru: "Инструменты", en: "Medical instruments" },
     description: {
       uz: "Diagnostika va professional ginekologik amaliyot uchun bir martalik instrumentlar.",
@@ -44,7 +44,7 @@ const categories = [
   },
   {
     count: 10,
-    image: "/media/catalog/intrauterine-devices-cutout.webp",
+    image: "/media/catalog/c4.png",
     title: {
       uz: "Bachadon ichi spirallari",
       ru: "Внутриматочные спирали",
@@ -58,7 +58,7 @@ const categories = [
   },
   {
     count: 14,
-    image: "/media/catalog/gynecological-kits-cutout.webp",
+    image: "/media/catalog/c1.png",
     title: {
       uz: "Ginekologik ko‘zgular va to‘plamlar",
       ru: "Зеркала и гинекологические наборы",
