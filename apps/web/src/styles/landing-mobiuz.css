@@ -1409,6 +1409,10 @@
     -webkit-line-clamp: 3;
   }
 
+  .site-shell .products-section .slider-controls {
+    display: none;
+  }
+
   .site-shell .xion-catalog-section {
     padding-block: 54px;
   }
@@ -1423,15 +1427,7 @@
   }
 
   .site-shell .xion-catalog-heading > a {
-    width: auto;
-    min-height: auto;
-    justify-content: center;
-    overflow: hidden;
-    padding: 8px;
-    border: 0;
-    background: transparent;
-    color: transparent;
-    white-space: nowrap;
+    display: none;
   }
 
   .site-shell .xion-catalog-heading > a svg {

@@ -47,6 +47,7 @@ export function Header({ contact = {}, loading = false }) {
         <a className="header-icon" href="/contact" aria-label={t.location}><Map size={17}/></a>
         <a className="nav-cta" href="/contact">{t.contactUs}</a>
       </div>
+      <label className="language-select mobile-language-select"><span className="sr-only">{t.language}</span><select value={language} onChange={(event) => setLanguage(event.target.value)}><option value="uz">O‘z</option><option value="ru">Рус</option><option value="en">Eng</option></select><ChevronDown size={13}/></label>
       <button className="menu-button" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mega-menu" aria-label={open ? t.closeMenu : t.openMenu}>{open ? <X/> : <Menu/>}</button>
     </div>
     <div className="header-subbar"><div className="container header-subbar-inner">
