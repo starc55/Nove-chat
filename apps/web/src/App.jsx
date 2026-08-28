@@ -5,7 +5,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { ProtectedRoute } from "./components/admin/ProtectedRoute.jsx";
 import "./styles/admin.css";
 import "./styles/chat.css";
-import { ADMIN_BASE } from "./config/admin.js";
+import { ADMIN_BASE, LEGACY_ADMIN_BASE } from "./config/admin.js";
 import { BrandLogo } from "./components/common/BrandLogo.jsx";
 
 const ProductPage = lazy(() =>
@@ -143,7 +143,10 @@ export function App() {
             <Route path="content" element={<AdminContentPagesPage />} />
             <Route path="archive" element={<AdminConversationArchivePage />} />
           </Route>
-          <Route path="/admin/*" element={<Navigate to="/" replace />} />
+          <Route
+            path={`${LEGACY_ADMIN_BASE}/*`}
+            element={<Navigate to={ADMIN_BASE} replace />}
+          />
         </Routes>
       </Suspense>
     </AuthProvider>
