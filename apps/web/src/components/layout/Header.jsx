@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, Eye, Map, Menu, Phone, Search, X } from "lucide-react";
+import { ChevronDown, Map, Menu, Moon, Phone, Search, Sun, X } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
+
+const THEME_KEY = "xion_theme";
+
+function initialDarkTheme() {
+  if (typeof window === "undefined") return false;
+  const savedTheme = window.localStorage.getItem(THEME_KEY);
+  if (savedTheme) return savedTheme === "dark";
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+}
 
 export function Header({ contact = {}, loading = false }) {
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
-  const [contrast, setContrast] = useState(false);
+  const [darkTheme, setDarkTheme] = useState(initialDarkTheme);
   const { language, setLanguage, t } = useLanguage();
   const reduceMotion = useReducedMotion();
   const primary = [[t.navProducts, "/catalog"], [t.navMedical, "/medical-institutions"], [t.navCompany, "/company"], [t.navContact, "/contact"]];
@@ -21,9 +30,11 @@ export function Header({ contact = {}, loading = false }) {
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("is-high-contrast", contrast);
-    return () => document.documentElement.classList.remove("is-high-contrast");
-  }, [contrast]);
+    const theme = darkTheme ? "dark" : "light";
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem(THEME_KEY, theme);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", darkTheme ? "#0B1017" : "#0D6EFD");
+  }, [darkTheme]);
 
   useEffect(() => {
     document.body.classList.toggle("mega-menu-open", open);
@@ -43,10 +54,11 @@ export function Header({ contact = {}, loading = false }) {
       <nav className="desktop-nav" aria-label={t.mainNavigation}>{primary.map(([label, href], index) => <a className={index === 0 ? "is-active" : ""} key={`${href}-${index}`} href={href}>{label}</a>)}</nav>
       <div className="nav-actions">
         <label className="language-select"><span className="sr-only">{t.language}</span><select value={language} onChange={(event) => setLanguage(event.target.value)}><option value="uz">O‘z</option><option value="ru">Рус</option><option value="en">Eng</option></select><ChevronDown size={13}/></label>
-        <button type="button" className="header-icon" aria-label={t.contrastMode} aria-pressed={contrast} onClick={() => setContrast((value) => !value)}><Eye size={17}/></button>
+        <button type="button" className="header-icon theme-toggle" aria-label={darkTheme ? t.lightMode : t.darkMode} aria-pressed={darkTheme} onClick={() => setDarkTheme((value) => !value)}>{darkTheme ? <Sun size={17}/> : <Moon size={17}/>}</button>
         <a className="header-icon" href="/contact" aria-label={t.location}><Map size={17}/></a>
         <a className="nav-cta" href="/contact">{t.contactUs}</a>
       </div>
+      <button type="button" className="header-icon theme-toggle mobile-theme-toggle" aria-label={darkTheme ? t.lightMode : t.darkMode} aria-pressed={darkTheme} onClick={() => setDarkTheme((value) => !value)}>{darkTheme ? <Sun size={17}/> : <Moon size={17}/>}</button>
       <label className="language-select mobile-language-select"><span className="sr-only">{t.language}</span><select value={language} onChange={(event) => setLanguage(event.target.value)}><option value="uz">O‘z</option><option value="ru">Рус</option><option value="en">Eng</option></select><ChevronDown size={13}/></label>
       <button className="menu-button" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="mega-menu" aria-label={open ? t.closeMenu : t.openMenu}>{open ? <X/> : <Menu/>}</button>
     </div>

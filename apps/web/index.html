@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0D6EFD" />
+    <script>
+      (() => {
+        try {
+          const saved = localStorage.getItem("xion_theme");
+          const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+          document.querySelector('meta[name="theme-color"]').content = dark ? "#0B1017" : "#0D6EFD";
+        } catch {}
+      })();
+    </script>
     <link rel="preload" as="image" href="/media/xion-products/hero-catalog.webp" fetchpriority="high" />
     <meta
       name="description"
@@ -16,7 +26,10 @@
       property="og:description"
       content="Sifat nazoratidan o‘tgan tibbiy buyumlar, O‘zbekiston bo‘ylab buyurtma va jonli yordam."
     />
-    <meta property="og:image" content="https://xion.uz/og.png" />
+    <meta property="og:image" content="https://xion.uz/og.png?v=xion-20260828" />
+    <meta property="og:image:width" content="2048" />
+    <meta property="og:image:height" content="1072" />
+    <meta property="og:image:alt" content="XION — ayollar salomatligi uchun tibbiy yechimlar" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="XION — ayollar salomatligi uchun tibbiy buyumlar" />
     <meta
@@ -25,7 +38,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://xion.uz/og.png"
+      content="https://xion.uz/og.png?v=xion-20260828"
     />
     <link rel="canonical" href="https://xion.uz/" />
     <title>XION — Tibbiy mahsulotlar va jonli yordam</title>
