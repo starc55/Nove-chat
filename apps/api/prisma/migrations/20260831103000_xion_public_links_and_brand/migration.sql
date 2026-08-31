@@ -1,4 +1,4 @@
-UPDATE "Setting"
+UPDATE "SiteSetting"
 SET "value" = jsonb_set(
   COALESCE("value", '{}'::jsonb),
   '{telegramUrl}',
