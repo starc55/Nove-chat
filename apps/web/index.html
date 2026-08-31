@@ -8,30 +8,51 @@
       (() => {
         try {
           const saved = localStorage.getItem("xion_theme");
-          const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+          const dark = saved
+            ? saved === "dark"
+            : matchMedia("(prefers-color-scheme: dark)").matches;
           document.documentElement.dataset.theme = dark ? "dark" : "light";
-          document.querySelector('meta[name="theme-color"]').content = dark ? "#0B1017" : "#0D6EFD";
+          document.querySelector('meta[name="theme-color"]').content = dark
+            ? "#0B1017"
+            : "#0D6EFD";
         } catch {}
       })();
     </script>
-    <link rel="preload" as="image" href="/media/xion-products/hero-catalog.webp" fetchpriority="high" />
+    <link
+      rel="preload"
+      as="image"
+      href="/media/xion-products/hero-catalog.webp"
+      fetchpriority="high"
+    />
     <meta
       name="description"
       content="XION — akusherlik, ginekologiya va urologiya uchun tibbiy buyumlar katalogi, buyurtma va jonli mutaxassis yordami."
     />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="uz_UZ" />
-    <meta property="og:title" content="XION — ayollar salomatligi uchun tibbiy buyumlar" />
+    <meta
+      property="og:title"
+      content="XION — ayollar salomatligi uchun tibbiy buyumlar"
+    />
     <meta
       property="og:description"
       content="Sifat nazoratidan o‘tgan tibbiy buyumlar, O‘zbekiston bo‘ylab buyurtma va jonli yordam."
     />
-    <meta property="og:image" content="https://xion.uz/og.png?v=xion-20260828" />
+    <meta
+      property="og:image"
+      content="https://xion.uz/og.png?v=xion-20260828"
+    />
     <meta property="og:image:width" content="2048" />
     <meta property="og:image:height" content="1072" />
-    <meta property="og:image:alt" content="XION — ayollar salomatligi uchun tibbiy yechimlar" />
+    <meta
+      property="og:image:alt"
+      content="XION — ayollar salomatligi uchun tibbiy yechimlar"
+    />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="XION — ayollar salomatligi uchun tibbiy buyumlar" />
+    <meta
+      name="twitter:title"
+      content="XION — ayollar salomatligi uchun tibbiy buyumlar"
+    />
     <meta
       name="twitter:description"
       content="Tibbiy mahsulotlar katalogi, buyurtma va mutaxassis yordami."

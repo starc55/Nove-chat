@@ -13,7 +13,11 @@ import {
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 import { localizeProduct } from "../../utils/localize-product.js";
-import { landingAdvertisementImage, landingProductImage } from "../../utils/landing-assets.js";
+import { XION_TELEGRAM_URL } from "../../config/public-links.js";
+import {
+  landingAdvertisementImage,
+  landingProductImage,
+} from "../../utils/landing-assets.js";
 
 export function Hero({
   settings = {},
@@ -154,13 +158,16 @@ export function Hero({
               </div>
               {slide.image ? (
                 <div className="hero-slide-media" aria-hidden="true">
-                  <img src={slide.image} alt="" width="694" height="614" decoding="async" />
+                  <img
+                    src={slide.image}
+                    alt=""
+                    width="694"
+                    height="614"
+                    decoding="async"
+                  />
                 </div>
               ) : (
-                <div
-                  className="hero-art"
-                  aria-hidden="true"
-                >
+                <div className="hero-art" aria-hidden="true">
                   <div className="hero-device">
                     <BrandLogo className="hero-device-logo" />
                     <i />
@@ -170,7 +177,11 @@ export function Hero({
                   <Wifi className="hero-wifi" />
                 </div>
               )}
-              <button className="hero-mobile-action" type="button" onClick={runAction}>
+              <button
+                className="hero-mobile-action"
+                type="button"
+                onClick={runAction}
+              >
                 {slide.product ? t.buy : slide.ctaLabel || t.heroPrimary}
                 <ArrowRight size={17} />
               </button>
@@ -221,7 +232,7 @@ export function Hero({
           <Instagram />
         </a>
         <a
-          href={contact.telegramUrl || "https://t.me/xionuzb"}
+          href={XION_TELEGRAM_URL}
           target="_blank"
           rel="noreferrer"
           aria-label="Telegram"

@@ -57,7 +57,7 @@ export const landingFallback = {
       phone: "+998 99 556 06 60",
       phones: ["+998 99 556 06 60", "+998 71 230 04 40"],
       address: "Toshkent shahri, Olmazor tumani, Allon ko‘chasi 141A",
-      telegramUrl: "https://t.me/xionuzb",
+      telegramUrl: "https://t.me/xion_office",
       workingHours: "Dushanba–Juma, 08:00–17:00",
     },
   },
