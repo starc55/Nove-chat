@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { LandingPage } from "./pages/LandingPage.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ProtectedRoute } from "./components/admin/ProtectedRoute.jsx";
@@ -110,6 +110,11 @@ function ScrollToTop() {
   return null;
 }
 
+function LocalizedPublicRoutes() {
+  const { locale } = useParams();
+  return locale === "ru" || locale === "en" ? <Outlet /> : <Navigate to="/" replace />;
+}
+
 export function App() {
   return (
     <AuthProvider>
@@ -138,6 +143,21 @@ export function App() {
           />
           <Route path="/terms" element={<InfoPage slug="terms" />} />
           <Route path="/privacy" element={<InfoPage slug="privacy" />} />
+          <Route path="/:locale" element={<LocalizedPublicRoutes />}>
+            <Route index element={<LandingPage />} />
+            <Route path="products/:slug" element={<ProductPage />} />
+            <Route path="catalog" element={<CatalogPage />} />
+            <Route path="company" element={<InfoPage slug="about" />} />
+            <Route path="simurg" element={<InfoPage slug="simurg" />} />
+            <Route path="medical-institutions" element={<InfoPage slug="medical-institutions" />} />
+            <Route path="manufacturers" element={<InfoPage slug="manufacturers" />} />
+            <Route path="news" element={<InfoPage slug="news" />} />
+            <Route path="career" element={<InfoPage slug="career" />} />
+            <Route path="contact" element={<InfoPage slug="contact" />} />
+            <Route path="warranty-return" element={<InfoPage slug="warranty-return" />} />
+            <Route path="terms" element={<InfoPage slug="terms" />} />
+            <Route path="privacy" element={<InfoPage slug="privacy" />} />
+          </Route>
           <Route path="/operator" element={<OperatorAppPage />} />
           <Route path={`${ADMIN_BASE}/sign-in`} element={<AdminLoginPage />} />
           <Route

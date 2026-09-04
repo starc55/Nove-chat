@@ -37,6 +37,8 @@ app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: false, limit: "32kb" }));
 app.use(cookieParser());
 app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use("/api", (_req, res, next) => { res.set("X-Robots-Tag", "noindex, nofollow, noarchive"); next(); });
+app.use(["/admin", "/operator"], (_req, res, next) => { res.set("X-Robots-Tag", "noindex, nofollow, noarchive"); next(); });
 app.use("/api", rateLimit({ windowMs: 60_000, limit: 180, standardHeaders: true, legacyHeaders: false }));
 app.use(seoRouter);
 app.use("/api/v1/health", healthRouter);
@@ -47,7 +49,7 @@ app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/telegram", telegramRouter);
 app.use("/api/v1/operator-app", operatorAppRouter);
 if (env.NODE_ENV === "production" && existsSync(webDist)) {
-  app.use(express.static(webDist, { maxAge: "1h", index: false }));
+  app.use(express.static(webDist, { maxAge: "1h", index: false, extensions: ["html"] }));
   app.get("*", (req, res, next) => req.path.startsWith("/api/") ? next() : res.sendFile(resolve(webDist, "index.html")));
 }
 app.use(notFound);

@@ -10,6 +10,7 @@ import { Seo } from "../components/common/Seo.jsx";
 import { useLandingData } from "../hooks/useLandingData.js";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { localizeProduct } from "../utils/localize-product.js";
+import { getPageSeo, localizedPath, XION_SITE_URL } from "../config/seo.js";
 
 const copy = {
   uz: { home: "Bosh sahifa", all: "Barcha mahsulotlar", search: "Mahsulot nomini qidiring", filter: "Filtr", categories: "Mahsulot asosi", availability: "Mavjudlik", request: "So‘rov asosida", featured: "Tavsiya etilgan", clear: "Tozalash", found: "ta mahsulot", sort: "Saralash", recommended: "Tavsiya bo‘yicha", name: "Nomi bo‘yicha", priceLow: "Arzonidan boshlab", priceHigh: "Qimmatidan boshlab", empty: "Tanlangan filtrlar bo‘yicha mahsulot topilmadi", reset: "Filtrlarni bekor qilish", price: "Narx bo‘yicha", from: "Dan", to: "Gacha", brand: "Brend", material: "Material", form: "Forma pessariy", size: "Razmer", type: "Razmer / tip", allCategories: "Hammasi" },
@@ -29,6 +30,7 @@ export function CatalogPage() {
   const { data, loading } = useLandingData();
   const { language, t } = useLanguage();
   const c = copy[language] || copy.uz;
+  const seo = getPageSeo("/catalog", language);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState({ categories: [], brands: [], materials: [], forms: [], sizes: [], types: [] });
@@ -88,10 +90,10 @@ export function CatalogPage() {
   }, [mobileFilters]);
 
   return <div className="site-shell">
-    <Seo title={`${t.catalogTitle} | XION`} description={t.catalogIntro} canonicalPath="/catalog" language={language}/>
+    <Seo title={seo.title} description={seo.description} canonicalPath="/catalog" language={language} jsonLd={{ "@context": "https://schema.org", "@type": "CollectionPage", "@id": `${XION_SITE_URL}${localizedPath("/catalog", language)}#collection`, name: seo.title, description: seo.description, url: `${XION_SITE_URL}${localizedPath("/catalog", language)}`, mainEntity: { "@type": "ItemList", numberOfItems: products.length, itemListElement: products.slice(0, 50).map((product, index) => ({ "@type": "ListItem", position: index + 1, name: product.title, url: `${XION_SITE_URL}${localizedPath(`/products/${product.slug}`, language)}` })) } }}/>
     <Header contact={data.settings.contact} loading={loading}/>
     <main className="catalog-page catalog-storefront">
-      <section className="catalog-storefront-hero"><div className="container"><nav><Link to="/">{c.home}</Link><span>/</span><strong>{c.all}</strong></nav><div><p className="eyebrow"><span/>{t.productsEyebrow}</p><h1>{t.catalogTitle}</h1><p>{t.catalogIntro}</p></div><aside><strong>{products.length}</strong><span>{c.found}</span></aside></div></section>
+      <section className="catalog-storefront-hero"><div className="container"><nav><Link to={localizedPath("/", language)}>{c.home}</Link><span>/</span><strong>{c.all}</strong></nav><div><p className="eyebrow"><span/>{t.productsEyebrow}</p><h1>{t.catalogTitle}</h1><p>{t.catalogIntro}</p></div><aside><strong>{products.length}</strong><span>{c.found}</span></aside></div></section>
       <nav className="catalog-category-nav" aria-label={c.categories}><div className="container"><button type="button" className={!filters.categories.length ? "is-active" : ""} onClick={() => setFilters((current) => ({ ...current, categories: [] }))}>{c.allCategories}<small>{products.length}</small></button>{options.categories.map((category) => <button type="button" className={filters.categories.includes(category) ? "is-active" : ""} onClick={() => toggle("categories", category)} key={category}>{category}<small>{products.filter((product) => (product.category || "XION MEDICAL") === category).length}</small></button>)}</div></nav>
       <section className="container catalog-browser">
         <div className="catalog-results"><div className="catalog-toolbar"><div className="catalog-search"><Search size={18}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={c.search}/>{query ? <button type="button" onClick={() => setQuery("")} aria-label={c.clear}><X size={16}/></button> : null}</div><div className="catalog-sort"><span>{c.sort}</span><label><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recommended">{c.recommended}</option><option value="price-asc">{c.priceLow}</option><option value="price-desc">{c.priceHigh}</option><option value="name">{c.name}</option></select><ChevronDown size={15}/></label></div><button className="catalog-mobile-filter" type="button" onClick={() => setMobileFilters(true)} aria-expanded={mobileFilters} aria-controls="catalog-mobile-filter-panel"><SlidersHorizontal size={17}/>{c.filter}</button></div>

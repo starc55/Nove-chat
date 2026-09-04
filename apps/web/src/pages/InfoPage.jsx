@@ -10,6 +10,7 @@ import { getVisitorId, getVisitorProfile } from "../services/visitor.js";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { infoFallback } from "../data/info-fallback.js";
 import { XION_ADDRESS, XION_MAP_URL, XION_TELEGRAM_URL } from "../config/public-links.js";
+import { getPageSeo, localizedPath, XION_SITE_URL } from "../config/seo.js";
 import { Seo } from "../components/common/Seo.jsx";
 
 const initialForm = { name: "", phone: "", email: "", company: "", message: "" };
@@ -63,6 +64,8 @@ export function InfoPage({ slug }) {
   const phone = contact.phones?.[0] || contact.phone || "+998 99 556 06 60";
   const email = contact.email || "info@xion.uz";
   const address = contact.address || XION_ADDRESS;
+  const routePath = `/${slug === "about" ? "company" : slug}`;
+  const seo = getPageSeo(routePath, language);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -75,20 +78,20 @@ export function InfoPage({ slug }) {
   };
 
   return <div className="site-shell">
-    {content ? <Seo title={`${content.title} | XION`} description={content.excerpt || content.title} canonicalPath={`/${slug === "about" ? "company" : slug}`} language={language}/> : null}
+    {content ? <Seo title={seo.title} description={seo.description} canonicalPath={routePath} language={language} jsonLd={{ "@context": "https://schema.org", "@type": slug === "about" ? "AboutPage" : slug === "contact" ? "ContactPage" : "WebPage", "@id": `${XION_SITE_URL}${localizedPath(routePath, language)}#webpage`, url: `${XION_SITE_URL}${localizedPath(routePath, language)}`, name: seo.title, description: seo.description, inLanguage: language, isPartOf: { "@id": `${XION_SITE_URL}/#website` } }}/>: null}
     <Header contact={state.settings.contact} loading={state.loading}/>
     <main className={`info-page info-page--${slug}`}>
       {state.loading && !content ? <div className="info-loading"><LoaderCircle className="admin-spin"/>{t.loading}</div> : null}
-      {state.error && !content ? <div className="container inline-state"><h1>{t.pageNotFound}</h1><p>{state.error}</p><Link className="back-link" to="/"><ArrowLeft size={17}/>{t.backHome}</Link></div> : null}
+      {state.error && !content ? <div className="container inline-state"><h1>{t.pageNotFound}</h1><p>{state.error}</p><Link className="back-link" to={localizedPath("/", language)}><ArrowLeft size={17}/>{t.backHome}</Link></div> : null}
       {content ? <>
         <section className={`info-hero ${visual ? "info-hero--visual" : ""}`}>
           <div className={`container ${visual ? "info-hero-grid" : ""}`}>
             <div className="info-hero-copy">
-              <Link className="info-breadcrumb" to="/"><ArrowLeft size={15}/>{t.backHome}</Link>
+              <Link className="info-breadcrumb" to={localizedPath("/", language)}><ArrowLeft size={15}/>{t.backHome}</Link>
               <p className="eyebrow"><span/>{content.eyebrow}</p>
               <h1>{content.title}</h1>
               <p>{content.excerpt}</p>
-              {visual ? <div className="info-hero-actions"><Link className="button button--primary" to="/catalog">{actions.catalog}<ArrowRight size={17}/></Link>{formSource ? <a className="info-text-action" href="#inquiry">{actions.inquiry}<ArrowRight size={16}/></a> : null}</div> : null}
+              {visual ? <div className="info-hero-actions"><Link className="button button--primary" to={localizedPath("/catalog", language)}>{actions.catalog}<ArrowRight size={17}/></Link>{formSource ? <a className="info-text-action" href="#inquiry">{actions.inquiry}<ArrowRight size={16}/></a> : null}</div> : null}
             </div>
             {visual ? <div className={`info-hero-visual ${visual.contain ? "is-contained" : ""}`}>
               <img className="info-hero-main-image" src={visual.image} alt="" width="760" height="680" decoding="async"/>

@@ -27,7 +27,7 @@ function AdminLayoutContent() {
 
   return (
     <div className="admin-shell">
-      <Seo title="XION Control — Admin" description="XION boshqaruv paneli" canonicalPath="/admin" noindex/>
+      <Seo title="XION Control — Admin" description="XION boshqaruv paneli" canonicalPath="/admin" noindex localized={false}/>
       <AnimatePresence>
         {sidebarOpen && <motion.button className="admin-overlay" aria-label="Menyuni yopish" onClick={() => setSidebarOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />}
       </AnimatePresence>

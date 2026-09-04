@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { ADMIN_BASE } from "../../config/admin.js";
 import { BrandLogo } from "../../components/common/BrandLogo.jsx";
+import { Seo } from "../../components/common/Seo.jsx";
 
 const REMEMBERED_EMAIL_KEY = "xion_admin_email";
 
@@ -32,6 +33,7 @@ export function AdminLoginPage() {
   };
 
   return <main className="admin-login-page">
+    <Seo title="XION Control — kirish" description="XION yopiq boshqaruv paneli" canonicalPath="/admin/sign-in" noindex localized={false}/>
     <Link className="admin-login-back" to="/"><ArrowLeft size={17}/> Saytga qaytish</Link>
     <motion.section className="admin-login-panel" initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .65, ease: [0.22, 1, 0.36, 1] }}>
       <div className="admin-login-mark"><BrandLogo symbolOnly/><small>Private<br/>Workspace</small></div>

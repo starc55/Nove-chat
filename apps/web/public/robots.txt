@@ -5,4 +5,4 @@ Disallow: /operator
 Disallow: /api/
 
 Sitemap: https://xion.uz/sitemap.xml
-Host: https://xion.uz
+Host: xion.uz

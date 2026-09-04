@@ -2,6 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { Reveal } from "../common/Reveal.jsx";
+import { localizedPath } from "../../config/seo.js";
 
 const categories = [
   {
@@ -90,7 +91,7 @@ export function ProductCatalog() {
             <p className="eyebrow">{copy.eyebrow}</p>
             <h2>{copy.title}</h2>
           </div>
-          <Link to="/catalog">
+          <Link to={localizedPath("/catalog", language)}>
             {copy.action}
             <ArrowUpRight size={18} />
           </Link>
@@ -98,7 +99,7 @@ export function ProductCatalog() {
         <div className="xion-category-grid">
           {categories.map((category, index) => (
             <Reveal className="xion-category-reveal" delay={index * 0.04} key={category.title.ru}>
-              <Link className="xion-category-card" to="/catalog">
+              <Link className="xion-category-card" to={localizedPath("/catalog", language)}>
                 <span className="xion-category-count">
                   <strong>{category.count}</strong>
                   <small>{copy.unit}</small>

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { localizedPath, stripLanguagePrefix } from "../../config/seo.js";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 
 const THEME_KEY = "xion_theme";
@@ -29,6 +30,8 @@ export function Header({ contact = {}, loading = false }) {
   const [darkTheme, setDarkTheme] = useState(initialDarkTheme);
   const { pathname } = useLocation();
   const { language, setLanguage, t } = useLanguage();
+  const currentPath = stripLanguagePrefix(pathname);
+  const publicHref = (href) => localizedPath(href, language);
   const reduceMotion = useReducedMotion();
   const primary = [
     [t.navProducts, "/catalog"],
@@ -78,15 +81,15 @@ export function Header({ contact = {}, loading = false }) {
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="container header-top">
-        <a className="wordmark" href="/" aria-label={`XION ${t.homeLabel}`}>
+        <a className="wordmark" href={publicHref("/")} aria-label={`XION ${t.homeLabel}`}>
           <BrandLogo />
         </a>
         <nav className="desktop-nav" aria-label={t.mainNavigation}>
           {primary.map(([label, href]) => (
             <a
-              className={pathname.startsWith(href) ? "is-active" : ""}
+              className={currentPath.startsWith(href) ? "is-active" : ""}
               key={href}
-              href={href}
+              href={publicHref(href)}
             >
               {label}
             </a>
@@ -117,12 +120,12 @@ export function Header({ contact = {}, loading = false }) {
           </button>
           <a
             className="header-icon"
-            href={pathname === "/" ? "#location-map" : "/#location-map"}
+            href={currentPath === "/" ? "#location-map" : publicHref("/#location-map")}
             aria-label={t.location}
           >
             <Map size={17} />
           </a>
-          <a className="nav-cta" href="/contact">
+          <a className="nav-cta" href={publicHref("/contact")}>
             {t.contactUs}
           </a>
         </div>
@@ -164,17 +167,17 @@ export function Header({ contact = {}, loading = false }) {
           <nav className="secondary-nav" aria-label={t.sectionsNavigation}>
             {secondary.map(([label, href]) => (
               <a
-                className={pathname.startsWith(href) ? "is-active" : ""}
+                className={currentPath.startsWith(href) ? "is-active" : ""}
                 key={href}
-                href={href}
+                href={publicHref(href)}
               >
                 {label}
                 <ChevronDown size={12} />
               </a>
             ))}
             <a
-              className={pathname.startsWith("/simurg") ? "is-active" : ""}
-              href="/simurg"
+              className={currentPath.startsWith("/simurg") ? "is-active" : ""}
+              href={publicHref("/simurg")}
             >
               {t.navServices}
               <ChevronDown size={12} />
@@ -194,12 +197,12 @@ export function Header({ contact = {}, loading = false }) {
                     <strong>{phone}</strong>
                   </a>
                 ) : null}
-                <a href="/contact">{t.contactPrompt}</a>
+                <a href={publicHref("/contact")}>{t.contactPrompt}</a>
               </>
             )}
             <a
               className="header-search-link"
-              href="/catalog"
+              href={publicHref("/catalog")}
               aria-label={t.searchProducts}
             >
               <Search size={18} />
@@ -230,9 +233,9 @@ export function Header({ contact = {}, loading = false }) {
               <div className="mobile-menu-primary" aria-label={t.mainNavigation}>
                 {primary.map(([label, href]) => (
                   <a
-                    className={pathname.startsWith(href) ? "is-active" : ""}
+                    className={currentPath.startsWith(href) ? "is-active" : ""}
                     key={href}
-                    href={href}
+                    href={publicHref(href)}
                     onClick={closeMenu}
                   >
                     {label}
@@ -246,13 +249,13 @@ export function Header({ contact = {}, loading = false }) {
                     <div className="mega-group" key={group.label}>
                       <a
                         className="mega-group-title"
-                        href={
+                        href={publicHref(
                           columnIndex === 0
                             ? "/catalog"
                             : columnIndex === 1
                             ? "/medical-institutions"
                             : "/contact"
-                        }
+                        )}
                         onClick={closeMenu}
                       >
                         <ChevronDown size={11} />
@@ -261,7 +264,7 @@ export function Header({ contact = {}, loading = false }) {
                       {group.links.map((link, index) => (
                         <a
                           key={link}
-                          href={
+                          href={publicHref(
                             columnIndex === 0
                               ? "/catalog"
                               : columnIndex === 1
@@ -273,7 +276,7 @@ export function Header({ contact = {}, loading = false }) {
                               : index === 1
                               ? "/news"
                               : "/contact"
-                          }
+                          )}
                           onClick={closeMenu}
                         >
                           {link}

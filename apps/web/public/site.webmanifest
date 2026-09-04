@@ -1,0 +1,19 @@
+{
+  "name": "XION — tibbiy mahsulotlar",
+  "short_name": "XION",
+  "description": "Akusherlik, ginekologiya va urologiya uchun tibbiy mahsulotlar.",
+  "lang": "uz",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "icons": [
+    {
+      "src": "/xion-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

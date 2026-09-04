@@ -12,13 +12,8 @@ import { ChatWidget } from "../components/chat/ChatWidget.jsx";
 import { PurchaseModal } from "../components/common/PurchaseModal.jsx";
 import { LanguageMotion } from "../components/common/LanguageMotion.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
+import { getPageSeo, XION_SITE_URL } from "../config/seo.js";
 import { Seo } from "../components/common/Seo.jsx";
-
-const seoCopy = {
-  uz: { title: "XION — Tibbiy mahsulotlar va mutaxassis yordami", description: "Akusherlik, ginekologiya va urologiya uchun sertifikatlangan tibbiy mahsulotlar katalogi, O‘zbekiston bo‘ylab yetkazish va mutaxassis yordami." },
-  ru: { title: "XION — медицинские изделия и помощь специалиста", description: "Каталог сертифицированных изделий для акушерства, гинекологии и урологии, доставка по Узбекистану и консультация специалиста." },
-  en: { title: "XION — medical products and specialist support", description: "Certified products for obstetrics, gynecology and urology, delivery across Uzbekistan and professional product support." }
-};
 
 export function LandingPage() {
   const { data, loading, error } = useLandingData();
@@ -26,10 +21,10 @@ export function LandingPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const heroAdvertisements = data.advertisements.filter((item) => item.placement === "HERO");
   const campaignAdvertisements = data.advertisements.filter((item) => item.placement !== "HERO");
-  const seo = seoCopy[language] || seoCopy.uz;
+  const seo = getPageSeo("/", language);
   return (
     <div className="site-shell">
-      <Seo title={seo.title} description={seo.description} canonicalPath="/" language={language} jsonLd={{ "@context": "https://schema.org", "@type": "MedicalBusiness", name: "XION", url: "https://xion.uz", logo: "https://xion.uz/xion-logo.svg", telephone: data.settings.contact?.phone, email: data.settings.contact?.email, address: { "@type": "PostalAddress", streetAddress: "Allon ko‘chasi 141A", addressLocality: "Toshkent", addressCountry: "UZ" } }}/>
+      <Seo title={seo.title} description={seo.description} canonicalPath="/" language={language} jsonLd={{ "@context": "https://schema.org", "@type": "MedicalBusiness", "@id": `${XION_SITE_URL}/#organization`, name: "XION", url: XION_SITE_URL, logo: `${XION_SITE_URL}/xion-logo.svg`, image: `${XION_SITE_URL}/og.png`, telephone: data.settings.contact?.phone, email: data.settings.contact?.email, priceRange: "$$", areaServed: { "@type": "Country", name: "Uzbekistan" }, geo: { "@type": "GeoCoordinates", latitude: 41.333715, longitude: 69.20532 }, address: { "@type": "PostalAddress", streetAddress: "Allon ko‘chasi 141A", addressLocality: "Toshkent", addressCountry: "UZ" }, sameAs: ["https://t.me/xion_office"] }}/>
       <Header contact={data.settings.contact} loading={loading} />
       <LanguageMotion language={language}>
         <Hero settings={data.settings} advertisements={heroAdvertisements} products={data.products} onBuy={setSelectedProduct} loading={loading}/>

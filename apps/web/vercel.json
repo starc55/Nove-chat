@@ -1,4 +1,6 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/media/(.*)",
@@ -8,9 +10,21 @@
           "value": "public, max-age=86400, stale-while-revalidate=604800"
         }
       ]
+    },
+    {
+      "source": "/admin/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }]
+    },
+    {
+      "source": "/operator",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" }]
     }
   ],
   "rewrites": [
+    {
+      "source": "/favicon.ico",
+      "destination": "/xion-logo.svg"
+    },
     {
       "source": "/sitemap.xml",
       "destination": "https://nove-chat.onrender.com/sitemap.xml"

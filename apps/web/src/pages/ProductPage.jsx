@@ -13,6 +13,7 @@ import { useLanguage } from "../context/LanguageContext.jsx";
 import { localeFor } from "../i18n/landing.js";
 import { localizeProduct } from "../utils/localize-product.js";
 import { xionAssetUrl } from "../utils/landing-assets.js";
+import { localizedPath, XION_SITE_URL } from "../config/seo.js";
 
 const productCopy = {
   uz: { home: "Bosh sahifa", catalogue: "Mahsulotlar", verified: "Tekshirilgan mahsulot", availability: "Mavjudlik so‘rov asosida", inStock: "dona mavjud", outOfStock: "Sotuvda yo‘q", chooseSize: "Razmer yoki tipni tanlang", chooseRequired: "Buyurtma berish uchun mos variantni tanlang", orderTitle: "Mutaxassis bilan buyurtma bering", orderText: "Narx, mos modifikatsiya va yetkazish muddatini aniqlab beramiz.", response: "Ish vaqtida tezkor javob", delivery: "O‘zbekiston bo‘ylab yetkazish", documents: "Rasmiy hujjatlar mavjud", consultation: "Mutaxassis konsultatsiyasi", relatedEyebrow: "SIZGA MOS BO‘LISHI MUMKIN", relatedTitle: "O‘xshash mahsulotlar", relatedText: "Shu yo‘nalishdagi boshqa modifikatsiya va tibbiy yechimlarni solishtiring.", enlarge: "Rasmni kattalashtirish", close: "Yopish" },
@@ -78,19 +79,59 @@ export function ProductPage() {
   const settings = Object.keys(state.settings).length ? state.settings : landing.data.settings;
   const availability = variants.length ? (totalStock > 0 ? `${totalStock} ${c.inStock}` : c.outOfStock) : product?.stock != null ? (product.stock > 0 ? `${product.stock} ${c.inStock}` : c.outOfStock) : c.availability;
   const canOrder = variants.length ? Boolean(selectedVariant && selectedVariant.stock > 0) : product?.stock !== 0;
+  const productPath = product ? `/products/${product.slug}` : "/catalog";
+  const productUrl = `${XION_SITE_URL}${localizedPath(productPath, language)}`;
+  const seoPrices = product ? [product.price, ...variants.map((variant) => variant.price)].filter((price) => price != null).map(Number) : [];
+  const seoPrice = seoPrices.length ? Math.min(...seoPrices) : null;
+  const seoDescription = product?.shortDescription || product?.longDescription || "XION tibbiy mahsuloti";
+  const productJsonLd = product ? {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "@id": `${productUrl}#product`,
+        name: product.title,
+        url: productUrl,
+        image: images.map((url) => new URL(url, XION_SITE_URL).href),
+        description: seoDescription,
+        sku: product.id,
+        category: product.category || undefined,
+        brand: { "@type": "Brand", name: product.brand || "XION" },
+        additionalProperty: specifications.map(([name, value]) => ({ "@type": "PropertyValue", name, value: String(value) })),
+        offers: seoPrice != null ? {
+          "@type": "Offer",
+          url: productUrl,
+          priceCurrency: "UZS",
+          price: seoPrice,
+          availability: (variants.length && totalStock < 1) || (!variants.length && product.stock === 0) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+          itemCondition: "https://schema.org/NewCondition",
+          seller: { "@id": `${XION_SITE_URL}/#organization` },
+        } : undefined,
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${productUrl}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: c.home, item: `${XION_SITE_URL}${localizedPath("/", language)}` },
+          { "@type": "ListItem", position: 2, name: c.catalogue, item: `${XION_SITE_URL}${localizedPath("/catalog", language)}` },
+          { "@type": "ListItem", position: 3, name: product.title, item: productUrl },
+        ],
+      },
+    ],
+  } : null;
   const startOrder = () => {
     if (!canOrder) return;
     setBuying({ ...product, initialVariantId: selectedVariantId });
   };
 
   return <div className="site-shell">
-    {product ? <Seo title={`${product.title} | XION`} description={product.shortDescription || product.longDescription} canonicalPath={`/products/${product.slug}`} image={images[0]} language={language} jsonLd={{ "@context": "https://schema.org", "@type": "Product", name: product.title, image: images.map((url) => new URL(url, "https://xion.uz").href), description: product.shortDescription || product.longDescription, brand: { "@type": "Brand", name: product.brand || "XION" }, offers: currentPrice != null ? { "@type": "Offer", priceCurrency: "UZS", price: Number(currentPrice), availability: (variants.length && totalStock < 1) || (!variants.length && product.stock === 0) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock" } : undefined }}/> : null}
+    {product ? <Seo title={`${product.title} | XION`} description={seoDescription} canonicalPath={productPath} image={images[0]} imageAlt={product.title} type="product" language={language} jsonLd={productJsonLd}/> : null}
     <Header contact={settings.contact} loading={state.loading}/>
     <main className="product-page product-storefront">
       <div className="container">
-        <nav className="product-breadcrumb"><Link to="/">{c.home}</Link><span>/</span><Link to="/catalog">{c.catalogue}</Link>{product ? <><span>/</span><strong>{product.title}</strong></> : null}</nav>
+        <nav className="product-breadcrumb"><Link to={localizedPath("/", language)}>{c.home}</Link><span>/</span><Link to={localizedPath("/catalog", language)}>{c.catalogue}</Link>{product ? <><span>/</span><strong>{product.title}</strong></> : null}</nav>
         {state.loading && !product ? <div className="product-loading"/> : null}
-        {state.error && !product ? <div className="inline-state"><h1>{t.productNotFound}</h1><p>{state.error}</p><Link className="back-link" to="/catalog"><ArrowLeft size={17}/>{c.catalogue}</Link></div> : null}
+        {state.error && !product ? <div className="inline-state"><h1>{t.productNotFound}</h1><p>{state.error}</p><Link className="back-link" to={localizedPath("/catalog", language)}><ArrowLeft size={17}/>{c.catalogue}</Link></div> : null}
         {product ? <>
           <article className="product-commerce-layout">
             <div className={`product-gallery-stage ${images.length < 2 ? "has-single-image" : ""}`}>
