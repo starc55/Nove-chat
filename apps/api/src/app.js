@@ -15,6 +15,7 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
 import { telegramRouter } from "./routes/telegram.routes.js";
 import { operatorAppRouter } from "./routes/operator-app.routes.js";
+import { seoRouter } from "./routes/seo.routes.js";
 import { errorHandler, notFound } from "./middleware/error-handler.js";
 
 export const app = express();
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: false, limit: "32kb" }));
 app.use(cookieParser());
 app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use("/api", rateLimit({ windowMs: 60_000, limit: 180, standardHeaders: true, legacyHeaders: false }));
+app.use(seoRouter);
 app.use("/api/v1/health", healthRouter);
 app.use("/api/v1/public", publicRouter);
 app.use("/api/v1/auth", authRouter);

@@ -18,19 +18,19 @@ function publicUser(user) {
   };
 }
 
-async function createSession(user) {
+async function createSession(user, persistent = true) {
   const accessToken = jwt.sign(
     { sub: user.id, role: user.role },
     env.JWT_ACCESS_SECRET,
     { expiresIn: env.ACCESS_TOKEN_TTL, issuer: "nova-api", audience: "nova-admin" }
   );
   const refreshToken = randomBytes(48).toString("base64url");
-  const expiresAt = new Date(Date.now() + env.REFRESH_TOKEN_DAYS * 86_400_000);
-  await prisma.refreshToken.create({ data: { userId: user.id, tokenHash: tokenHash(refreshToken), expiresAt } });
-  return { accessToken, refreshToken, refreshExpiresAt: expiresAt, user: publicUser(user) };
+  const expiresAt = new Date(Date.now() + (persistent ? env.REFRESH_TOKEN_DAYS : 1) * 86_400_000);
+  await prisma.refreshToken.create({ data: { userId: user.id, tokenHash: tokenHash(refreshToken), expiresAt, persistent } });
+  return { accessToken, refreshToken, refreshExpiresAt: expiresAt, persistent, user: publicUser(user) };
 }
 
-export async function login(email, password) {
+export async function login(email, password, persistent = true) {
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
     include: { admin: true, operator: true }
@@ -39,7 +39,7 @@ export async function login(email, password) {
     throw new ApiError(401, "INVALID_CREDENTIALS", "Email yoki parol noto‘g‘ri.");
   }
   await prisma.refreshToken.deleteMany({ where: { userId: user.id, OR: [{ expiresAt: { lt: new Date() } }, { revokedAt: { not: null } }] } });
-  return createSession(user);
+  return createSession(user, persistent);
 }
 
 export async function refreshSession(refreshToken) {
@@ -52,7 +52,7 @@ export async function refreshSession(refreshToken) {
     throw new ApiError(401, "SESSION_EXPIRED", "Sessiya muddati tugagan. Qayta kiring.");
   }
   await prisma.refreshToken.update({ where: { id: stored.id }, data: { revokedAt: new Date() } });
-  return createSession(stored.user);
+  return createSession(stored.user, stored.persistent);
 }
 
 export async function logout(refreshToken) {

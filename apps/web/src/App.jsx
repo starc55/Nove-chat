@@ -94,11 +94,18 @@ function RouteFallback() {
 }
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      const timer = window.setTimeout(() => {
+        document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 120);
+      return () => window.clearTimeout(timer);
+    }
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }, [pathname]);
+    return undefined;
+  }, [pathname, hash]);
 
   return null;
 }

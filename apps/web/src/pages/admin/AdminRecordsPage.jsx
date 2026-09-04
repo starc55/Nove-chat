@@ -24,7 +24,7 @@ const configs = {
 const dateFormat = new Intl.DateTimeFormat("uz-UZ", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 function RecordTitle({ kind, item }) {
-  if (kind === "orders") return <><strong>{item.name}</strong><small>{item.product?.title || item.productTitle}</small></>;
+  if (kind === "orders") return <><strong>{item.name}</strong><small>{item.product?.title || item.productTitle}{item.variantLabel ? ` · ${item.variantLabel}` : ""} · {item.quantity || 1} dona</small></>;
   if (kind === "reviews") return <><strong>{item.customerName} · {item.rating}/5</strong><small>{item.customerPhone || "Telefon yo‘q"}</small></>;
   return <><strong>{item.name}</strong><small>{item.phone}</small></>;
 }

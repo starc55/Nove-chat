@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import { z } from "zod";
 import {
   createAdvertisement, createProduct, deleteAdvertisement, deleteProduct,
@@ -10,6 +11,8 @@ import {
   updateLead, updateOrder, updateReview
 } from "../services/admin-operations.service.js";
 import { createContentPage, deleteContentPage, listContentPages, updateContentPage } from "../services/content-page.service.js";
+import { saveImages } from "../services/media.service.js";
+import { ApiError } from "../utils/api-error.js";
 
 export const adminManagementRouter = Router();
 
@@ -37,6 +40,7 @@ const productBaseSchema = z.object({
   longDescription: nullableText(5000),
   price: nullablePrice,
   oldPrice: nullablePrice,
+  stock: z.preprocess((value) => value === "" || value === null ? null : value, z.coerce.number().int().min(0).max(1_000_000).nullable()),
   image: nullableUrl,
   sourceUrl: nullableUrl,
   documents: z.array(z.object({ label: z.string().trim().min(2).max(180), url: z.string().trim().url().max(1000) }).strict()).max(20).nullable().optional(),
@@ -44,6 +48,23 @@ const productBaseSchema = z.object({
   translations: z.record(z.string(), z.unknown()).nullable().optional(),
   gallery: z.array(z.string().trim().url().max(1000)).max(20).optional(),
   category: nullableText(80),
+  brand: nullableText(120),
+  material: nullableText(160),
+  form: nullableText(160),
+  productType: nullableText(160),
+  tags: z.array(z.string().trim().min(1).max(40)).max(12).default([]),
+  showTags: z.boolean().default(true),
+  variants: z.array(z.object({
+    label: z.string().trim().min(1).max(120),
+    size: nullableText(80),
+    type: nullableText(120),
+    sku: nullableText(80),
+    translations: z.record(z.string(), z.unknown()).nullable().optional(),
+    price: nullablePrice,
+    stock: z.coerce.number().int().min(0).max(1_000_000),
+    active: z.boolean().default(true),
+    sortOrder: z.coerce.number().int().min(-10000).max(10000).default(0)
+  }).strict()).max(100).default([]),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
   sortOrder: z.coerce.number().int().min(-10000).max(10000).default(0)
@@ -69,6 +90,7 @@ const advertisementSchema = z.object({
   image: nullableUrl,
   ctaLabel: nullableText(80),
   ctaUrl: linkValue,
+  translations: z.record(z.string(), z.unknown()).nullable().optional(),
   placement: z.enum(placementValues),
   startAt: nullableDate,
   endAt: nullableDate,
@@ -93,6 +115,20 @@ function route(handler) {
     try { await handler(req, res); } catch (error) { next(error); }
   };
 }
+
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { files: 12, fileSize: 5 * 1024 * 1024 }
+}).array("images", 12);
+
+adminManagementRouter.post("/uploads/images", (req, res, next) => {
+  imageUpload(req, res, async (error) => {
+    if (error) return next(new ApiError(422, "UPLOAD_FAILED", error.code === "LIMIT_FILE_SIZE" ? "Har bir rasm 5 MB dan kichik bo‘lishi kerak." : "Rasm yuklanmadi."));
+    try {
+      res.status(201).json({ success: true, data: await saveImages(req.files, req) });
+    } catch (saveError) { next(saveError); }
+  });
+});
 
 adminManagementRouter.get("/products", route(async (req, res) => {
   res.json({ success: true, data: await listProducts(paginationSchema.parse(req.query)) });

@@ -117,7 +117,7 @@ export function Header({ contact = {}, loading = false }) {
           </button>
           <a
             className="header-icon"
-            href="#location-map"
+            href={pathname === "/" ? "#location-map" : "/#location-map"}
             aria-label={t.location}
           >
             <Map size={17} />

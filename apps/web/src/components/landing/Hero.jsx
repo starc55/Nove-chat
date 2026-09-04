@@ -13,6 +13,7 @@ import {
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 import { localizeProduct } from "../../utils/localize-product.js";
+import { localizeAdvertisement } from "../../utils/localize-advertisement.js";
 import { XION_TELEGRAM_URL } from "../../config/public-links.js";
 import {
   landingAdvertisementImage,
@@ -32,11 +33,14 @@ export function Hero({
   const [paused, setPaused] = useState(false);
   const touchStart = useRef(null);
   const slides = useMemo(() => {
-    const ads = advertisements.map((item) => ({
-      ...item,
-      image: landingAdvertisementImage(item),
-      kind: "advertisement",
-    }));
+    const ads = advertisements.map((sourceAdvertisement) => {
+      const item = localizeAdvertisement(sourceAdvertisement, language);
+      return {
+        ...item,
+        image: landingAdvertisementImage(item),
+        kind: "advertisement",
+      };
+    });
     const productSlides = products.slice(0, 3).map((sourceProduct) => {
       const item = localizeProduct(sourceProduct, language);
       return {

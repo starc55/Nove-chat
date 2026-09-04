@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { prisma } from "../config/database.js";
 import { ApiError } from "../utils/api-error.js";
+import { getMedia } from "../services/media.service.js";
 
 export const publicRouter = Router();
 const submissionLimiter = rateLimit({ windowMs: 10 * 60_000, limit: 12, standardHeaders: true, legacyHeaders: false });
@@ -13,7 +14,7 @@ publicRouter.get("/landing", async (req, res, next) => {
   try {
     const now = new Date();
     const [products, advertisements, reviews, settings] = await Promise.all([
-      prisma.product.findMany({ where: { active: true }, include: { images: { orderBy: { sortOrder: "asc" } } }, orderBy: [{ featured: "desc" }, { sortOrder: "asc" }] }),
+      prisma.product.findMany({ where: { active: true }, include: { images: { orderBy: { sortOrder: "asc" } }, variants: { where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } }, orderBy: [{ featured: "desc" }, { sortOrder: "asc" }] }),
       prisma.advertisement.findMany({ where: { enabled: true, AND: [{ OR: [{ startAt: null }, { startAt: { lte: now } }] }, { OR: [{ endAt: null }, { endAt: { gte: now } }] }] }, orderBy: { sortOrder: "asc" } }),
       prisma.review.findMany({ where: { status: "APPROVED" }, orderBy: { createdAt: "desc" }, take: 8 }),
       prisma.siteSetting.findMany()
@@ -26,6 +27,20 @@ publicRouter.get("/settings", async (req, res, next) => {
   try {
     const settings = await prisma.siteSetting.findMany();
     res.json({ success: true, data: Object.fromEntries(settings.map(({ key, value }) => [key, value])) });
+  } catch (error) { next(error); }
+});
+
+publicRouter.get("/media/:id", async (req, res, next) => {
+  try {
+    const asset = await getMedia(z.string().cuid().parse(req.params.id));
+    if (req.headers["if-none-match"] === `"${asset.id}"`) return res.status(304).end();
+    res.set({
+      "Content-Type": asset.mimeType,
+      "Content-Length": String(asset.size),
+      "Cache-Control": "public, max-age=31536000, immutable",
+      ETag: `"${asset.id}"`
+    });
+    res.end(Buffer.from(asset.data));
   } catch (error) { next(error); }
 });
 
@@ -46,7 +61,7 @@ publicRouter.get("/pages/:slug", async (req, res, next) => {
 
 publicRouter.get("/products/:slug", async (req, res, next) => {
   try {
-    const product = await prisma.product.findFirst({ where: { slug: req.params.slug, active: true }, include: { images: true } });
+    const product = await prisma.product.findFirst({ where: { slug: req.params.slug, active: true }, include: { images: { orderBy: { sortOrder: "asc" } }, variants: { where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } } });
     if (!product) return res.status(404).json({ success: false, error: { code: "PRODUCT_NOT_FOUND", message: "Xizmat topilmadi." } });
     res.json({ success: true, data: product });
   } catch (error) { next(error); }
@@ -87,15 +102,28 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
   try {
     const input = z.object({
       visitorId: visitorSchema,
-      productId: z.string().cuid(),
+      productId: z.string().trim().regex(/^[A-Za-z0-9_-]{8,80}$/),
+      productVariantId: z.union([z.string().trim().regex(/^[A-Za-z0-9_-]{8,80}$/), z.literal(""), z.null()]).optional().transform((value) => value || null),
+      quantity: z.coerce.number().int().min(1).max(99).default(1),
       name: z.string().trim().min(2).max(100),
       phone: phoneSchema,
       comment: z.string().trim().max(1000).optional().default(""),
       sourcePath: z.string().trim().max(300).optional().default("/")
     }).parse(req.body);
-    const product = await prisma.product.findFirst({ where: { id: input.productId, active: true }, select: { id: true, title: true, price: true } });
+    const product = await prisma.product.findFirst({ where: { id: input.productId, active: true }, select: { id: true, title: true, price: true, stock: true, variants: { where: { active: true }, select: { id: true } } } });
     if (!product) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
+    if (product.variants.length && !input.productVariantId) throw new ApiError(422, "VARIANT_REQUIRED", "Razmer yoki mahsulot turini tanlang.");
     const order = await prisma.$transaction(async (tx) => {
+      let variant = null;
+      if (input.productVariantId) {
+        variant = await tx.productVariant.findFirst({ where: { id: input.productVariantId, productId: product.id, active: true } });
+        if (!variant) throw new ApiError(422, "INVALID_VARIANT", "Tanlangan variant mavjud emas.");
+        const reserved = await tx.productVariant.updateMany({ where: { id: variant.id, stock: { gte: input.quantity } }, data: { stock: { decrement: input.quantity } } });
+        if (!reserved.count) throw new ApiError(409, "OUT_OF_STOCK", "Tanlangan variantdan yetarli miqdor qolmagan.");
+      } else if (product.stock !== null) {
+        const reserved = await tx.product.updateMany({ where: { id: product.id, stock: { gte: input.quantity } }, data: { stock: { decrement: input.quantity } } });
+        if (!reserved.count) throw new ApiError(409, "OUT_OF_STOCK", "Mahsulotdan yetarli miqdor qolmagan.");
+      }
       const customer = await tx.customer.upsert({
         where: { visitorId: input.visitorId },
         update: { name: input.name, phone: input.phone },
@@ -105,8 +133,12 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
         data: {
           customerId: customer.id,
           productId: product.id,
+          productVariantId: variant?.id || null,
           productTitle: product.title,
-          productPrice: product.price,
+          productPrice: variant?.price ?? product.price,
+          variantLabel: variant?.label || null,
+          quantity: input.quantity,
+          stockManaged: Boolean(variant || product.stock !== null),
           name: input.name,
           phone: input.phone,
           comment: input.comment || null,

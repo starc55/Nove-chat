@@ -6,7 +6,7 @@ import { login, logout, refreshSession } from "../services/auth.service.js";
 
 const REFRESH_COOKIE = "nova_refresh";
 const router = Router();
-const credentialsSchema = z.object({ email: z.string().email().max(160), password: z.string().min(8).max(128) });
+const credentialsSchema = z.object({ email: z.string().email().max(160), password: z.string().min(8).max(128), remember: z.boolean().default(true) });
 const authLimiter = rateLimit({ windowMs: 15 * 60_000, limit: 12, standardHeaders: true, legacyHeaders: false, message: { success: false, error: { code: "TOO_MANY_ATTEMPTS", message: "Juda ko‘p urinish. Keyinroq qayta urinib ko‘ring." } } });
 
 function refreshCookieOptions() {
@@ -20,16 +20,15 @@ function refreshCookieOptions() {
 }
 
 function setRefreshCookie(res, session) {
-  res.cookie(REFRESH_COOKIE, session.refreshToken, {
-    ...refreshCookieOptions(),
-    expires: session.refreshExpiresAt
-  });
+  const options = refreshCookieOptions();
+  if (session.persistent) options.expires = session.refreshExpiresAt;
+  res.cookie(REFRESH_COOKIE, session.refreshToken, options);
 }
 
 router.post("/login", authLimiter, async (req, res, next) => {
   try {
-    const { email, password } = credentialsSchema.parse(req.body);
-    const session = await login(email, password);
+    const { email, password, remember } = credentialsSchema.parse(req.body);
+    const session = await login(email, password, remember);
     setRefreshCookie(res, session);
     res.json({ success: true, data: { accessToken: session.accessToken, user: session.user } });
   } catch (error) { next(error); }

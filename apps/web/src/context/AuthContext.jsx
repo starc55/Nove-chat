@@ -3,6 +3,7 @@ import { api, setAccessToken } from "../services/api.js";
 
 const AuthContext = createContext(null);
 const SESSION_HINT_KEY = "nova_admin_session";
+const SESSION_TAB_HINT_KEY = "nova_admin_tab_session";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -12,13 +13,14 @@ export function AuthProvider({ children }) {
     setAccessToken("");
     setUser(null);
     window.localStorage.removeItem(SESSION_HINT_KEY);
+    window.sessionStorage.removeItem(SESSION_TAB_HINT_KEY);
   }, []);
 
   useEffect(() => {
     let active = true;
     const onExpired = () => clearSession();
     window.addEventListener("nova:auth-expired", onExpired);
-    if (window.localStorage.getItem(SESSION_HINT_KEY) === "1") {
+    if (window.localStorage.getItem(SESSION_HINT_KEY) === "1" || window.sessionStorage.getItem(SESSION_TAB_HINT_KEY) === "1") {
       api.post("/auth/refresh")
         .then(({ data }) => {
           if (!active) return;
@@ -37,7 +39,10 @@ export function AuthProvider({ children }) {
     const { data } = await api.post("/auth/login", credentials);
     setAccessToken(data.data.accessToken);
     setUser(data.data.user);
-    window.localStorage.setItem(SESSION_HINT_KEY, "1");
+    window.localStorage.removeItem(SESSION_HINT_KEY);
+    window.sessionStorage.removeItem(SESSION_TAB_HINT_KEY);
+    if (credentials.remember) window.localStorage.setItem(SESSION_HINT_KEY, "1");
+    else window.sessionStorage.setItem(SESSION_TAB_HINT_KEY, "1");
     return data.data.user;
   }, []);
 

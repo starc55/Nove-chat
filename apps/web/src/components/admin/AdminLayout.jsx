@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { AdminUiProvider, useAdminUi } from "./AdminUi.jsx";
 import { ADMIN_BASE } from "../../config/admin.js";
 import { BrandLogo } from "../common/BrandLogo.jsx";
+import { Seo } from "../common/Seo.jsx";
 
 function AdminLayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,6 +27,7 @@ function AdminLayoutContent() {
 
   return (
     <div className="admin-shell">
+      <Seo title="XION Control — Admin" description="XION boshqaruv paneli" canonicalPath="/admin" noindex/>
       <AnimatePresence>
         {sidebarOpen && <motion.button className="admin-overlay" aria-label="Menyuni yopish" onClick={() => setSidebarOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />}
       </AnimatePresence>

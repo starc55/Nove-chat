@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /operator
+Disallow: /api/
 
 Sitemap: https://xion.uz/sitemap.xml
+Host: https://xion.uz

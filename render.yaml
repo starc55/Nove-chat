@@ -21,6 +21,8 @@ services:
         value: 22.22.0
       - key: CLIENT_URL
         sync: false
+      - key: PUBLIC_API_URL
+        value: https://nove-chat.onrender.com
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL

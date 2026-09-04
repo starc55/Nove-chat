@@ -786,3 +786,24 @@ select:not([multiple]):not([data-header-select]):focus-visible {
     color: #e7eef6!important;
   }
 }
+
+/* Commerce controls introduced by the catalogue editor */
+:root[data-theme="dark"] .catalog-category-nav,
+:root[data-theme="dark"] .catalog-category-nav button,
+:root[data-theme="dark"] .product-variant-picker label > span,
+:root[data-theme="dark"] .catalog-price-fields input {
+  border-color: var(--theme-line);
+  background: #111a24;
+  color: var(--theme-text);
+}
+:root[data-theme="dark"] .catalog-category-nav button small { background:#1d2a38;color:#9baebe }
+:root[data-theme="dark"] .catalog-category-nav button.is-active { border-color:var(--blue);background:var(--blue);color:#fff }
+:root[data-theme="dark"] .catalog-category-nav button.is-active small { background:rgba(255,255,255,.16);color:#fff }
+:root[data-theme="dark"] .product-variant-picker label.is-selected > span,
+:root[data-theme="dark"] .purchase-variants label.is-selected > span { border-color:var(--blue);background:#132a45 }
+:root[data-theme="dark"] .product-variant-picker legend,
+:root[data-theme="dark"] .product-variant-picker small { color:var(--theme-muted) }
+:root[data-theme="dark"] .product-detail-tags span { border-color:#284e79;background:#122943;color:#8fc1ff }
+:root[data-theme="dark"] .purchase-variants label > span,
+:root[data-theme="dark"] .purchase-quantity > div { border-color:var(--theme-line);background:#111a24;color:var(--theme-text) }
+:root[data-theme="dark"] .purchase-quantity button { background:#192634;color:var(--theme-text) }

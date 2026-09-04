@@ -4,6 +4,7 @@ import { ApiError } from "../utils/api-error.js";
 function productData(input) {
   const data = { ...input };
   delete data.gallery;
+  delete data.variants;
   if (data.slug) data.slug = data.slug.toLowerCase();
   return data;
 }
@@ -12,12 +13,28 @@ function galleryData(gallery = []) {
   return gallery.map((url, index) => ({ url, sortOrder: index + 1 }));
 }
 
+function variantData(variants = []) {
+  return variants.map((variant, index) => ({
+    ...variant,
+    price: variant.price ?? null,
+    size: variant.size || null,
+    type: variant.type || null,
+    sku: variant.sku || null,
+    sortOrder: variant.sortOrder ?? index
+  }));
+}
+
+const productInclude = {
+  images: { orderBy: { sortOrder: "asc" } },
+  variants: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }
+};
+
 export async function listProducts({ page, limit, q }) {
   const where = q
     ? { OR: [{ title: { contains: q, mode: "insensitive" } }, { slug: { contains: q, mode: "insensitive" } }, { category: { contains: q, mode: "insensitive" } }] }
     : {};
   const [items, total] = await Promise.all([
-    prisma.product.findMany({ where, include: { images: { orderBy: { sortOrder: "asc" } } }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }], skip: (page - 1) * limit, take: limit }),
+    prisma.product.findMany({ where, include: productInclude, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }], skip: (page - 1) * limit, take: limit }),
     prisma.product.count({ where })
   ]);
   return { items, pagination: { page, limit, total, pages: Math.max(1, Math.ceil(total / limit)) } };
@@ -26,7 +43,8 @@ export async function listProducts({ page, limit, q }) {
 export async function createProduct(input) {
   const data = productData(input);
   if (input.gallery?.length) data.images = { create: galleryData(input.gallery) };
-  return prisma.product.create({ data, include: { images: true } });
+  if (input.variants?.length) data.variants = { create: variantData(input.variants) };
+  return prisma.product.create({ data, include: productInclude });
 }
 
 export async function updateProduct(id, input) {
@@ -34,7 +52,8 @@ export async function updateProduct(id, input) {
   if (!existing) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
   const data = productData(input);
   if (input.gallery) data.images = { deleteMany: {}, create: galleryData(input.gallery) };
-  return prisma.product.update({ where: { id }, data, include: { images: true } });
+  if (input.variants) data.variants = { deleteMany: {}, create: variantData(input.variants) };
+  return prisma.product.update({ where: { id }, data, include: productInclude });
 }
 
 export async function deleteProduct(id) {

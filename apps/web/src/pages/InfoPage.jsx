@@ -10,6 +10,7 @@ import { getVisitorId, getVisitorProfile } from "../services/visitor.js";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { infoFallback } from "../data/info-fallback.js";
 import { XION_ADDRESS, XION_MAP_URL, XION_TELEGRAM_URL } from "../config/public-links.js";
+import { Seo } from "../components/common/Seo.jsx";
 
 const initialForm = { name: "", phone: "", email: "", company: "", message: "" };
 
@@ -54,7 +55,7 @@ export function InfoPage({ slug }) {
 
   const localContent = infoFallback(slug, language);
   const remoteContent = state.page?.content?.[language] || state.page?.content?.uz || null;
-  const content = useMemo(() => normalizeContent(localContent || remoteContent), [localContent, remoteContent]);
+  const content = useMemo(() => normalizeContent(remoteContent || localContent), [localContent, remoteContent]);
   const formSource = localContent?.form || state.page?.content?.form;
   const visual = visualPages[slug];
   const actions = heroActionCopy[language] || heroActionCopy.uz;
@@ -74,6 +75,7 @@ export function InfoPage({ slug }) {
   };
 
   return <div className="site-shell">
+    {content ? <Seo title={`${content.title} | XION`} description={content.excerpt || content.title} canonicalPath={`/${slug === "about" ? "company" : slug}`} language={language}/> : null}
     <Header contact={state.settings.contact} loading={state.loading}/>
     <main className={`info-page info-page--${slug}`}>
       {state.loading && !content ? <div className="info-loading"><LoaderCircle className="admin-spin"/>{t.loading}</div> : null}

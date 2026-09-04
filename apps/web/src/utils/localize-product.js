@@ -39,6 +39,7 @@ export function localizeProduct(product, language) {
     title,
     category: explicit.category || categories[language][product.category] || product.category,
     shortDescription: explicit.shortDescription || descriptions[language],
-    longDescription: explicit.longDescription || descriptions[language]
+    longDescription: explicit.longDescription || descriptions[language],
+    variants: (product.variants || []).map((variant) => ({ ...variant, ...(variant.translations?.[language] || {}) }))
   };
 }

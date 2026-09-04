@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { localizeProduct } from "../../utils/localize-product.js";
+import { localizeAdvertisement } from "../../utils/localize-advertisement.js";
 import { landingAdvertisementImage, landingProductImage } from "../../utils/landing-assets.js";
 
 export function Campaigns({ advertisements = [], products = [], onBuy }) {
@@ -11,10 +12,13 @@ export function Campaigns({ advertisements = [], products = [], onBuy }) {
     const product = localizeProduct(sourceProduct, language);
     return { id: `offer-${product.id}`, title: product.title, description: product.shortDescription, image: landingProductImage(product), createdAt: product.createdAt, product };
   });
-  const campaignAdvertisements = advertisements.map((item) => ({
-    ...item,
-    image: landingAdvertisementImage(item),
-  }));
+  const campaignAdvertisements = advertisements.map((sourceAdvertisement) => {
+    const item = localizeAdvertisement(sourceAdvertisement, language);
+    return {
+      ...item,
+      image: landingAdvertisementImage(item),
+    };
+  });
   const visible = [...campaignAdvertisements, ...productOffers].slice(0, 7);
   const pageCount = Math.max(1, Math.ceil(visible.length / 4));
   const pageItems = visible.slice(page * 4, page * 4 + 4);

@@ -6,5 +6,9 @@
   <url><loc>https://xion.uz/medical-institutions</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://xion.uz/manufacturers</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://xion.uz/news</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://xion.uz/career</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://xion.uz/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://xion.uz/warranty-return</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://xion.uz/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://xion.uz/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
