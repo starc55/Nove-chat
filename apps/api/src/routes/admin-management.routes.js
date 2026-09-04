@@ -17,16 +17,16 @@ import { ApiError } from "../utils/api-error.js";
 export const adminManagementRouter = Router();
 
 const idSchema = z.string().trim().regex(/^[A-Za-z0-9_-]{8,80}$/);
-const nullableText = (max) => z.union([z.string().trim().max(max), z.null()]).transform((value) => value || null);
-const nullableUrl = z.union([z.string().trim().url().max(1000), z.literal(""), z.null()]).transform((value) => value || null);
+const nullableText = (max) => z.union([z.string().trim().max(max), z.null()]).optional().transform((value) => value || null);
+const nullableUrl = z.union([z.string().trim().url().max(1000), z.literal(""), z.null()]).optional().transform((value) => value || null);
 const MAX_PRODUCT_PRICE = 9_999_999_999_999.99;
-const nullablePrice = z.preprocess((value) => value === "" || value === null ? null : value, z.coerce.number().nonnegative().max(MAX_PRODUCT_PRICE).nullable());
-const nullableDate = z.union([z.string().datetime(), z.literal(""), z.null()]).transform((value) => value ? new Date(value) : null);
+const nullablePrice = z.preprocess((value) => value === "" || value == null ? null : value, z.coerce.number().nonnegative().max(MAX_PRODUCT_PRICE).nullable());
+const nullableDate = z.union([z.string().datetime(), z.literal(""), z.null()]).optional().transform((value) => value ? new Date(value) : null);
 const linkValue = z.union([
   z.string().trim().url().max(1000),
   z.string().trim().regex(/^(#|\/)[^\s]*$/).max(1000),
   z.literal(""), z.null()
-]).transform((value) => value || null);
+]).optional().transform((value) => value || null);
 const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(50),
@@ -40,7 +40,7 @@ const productBaseSchema = z.object({
   longDescription: nullableText(5000),
   price: nullablePrice,
   oldPrice: nullablePrice,
-  stock: z.preprocess((value) => value === "" || value === null ? null : value, z.coerce.number().int().min(0).max(1_000_000).nullable()),
+  stock: z.preprocess((value) => value === "" || value == null ? null : value, z.coerce.number().int().min(0).max(1_000_000).nullable()),
   image: nullableUrl,
   sourceUrl: nullableUrl,
   documents: z.array(z.object({ label: z.string().trim().min(2).max(180), url: z.string().trim().url().max(1000) }).strict()).max(20).nullable().optional(),
