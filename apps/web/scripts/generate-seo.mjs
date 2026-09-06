@@ -256,6 +256,12 @@ async function writeRoute(path, html) {
     await writeFile(resolve(DIST_DIR, "index.html"), html, "utf8");
     return;
   }
+  if (path === "/ru" || path === "/en") {
+    const output = resolve(DIST_DIR, path.slice(1), "index.html");
+    await mkdir(resolve(output, ".."), { recursive: true });
+    await writeFile(output, html, "utf8");
+    return;
+  }
   const output = resolve(DIST_DIR, `${path.replace(/^\//, "")}.html`);
   await mkdir(resolve(output, ".."), { recursive: true });
   await writeFile(output, html, "utf8");
