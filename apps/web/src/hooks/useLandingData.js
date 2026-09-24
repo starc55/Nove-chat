@@ -35,8 +35,9 @@ export function useLandingData() {
     api.get("/public/landing", { signal: controller.signal })
       .then(({ data }) => {
         if (!data?.data?.products?.length) return;
-        saveCachedLanding(data.data);
-        setState({ data: data.data, loading: false, error: "" });
+        const normalized = { ...data.data, blogPosts: data.data.blogPosts || landingFallback.blogPosts };
+        saveCachedLanding(normalized);
+        setState({ data: normalized, loading: false, error: "" });
       })
       .catch((error) => {
         if (error.name !== "CanceledError") {

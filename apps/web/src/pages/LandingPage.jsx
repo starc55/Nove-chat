@@ -24,14 +24,14 @@ export function LandingPage() {
   const seo = getPageSeo("/", language);
   return (
     <div className="site-shell">
-      <Seo title={seo.title} description={seo.description} canonicalPath="/" language={language} jsonLd={{ "@context": "https://schema.org", "@type": "MedicalBusiness", "@id": `${XION_SITE_URL}/#organization`, name: "XION", url: XION_SITE_URL, logo: `${XION_SITE_URL}/xion-logo.svg`, image: `${XION_SITE_URL}/og.png`, telephone: data.settings.contact?.phone, email: data.settings.contact?.email, priceRange: "$$", areaServed: { "@type": "Country", name: "Uzbekistan" }, geo: { "@type": "GeoCoordinates", latitude: 41.333715, longitude: 69.20532 }, address: { "@type": "PostalAddress", streetAddress: "Allon ko‘chasi 141A", addressLocality: "Toshkent", addressCountry: "UZ" }, sameAs: ["https://t.me/xion_office"] }}/>
+      <Seo title={seo.title} description={seo.description} canonicalPath="/" language={language} jsonLd={{ "@context": "https://schema.org", "@type": "MedicalBusiness", "@id": `${XION_SITE_URL}/#organization`, name: "XION", url: XION_SITE_URL, logo: `${XION_SITE_URL}/xion-logo.svg`, image: `${XION_SITE_URL}/og.png`, telephone: data.settings.contact?.phone, email: data.settings.contact?.email, priceRange: "$$", areaServed: { "@type": "Country", name: "Uzbekistan" }, geo: { "@type": "GeoCoordinates", latitude: 41.346819, longitude: 69.214511 }, address: { "@type": "PostalAddress", streetAddress: "Allon ko‘chasi 141A", addressLocality: "Toshkent", addressCountry: "UZ" }, sameAs: ["https://t.me/xion_office"] }}/>
       <Header contact={data.settings.contact} loading={loading} />
       <LanguageMotion language={language}>
         <Hero settings={data.settings} advertisements={heroAdvertisements} products={data.products} onBuy={setSelectedProduct} loading={loading}/>
         <Services products={data.products} loading={loading} error={error} onBuy={setSelectedProduct}/>
         <ProductCatalog />
         <Campaigns advertisements={campaignAdvertisements} products={data.products} onBuy={setSelectedProduct}/>
-        <Approach newsItems={[...campaignAdvertisements, ...data.products]} loading={loading} />
+        <Approach newsItems={data.blogPosts || []} loading={loading} />
         <Reviews reviews={data.reviews} loading={loading} />
         <Footer settings={data.settings} loading={loading} />
       </LanguageMotion>

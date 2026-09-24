@@ -1,18 +1,23 @@
+import { useState } from "react";
 import { ArrowRight, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Reveal } from "../common/Reveal.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import { localizeProduct } from "../../utils/localize-product.js";
+import { localizeBlogPost } from "../../utils/localize-blog-post.js";
 import { XionMap } from "../common/XionMap.jsx";
+import { localizedPath } from "../../config/seo.js";
 
 export function Approach({ newsItems = [], loading = false }) {
   const { language, t } = useLanguage();
+  const [category, setCategory] = useState("NEWS");
   const locale =
     language === "uz" ? "uz-UZ" : language === "ru" ? "ru-RU" : "en-US";
   const mapAddress = t.supportAddress;
   const entries = newsItems.length
     ? newsItems
+        .filter((item) => (item.content?.category || "NEWS") === category)
         .slice(0, 3)
-        .map((item) => (item.slug ? localizeProduct(item, language) : item))
+        .map((item) => localizeBlogPost(item, language))
     : t.trustItems.slice(0, 3).map(([id, title], index) => ({
         id,
         title,
@@ -22,9 +27,9 @@ export function Approach({ newsItems = [], loading = false }) {
     <section className="section news-section" id="location-map">
       <div className="container news-panel">
         <div className="news-list">
-          <div className="news-tabs">
-            <strong>{t.news}</strong>
-            <span>{t.xionLife}</span>
+          <div className="news-tabs" role="tablist">
+            <button type="button" className={category === "NEWS" ? "is-active" : ""} onClick={() => setCategory("NEWS")}>{t.news}</button>
+            <button type="button" className={category === "XION_LIFE" ? "is-active" : ""} onClick={() => setCategory("XION_LIFE")}>{t.xionLife}</button>
           </div>
           {entries.map((item, index) => (
             <Reveal
@@ -32,6 +37,7 @@ export function Approach({ newsItems = [], loading = false }) {
               key={item.id || item.slug || item.title}
               delay={index * 0.04}
             >
+              <Link to={item.slug ? localizedPath(`/news/${item.slug}`, language) : localizedPath("/news", language)}>
               <div>
                 <time>
                   {new Intl.DateTimeFormat(locale, {
@@ -39,12 +45,13 @@ export function Approach({ newsItems = [], loading = false }) {
                     month: "2-digit",
                     year: "numeric",
                   }).format(
-                    new Date(item.startAt || item.createdAt || Date.now())
+                    new Date(item.publishedAt || item.createdAt || Date.now())
                   )}
                 </time>
                 <h3>{item.title}</h3>
               </div>
               <ArrowRight size={18} />
+              </Link>
             </Reveal>
           ))}
         </div>

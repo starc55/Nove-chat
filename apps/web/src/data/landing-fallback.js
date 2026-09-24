@@ -24,6 +24,21 @@ const products = [
 
 export const landingFallback = {
   products,
+  blogPosts: [{
+    id: "xion-blog-juno-gold-2026",
+    slug: "vnutrimatochnaya-spiral-juno-gold",
+    title: "Внутриматочная спираль Juno Gold",
+    active: true,
+    sortOrder: 10,
+    createdAt: "2026-09-18T08:00:00.000Z",
+    updatedAt: "2026-09-18T08:00:00.000Z",
+    content: {
+      type: "blog", category: "NEWS", coverImage: "/media/juno-gold-news.png", videoUrl: "https://youtu.be/-So_48JdX14", telegramUrl: "https://t.me/xion_office", phones: ["+998 71 230 04 40", "+998 99 556 06 60"], publishedAt: "2026-09-18T08:00:00.000Z",
+      uz: { eyebrow: "XION yangiliklari", title: "Juno Gold bachadon ichi spirali", excerpt: "Juno Gold — 9 yilgacha himoya beruvchi oltin va mis qotishmasidan tayyorlangan yangi avlod vositasi.", sections: [{ title: "Juno Gold afzalliklari", text: "Juno Gold yangi avlod bachadon ichi kontratseptiv vositasidir.", items: ["Homiladorlikdan 9 yilgacha himoya.", "58,5% oltin va 41,5% mis qotishmasi.", "Gipoallergen va yallig‘lanishga qarshi xususiyatlar.", "Klassik T shakli, gormonsiz tarkib va patentlangan Nautilus kiritish tizimi."] }] },
+      ru: { eyebrow: "Новости XION", title: "Внутриматочная спираль Juno Gold", excerpt: "Внутриматочная золотосодержащая спираль Juno Gold относится к средствам контрацепции нового поколения.", sections: [{ title: "Преимущества Juno Gold", text: "Внутриматочная золотосодержащая спираль Juno Gold относится к средствам контрацепции нового поколения.", items: ["Защита от беременности сроком до 9 лет.", "Спираль из золотой проволоки, аналогичной золоту 585 пробы (58,5 %) и меди (41,5 %).", "Обладает гипоаллергенными и противовоспалительными свойствами.", "Классическая Т-образная форма.", "Якорь изготовлен из медицинского пластика.", "Не содержит гормонов.", "Поставляется с запатентованной системой введения ВМС «Nautilus»."] }] },
+      en: { eyebrow: "XION news", title: "Juno Gold intrauterine device", excerpt: "Juno Gold is a new-generation gold-containing intrauterine contraceptive device.", sections: [{ title: "Juno Gold benefits", text: "A reliable, hormone-free intrauterine contraceptive device.", items: ["Protection for up to 9 years.", "58.5% gold and 41.5% copper alloy.", "Hypoallergenic and anti-inflammatory properties.", "Classic T-shape and patented Nautilus insertion system."] }] }
+    }
+  }],
   advertisements: [
     {
       id: "xion-hero-medical-catalog",

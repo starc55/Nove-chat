@@ -13,6 +13,7 @@ import {
 } from "../src/config/seo.js";
 import { landingFallback } from "../src/data/landing-fallback.js";
 import { localizeProduct } from "../src/utils/localize-product.js";
+import { localizeBlogPost } from "../src/utils/localize-blog-post.js";
 
 const DIST_DIR = resolve("dist");
 const API_URL = (process.env.SEO_API_URL || process.env.VITE_API_URL || "https://nove-chat.onrender.com/api/v1").replace(/\/$/, "");
@@ -75,7 +76,7 @@ function commonGraph({ canonicalUrl, language, title, description, type = "WebPa
         addressRegion: "Toshkent",
         addressCountry: "UZ",
       },
-      geo: { "@type": "GeoCoordinates", latitude: 41.333715, longitude: 69.20532 },
+      geo: { "@type": "GeoCoordinates", latitude: 41.346819, longitude: 69.214511 },
       openingHoursSpecification: [{
         "@type": "OpeningHoursSpecification",
         dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -138,8 +139,8 @@ function renderHtml(template, page) {
     <meta name="author" content="XION" />
     <meta name="geo.region" content="UZ-TK" />
     <meta name="geo.placename" content="Tashkent" />
-    <meta name="geo.position" content="41.333715;69.20532" />
-    <meta name="ICBM" content="41.333715, 69.20532" />
+    <meta name="geo.position" content="41.346819;69.214511" />
+    <meta name="ICBM" content="41.346819, 69.214511" />
     ${verification}
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />
     ${page.noindex ? "" : alternateLinks}
@@ -176,7 +177,7 @@ async function fetchJson(path) {
 async function loadContent() {
   try {
     const [landing, pages] = await Promise.all([fetchJson("/public/landing"), fetchJson("/public/pages")]);
-    return { ...landing, pages };
+    return { ...landing, blogPosts: landing.blogPosts || landingFallback.blogPosts, pages };
   } catch (error) {
     console.warn(`[seo] API ishlamadi, bundled fallback ishlatiladi: ${error.message}`);
     return { ...landingFallback, pages: [] };
@@ -251,6 +252,26 @@ function productGraph(product, language, contact) {
   return { graph, images, description };
 }
 
+function blogGraph(post, language, contact) {
+  const path = `/news/${post.slug}`;
+  const canonicalUrl = absoluteLocalizedUrl(path, language);
+  const graph = commonGraph({ canonicalUrl, language, title: post.title, description: post.excerpt, type: "NewsArticle", contact });
+  graph.push({
+    "@type": "NewsArticle",
+    "@id": `${canonicalUrl}#article`,
+    headline: post.title,
+    description: post.excerpt,
+    image: post.coverImage ? [absoluteUrl(post.coverImage)] : [XION_DEFAULT_IMAGE],
+    datePublished: post.publishedAt || post.createdAt,
+    dateModified: post.updatedAt,
+    author: { "@id": `${XION_SITE_URL}/#organization` },
+    publisher: { "@id": `${XION_SITE_URL}/#organization` },
+    mainEntityOfPage: { "@id": `${canonicalUrl}#webpage` },
+  });
+  graph.push(breadcrumbGraph(path, language, post.title));
+  return graph;
+}
+
 async function writeRoute(path, html) {
   if (path === "/") {
     await writeFile(resolve(DIST_DIR, "index.html"), html, "utf8");
@@ -281,6 +302,7 @@ async function main() {
   const content = await loadContent();
   const products = content.products || [];
   const pages = content.pages || [];
+  const blogPosts = content.blogPosts || [];
   const contact = content.settings?.contact || {};
   const sitemapEntries = [];
 
@@ -305,6 +327,16 @@ async function main() {
     }
   }
 
+  for (const source of blogPosts) {
+    for (const language of XION_LANGUAGES) {
+      const post = localizeBlogPost(source, language);
+      const path = `/news/${post.slug}`;
+      const localized = localizedPath(path, language);
+      await writeRoute(localized, renderHtml(template, { path, language, title: `${post.title} | XION`, description: post.excerpt, image: post.coverImage, imageAlt: post.title, ogType: "article", graph: blogGraph(post, language, contact) }));
+      sitemapEntries.push({ basePath: path, url: absoluteLocalizedUrl(path, language), lastmod: post.updatedAt, changefreq: "monthly", priority: "0.8", image: post.coverImage, title: post.title });
+    }
+  }
+
   const privateGraph = commonGraph({ canonicalUrl: `${XION_SITE_URL}/admin`, language: "uz", title: "XION Control", description: "XION yopiq boshqaruv paneli" });
   const privateHtml = renderHtml(template, { path: "/admin", language: "uz", title: "XION Control", description: "XION yopiq boshqaruv paneli", noindex: true, graph: privateGraph });
   await writeRoute("/admin", privateHtml);
@@ -313,7 +345,7 @@ async function main() {
   await writeFile(resolve(DIST_DIR, "404.html"), renderHtml(template, { path: "/404", language: "uz", title: "Sahifa topilmadi | XION", description: "So‘ralgan sahifa topilmadi.", noindex: true, graph: [] }), "utf8");
   await writeFile(resolve(DIST_DIR, "sitemap.xml"), sitemapXml(sitemapEntries), "utf8");
   await writeFile(resolve(DIST_DIR, "robots.txt"), "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /operator\nDisallow: /api/\n\nSitemap: https://xion.uz/sitemap.xml\nHost: xion.uz\n", "utf8");
-  console.log(`[seo] ${sitemapEntries.length} sitemap URL va ${PUBLIC_ROUTES.length * XION_LANGUAGES.length + products.length * XION_LANGUAGES.length} public SEO sahifa yaratildi.`);
+  console.log(`[seo] ${sitemapEntries.length} sitemap URL va ${(PUBLIC_ROUTES.length + products.length + blogPosts.length) * XION_LANGUAGES.length} public SEO sahifa yaratildi.`);
 }
 
 await main();

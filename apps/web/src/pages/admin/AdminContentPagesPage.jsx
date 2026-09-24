@@ -3,11 +3,13 @@ import { Edit3, FileText, LoaderCircle, Plus, Search, Trash2, X } from "lucide-r
 import { api } from "../../services/api.js";
 import { AdminModal, FormField, FormToggle } from "../../components/admin/AdminModal.jsx";
 import { AdminLanguageTabs } from "../../components/admin/AdminLanguageTabs.jsx";
+import { AdminImageUpload } from "../../components/admin/AdminImageUpload.jsx";
 import { useAdminUi } from "../../components/admin/AdminUi.jsx";
 
 const emptyLocale = () => ({ eyebrow: "", title: "", excerpt: "", sections: [] });
 const emptySection = () => ({ title: "", text: "", itemsText: "", date: "" });
-const emptyForm = () => ({ slug: "", title: "", locale: { uz: emptyLocale(), ru: emptyLocale(), en: emptyLocale() }, shared: {}, active: true, sortOrder: 0 });
+const emptyShared = () => ({ type: "page", category: "NEWS", coverImage: "", videoUrl: "", telegramUrl: "https://t.me/xion_office", phonesText: "+998 71 230 04 40\n+998 99 556 06 60", publishedAt: "" });
+const emptyForm = () => ({ slug: "", title: "", locale: { uz: emptyLocale(), ru: emptyLocale(), en: emptyLocale() }, shared: emptyShared(), active: true, sortOrder: 0 });
 const slugify = (value) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function pageForm(item) {
@@ -16,7 +18,8 @@ function pageForm(item) {
     const value = content[language] || {};
     return [language, { eyebrow: value.eyebrow || "", title: value.title || "", excerpt: value.excerpt || "", sections: (value.sections || []).map((section) => ({ ...section, itemsText: (section.items || []).join("\n"), date: section.date || "" })) }];
   }));
-  const shared = Object.fromEntries(Object.entries(content).filter(([key]) => !["uz", "ru", "en"].includes(key)));
+  const rawShared = Object.fromEntries(Object.entries(content).filter(([key]) => !["uz", "ru", "en"].includes(key)));
+  const shared = { ...emptyShared(), ...rawShared, phonesText: (rawShared.phones || []).join("\n"), publishedAt: rawShared.publishedAt?.slice(0, 10) || "" };
   return { slug: item.slug, title: item.title, locale, shared, active: item.active, sortOrder: item.sortOrder };
 }
 
@@ -45,12 +48,14 @@ export function AdminContentPagesPage() {
   const close = () => { setOpen(false); setEditing(null); setForm(emptyForm()); };
   const set = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const setLocale = (key, value) => setForm((current) => ({ ...current, locale: { ...current.locale, [language]: { ...current.locale[language], [key]: value } } }));
+  const setShared = (key, value) => setForm((current) => ({ ...current, shared: { ...current.shared, [key]: value } }));
   const setSection = (index, key, value) => setForm((current) => ({ ...current, locale: { ...current.locale, [language]: { ...current.locale[language], sections: current.locale[language].sections.map((section, sectionIndex) => sectionIndex === index ? { ...section, [key]: value } : section) } } }));
 
   const save = async (event) => {
     event.preventDefault(); setSaving(true); setError("");
     try {
-      const content = { ...form.shared };
+      const { phonesText, ...shared } = form.shared;
+      const content = { ...shared, phones: phonesText.split("\n").map((item) => item.trim()).filter(Boolean), publishedAt: form.shared.publishedAt ? new Date(`${form.shared.publishedAt}T08:00:00.000Z`).toISOString() : undefined };
       for (const code of ["uz", "ru", "en"]) {
         const value = form.locale[code];
         content[code] = { eyebrow: value.eyebrow, title: value.title, excerpt: value.excerpt, sections: value.sections.map(({ itemsText, ...section }) => ({ ...section, date: section.date || undefined, items: itemsText.split("\n").map((item) => item.trim()).filter(Boolean) })) };
@@ -73,12 +78,13 @@ export function AdminContentPagesPage() {
   const addSection = () => setLocale("sections", [...locale.sections, emptySection()]);
   const removeSection = (index) => setLocale("sections", locale.sections.filter((_, sectionIndex) => sectionIndex !== index));
   return <main className="admin-content admin-resource-page">
-    <div className="admin-page-head"><div><p>CONTENT · 3 LANGUAGES</p><h1>Kontent sahifalari</h1><span>Har bir tilning sarlavha, kirish matni va bo‘limlarini alohida boshqaring.</span></div><button type="button" onClick={startCreate}><Plus size={15}/> Qo‘shish</button></div>
+    <div className="admin-page-head"><div><p>CONTENT · BLOG · 3 LANGUAGES</p><h1>Kontent va yangiliklar</h1><span>Sahifalar hamda “Yangiliklar / XION hayoti” bloglarini rasmlar va havolalar bilan boshqaring.</span></div><button type="button" onClick={startCreate}><Plus size={15}/> Qo‘shish</button></div>
     <div className="admin-resource-toolbar"><form onSubmit={(event) => { event.preventDefault(); void load(query); }}><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Sahifa nomi yoki slug..."/><button type="submit">Qidirish</button></form><span>{items.length} ta sahifa</span></div>
     {error ? <div className="admin-error" role="alert"><strong>{error}</strong></div> : null}
     <section className="admin-resource-panel">{loading ? <div className="admin-resource-loading"><LoaderCircle className="admin-spin"/> Yuklanmoqda...</div> : <div className="admin-resource-table"><table><thead><tr><th>Sahifa</th><th>Slug</th><th>Holat</th><th>Tartib</th><th>Amallar</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td><div className="resource-title"><span><FileText size={17}/></span><strong>{item.title}</strong></div></td><td>/{item.slug}</td><td><span className={`resource-badge ${item.active ? "is-active" : ""}`}>{item.active ? "Faol" : "Yashirin"}</span></td><td>{item.sortOrder}</td><td><div className="resource-actions"><button type="button" onClick={() => startEdit(item)} aria-label="Tahrirlash"><Edit3 size={15}/></button><button type="button" className="is-danger" onClick={() => remove(item)} aria-label="O‘chirish"><Trash2 size={15}/></button></div></td></tr>)}</tbody></table></div>}</section>
     {open ? <AdminModal title={editing ? "Sahifani tahrirlash" : "Yangi sahifa"} subtitle="MULTILINGUAL CONTENT EDITOR" onClose={close}><form className="admin-resource-form" onSubmit={save}>
-      <div className="admin-form-grid"><FormField label="Admin nomi"><input required minLength="2" value={form.title} onChange={(event) => { const title = event.target.value; set("title", title); if (!editing && !form.slug) set("slug", slugify(title)); }}/></FormField><FormField label="Slug"><input required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" value={form.slug} onChange={(event) => set("slug", slugify(event.target.value))}/></FormField></div>
+      <div className="admin-form-grid"><FormField label="Admin nomi"><input required minLength="2" value={form.title} onChange={(event) => { const title = event.target.value; set("title", title); if (!editing && !form.slug) set("slug", slugify(title)); }}/></FormField><FormField label="Slug"><input required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" value={form.slug} onChange={(event) => set("slug", slugify(event.target.value))}/></FormField><FormField label="Kontent turi"><select value={form.shared.type} onChange={(event) => setShared("type", event.target.value)}><option value="page">Oddiy sahifa</option><option value="blog">Yangilik / blog</option></select></FormField>{form.shared.type === "blog" ? <FormField label="Blog bo‘limi"><select value={form.shared.category} onChange={(event) => setShared("category", event.target.value)}><option value="NEWS">Yangiliklar</option><option value="XION_LIFE">XION hayoti</option></select></FormField> : null}</div>
+      {form.shared.type === "blog" ? <div className="admin-form-section"><h3>Blog media va havolalari</h3><div className="admin-form-grid"><FormField label="Muqova rasmi" wide><AdminImageUpload value={form.shared.coverImage} onChange={(value) => setShared("coverImage", value)} label="Blog rasmini tanlash"/><input className="admin-url-fallback" value={form.shared.coverImage} onChange={(event) => setShared("coverImage", event.target.value)} placeholder="Yoki rasm URL/path kiriting"/></FormField><FormField label="Video havolasi"><input type="url" value={form.shared.videoUrl} onChange={(event) => setShared("videoUrl", event.target.value)} placeholder="https://youtu.be/..."/></FormField><FormField label="Telegram havolasi"><input type="url" value={form.shared.telegramUrl} onChange={(event) => setShared("telegramUrl", event.target.value)} placeholder="https://t.me/xion_office"/></FormField><FormField label="Telefonlar" hint="Har bir raqam yangi qatorda" wide><textarea rows="3" value={form.shared.phonesText} onChange={(event) => setShared("phonesText", event.target.value)}/></FormField><FormField label="Nashr sanasi"><input type="date" value={form.shared.publishedAt} onChange={(event) => setShared("publishedAt", event.target.value)}/></FormField></div></div> : null}
       <AdminLanguageTabs value={language} onChange={setLanguage}/>
       <div className="admin-form-grid admin-localized-panel" key={language}>
         <FormField label={`Kichik sarlavha · ${language.toUpperCase()}`} wide><input value={locale.eyebrow} onChange={(event) => setLocale("eyebrow", event.target.value)}/></FormField>

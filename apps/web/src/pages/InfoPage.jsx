@@ -9,7 +9,7 @@ import { api } from "../services/api.js";
 import { getVisitorId, getVisitorProfile } from "../services/visitor.js";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { infoFallback } from "../data/info-fallback.js";
-import { XION_ADDRESS, XION_MAP_URL, XION_TELEGRAM_URL } from "../config/public-links.js";
+import { openOutlookCompose, outlookComposeUrl, XION_ADDRESS, XION_MAP_URL, XION_TELEGRAM_URL } from "../config/public-links.js";
 import { getPageSeo, localizedPath, XION_SITE_URL } from "../config/seo.js";
 import { Seo } from "../components/common/Seo.jsx";
 
@@ -107,7 +107,7 @@ export function InfoPage({ slug }) {
           <div className="contact-direct-grid">
             <a href={`tel:${phone.replace(/\s/g, "")}`}><span><Phone/></span><small>{t.phone}</small><strong>{phone}</strong><i>{contact.workingHours || "Dushanba–Juma, 08:00–17:00"}</i></a>
             <a href={XION_TELEGRAM_URL} target="_blank" rel="noreferrer"><span><Send/></span><small>TELEGRAM</small><strong>@xion_office</strong><i>{actions.inquiry}</i></a>
-            <a href={`mailto:${email}`}><span><Mail/></span><small>EMAIL</small><strong>{email}</strong><i>{t.footerSupport}</i></a>
+            <a href={outlookComposeUrl(email)} onClick={(event) => openOutlookCompose(event, email)}><span><Mail/></span><small>EMAIL</small><strong>{email}</strong><i>{t.footerSupport}</i></a>
           </div>
           <div className="contact-map-card"><div><p className="eyebrow"><span/>{t.location}</p><h2>{address}</h2><div className="contact-map-meta"><span><Clock size={17}/>{contact.workingHours || "Dushanba–Juma, 08:00–17:00"}</span><a href={XION_MAP_URL} target="_blank" rel="noreferrer">{t.location}<ExternalLink size={15}/></a></div></div><XionMap className="contact-xion-map"/></div>
         </section> : null}

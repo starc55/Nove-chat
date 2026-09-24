@@ -23,6 +23,8 @@ const InfoPage = lazy(() =>
     default: module.InfoPage,
   }))
 );
+const NewsPage = lazy(() => import("./pages/NewsPage.jsx").then((module) => ({ default: module.NewsPage })));
+const BlogPostPage = lazy(() => import("./pages/BlogPostPage.jsx").then((module) => ({ default: module.BlogPostPage })));
 const AdminLayout = lazy(() =>
   import("./components/admin/AdminLayout.jsx").then((module) => ({
     default: module.AdminLayout,
@@ -134,7 +136,8 @@ export function App() {
             path="/manufacturers"
             element={<InfoPage slug="manufacturers" />}
           />
-          <Route path="/news" element={<InfoPage slug="news" />} />
+          <Route path="/news" element={<NewsPage />} />
+          <Route path="/news/:slug" element={<BlogPostPage />} />
           <Route path="/career" element={<InfoPage slug="career" />} />
           <Route path="/contact" element={<InfoPage slug="contact" />} />
           <Route
@@ -151,7 +154,8 @@ export function App() {
             <Route path="simurg" element={<InfoPage slug="simurg" />} />
             <Route path="medical-institutions" element={<InfoPage slug="medical-institutions" />} />
             <Route path="manufacturers" element={<InfoPage slug="manufacturers" />} />
-            <Route path="news" element={<InfoPage slug="news" />} />
+            <Route path="news" element={<NewsPage />} />
+            <Route path="news/:slug" element={<BlogPostPage />} />
             <Route path="career" element={<InfoPage slug="career" />} />
             <Route path="contact" element={<InfoPage slug="contact" />} />
             <Route path="warranty-return" element={<InfoPage slug="warranty-return" />} />

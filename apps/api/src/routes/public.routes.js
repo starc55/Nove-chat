@@ -13,13 +13,15 @@ const phoneSchema = z.string().trim().regex(/^\+?[0-9 ()-]{7,24}$/);
 publicRouter.get("/landing", async (req, res, next) => {
   try {
     const now = new Date();
-    const [products, advertisements, reviews, settings] = await Promise.all([
+    const [products, advertisements, reviews, settings, contentPages] = await Promise.all([
       prisma.product.findMany({ where: { active: true }, include: { images: { orderBy: { sortOrder: "asc" } }, variants: { where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } }, orderBy: [{ featured: "desc" }, { sortOrder: "asc" }] }),
       prisma.advertisement.findMany({ where: { enabled: true, AND: [{ OR: [{ startAt: null }, { startAt: { lte: now } }] }, { OR: [{ endAt: null }, { endAt: { gte: now } }] }] }, orderBy: { sortOrder: "asc" } }),
       prisma.review.findMany({ where: { status: "APPROVED" }, orderBy: { createdAt: "desc" }, take: 8 }),
-      prisma.siteSetting.findMany()
+      prisma.siteSetting.findMany(),
+      prisma.contentPage.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] })
     ]);
-    res.json({ success: true, data: { products, advertisements, reviews, settings: Object.fromEntries(settings.map(({ key, value }) => [key, value])) } });
+    const blogPosts = contentPages.filter((page) => page.content?.type === "blog");
+    res.json({ success: true, data: { products, advertisements, reviews, blogPosts, settings: Object.fromEntries(settings.map(({ key, value }) => [key, value])) } });
   } catch (error) { next(error); }
 });
 
@@ -55,6 +57,23 @@ publicRouter.get("/pages/:slug", async (req, res, next) => {
   try {
     const page = await prisma.contentPage.findFirst({ where: { slug: req.params.slug, active: true } });
     if (!page) throw new ApiError(404, "CONTENT_PAGE_NOT_FOUND", "Sahifa topilmadi.");
+    res.json({ success: true, data: page });
+  } catch (error) { next(error); }
+});
+
+publicRouter.get("/blog-posts", async (req, res, next) => {
+  try {
+    const pages = await prisma.contentPage.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] });
+    const category = typeof req.query.category === "string" ? req.query.category.toUpperCase() : "";
+    const posts = pages.filter((page) => page.content?.type === "blog" && (!category || page.content?.category === category));
+    res.json({ success: true, data: posts });
+  } catch (error) { next(error); }
+});
+
+publicRouter.get("/blog-posts/:slug", async (req, res, next) => {
+  try {
+    const page = await prisma.contentPage.findFirst({ where: { slug: req.params.slug, active: true } });
+    if (!page || page.content?.type !== "blog") throw new ApiError(404, "BLOG_POST_NOT_FOUND", "Yangilik topilmadi.");
     res.json({ success: true, data: page });
   } catch (error) { next(error); }
 });

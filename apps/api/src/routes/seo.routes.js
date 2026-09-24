@@ -18,12 +18,13 @@ seoRouter.get("/sitemap.xml", async (_req, res, next) => {
   try {
     const [products, pages] = await Promise.all([
       prisma.product.findMany({ where: { active: true }, select: { slug: true, title: true, image: true, updatedAt: true } }),
-      prisma.contentPage.findMany({ where: { active: true }, select: { slug: true, updatedAt: true } })
+      prisma.contentPage.findMany({ where: { active: true }, select: { slug: true, title: true, content: true, updatedAt: true } })
     ]);
     const pageRoutes = { about: "/company", "medical-institutions": "/medical-institutions", manufacturers: "/manufacturers", news: "/news", career: "/career", contact: "/contact", "warranty-return": "/warranty-return", terms: "/terms", privacy: "/privacy" };
     const entries = [
       ...staticPaths.map((path) => ({ path, priority: path === "/" ? "1.0" : path === "/catalog" ? "0.9" : "0.7" })),
-      ...pages.map((page) => ({ path: pageRoutes[page.slug], lastmod: page.updatedAt, priority: "0.7" })).filter((entry) => entry.path && !staticPaths.includes(entry.path)),
+      ...pages.filter((page) => page.content?.type !== "blog").map((page) => ({ path: pageRoutes[page.slug], lastmod: page.updatedAt, priority: "0.7" })).filter((entry) => entry.path && !staticPaths.includes(entry.path)),
+      ...pages.filter((page) => page.content?.type === "blog").map((page) => ({ path: `/news/${page.slug}`, title: page.title, image: page.content?.coverImage, lastmod: page.updatedAt, priority: "0.8" })),
       ...products.map((product) => ({ path: `/products/${product.slug}`, title: product.title, image: product.image, lastmod: product.updatedAt, priority: "0.8" }))
     ];
     const body = entries.flatMap((entry) => LANGUAGES.map((language) => {
