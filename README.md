@@ -1,4 +1,4 @@
-# NOVA Premium Platform
+# XION Platform
 
 React/Vite landing, Express API, Neon Postgres, Socket.IO live chat, admin boshqaruvi va Telegram operator botidan iborat JavaScript monorepo.
 
@@ -31,7 +31,7 @@ npm run dev
 - API: `http://localhost:4000/api/v1`
 - Health: `http://localhost:4000/api/v1/health`
 
-Development admin: `admin@nova.uz` / `NovaDev2026!`. Bu parol production uchun ishlatilmaydi.
+Development admin ma’lumotlari `.env` orqali beriladi; login yoki parol repozitoriyda saqlanmaydi.
 
 ## Admin bo‘limlari
 
@@ -51,7 +51,7 @@ cd apps/api
 npx prisma migrate deploy
 cd ../..
 npm run build
-npm run start -w @nova/api
+npm run start -w @xion/api
 ```
 
 Production admin yaratish:
@@ -59,8 +59,8 @@ Production admin yaratish:
 ```powershell
 $env:ADMIN_EMAIL='owner@example.com'
 $env:ADMIN_PASSWORD='juda-kuchli-maxfiy-parol'
-$env:ADMIN_NAME='NOVA Owner'
-npm run admin:create -w @nova/api
+$env:ADMIN_NAME='XION Owner'
+npm run admin:create -w @xion/api
 ```
 
 `db:seed` production muhitida ataylab bloklangan.

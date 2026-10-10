@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: nova-api
+    name: xion-api
     runtime: node
-    buildCommand: npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api && npm run db:deploy -w @nova/api && npm run build -w @nova/web
-    startCommand: npm run start -w @nova/api
+    buildCommand: npm ci --include=dev && npm run db:generate -w @xion/api && npm run check -w @xion/api && npm run db:deploy -w @xion/api && npm run build -w @xion/web
+    startCommand: npm run start -w @xion/api
     healthCheckPath: /api/v1/health
     autoDeployTrigger: commit
     buildFilter:

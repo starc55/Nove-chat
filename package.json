@@ -1,19 +1,22 @@
 {
-  "name": "nova-premium-platform",
+  "name": "xion-platform",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "concurrently -n WEB,API -c cyan,magenta \"npm run dev -w @nova/web\" \"npm run dev -w @nova/api\"",
-    "build": "npm run build -w @nova/web && npm run check -w @nova/api",
-    "lint": "npm run lint -w @nova/web && npm run lint -w @nova/api",
-    "db:generate": "npm run db:generate -w @nova/api",
-    "db:migrate": "npm run db:migrate -w @nova/api",
-    "db:seed": "npm run db:seed -w @nova/api",
-    "admin:create": "npm run admin:create -w @nova/api",
-    "render:build": "npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api && npm run db:deploy -w @nova/api && npm run build -w @nova/web",
-    "render:start": "npm run start -w @nova/api"
+    "dev": "concurrently -n WEB,API -c cyan,magenta \"npm run dev -w @xion/web\" \"npm run dev -w @xion/api\"",
+    "build": "npm run build -w @xion/web && npm run check -w @xion/api",
+    "lint": "npm run lint -w @xion/web && npm run lint -w @xion/api",
+    "db:generate": "npm run db:generate -w @xion/api",
+    "db:migrate": "npm run db:migrate -w @xion/api",
+    "db:seed": "npm run db:seed -w @xion/api",
+    "admin:create": "npm run admin:create -w @xion/api",
+    "render:build": "npm ci --include=dev && npm run db:generate -w @xion/api && npm run check -w @xion/api && npm run db:deploy -w @xion/api && npm run build -w @xion/web",
+    "render:start": "npm run start -w @xion/api"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"

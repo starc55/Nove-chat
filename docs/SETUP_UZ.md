@@ -1,4 +1,4 @@
-# NOVA: boshidan productiongacha qo‘llanma
+# XION: boshidan productiongacha qo‘llanma
 
 ## 1. Arxitektura
 
@@ -38,8 +38,7 @@ Socket:  http://localhost:4000/socket.io
 Development admin:
 
 ```text
-Email: admin@nova.uz
-Parol: NovaDev2026!
+Email va parol `.env` orqali xavfsiz kiritiladi.
 ```
 
 ## 3. Admin paneldan foydalanish
@@ -156,8 +155,8 @@ Repository rootida `render.yaml` tayyor. Mavjud Render Web Service’ni qo‘lda
 
 ```text
 Root Directory: bo‘sh qoldiring
-Build Command: npm ci --include=dev && npm run db:generate -w @nova/api && npm run check -w @nova/api
-Start Command: npm run start -w @nova/api
+Build Command: npm ci --include=dev && npm run db:generate -w @xion/api && npm run check -w @xion/api
+Start Command: npm run start -w @xion/api
 Health Check Path: /api/v1/health
 Node Version: 22.22.0
 ```
@@ -196,7 +195,7 @@ cd apps/api
 npx prisma migrate deploy
 cd ../..
 npm run build
-npm run start -w @nova/api
+npm run start -w @xion/api
 ```
 
 Production admin yaratish:
@@ -204,8 +203,8 @@ Production admin yaratish:
 ```powershell
 $env:ADMIN_EMAIL='owner@example.com'
 $env:ADMIN_PASSWORD='juda-kuchli-maxfiy-parol'
-$env:ADMIN_NAME='NOVA Owner'
-npm run admin:create -w @nova/api
+$env:ADMIN_NAME='XION Owner'
+npm run admin:create -w @xion/api
 ```
 
 `npm run db:seed` productionda bloklangan, chunki development paroli productionga tushmasligi kerak.
