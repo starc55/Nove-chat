@@ -1,0 +1,367 @@
+.admin-shell {
+  color-scheme: dark;
+}
+.admin-head-actions > button {
+  min-height: 42px;
+  border: 1px solid #343a43;
+  border-radius: 10px;
+  background: #162131;
+  color: #e9f1ff;
+  padding: 0 14px;
+  cursor: pointer;
+}
+.admin-form-options {
+  flex-wrap: wrap;
+}
+.admin-sidebar {
+  overflow-y: auto;
+}
+.admin-nav > a[href$="/operators"] {
+  margin: 8px 0;
+  border: 1px solid #2b6db1;
+  background: #122941;
+  color: #b5dbff;
+  border-radius: 12px;
+}
+.admin-nav > a[href$="/operators"] svg {
+  width: 26px;
+  height: 26px;
+  color: #63b5ff;
+}
+.admin-form-field > span {
+  color: #a9b1be;
+}
+.admin-form-field small {
+  color: #959eac;
+}
+.admin-top-actions > button {
+  color: #f2cd7a;
+  border-radius: 10px;
+}
+.admin-resource-table td {
+  font-size: 12px;
+}
+.admin-resource-table th {
+  font-size: 10px;
+}
+.admin-form-field input,
+.admin-form-field textarea,
+.admin-form-field .xion-select {
+  font-size: 14px;
+}
+.admin-sidebar-foot {
+  padding-top: 20px;
+}
+.admin-nav {
+  padding-top: 20px;
+}
+.admin-nav > a {
+  min-height: 44px;
+  height: auto;
+  padding-block: 12px;
+}
+.admin-profile small {
+  color: #a4aeba;
+}
+:root[data-admin-theme="light"] .admin-shell {
+  color-scheme: light;
+  --admin-bg: #f4f6f9;
+  --admin-line: #dce2e9;
+  --admin-muted: #5e6b7b;
+  color: #172334;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-sidebar,
+    .admin-topbar,
+    .admin-panel,
+    .admin-resource-panel,
+    .admin-kpi,
+    .admin-modal,
+    .admin-modal > header,
+    .admin-confirm,
+    .admin-toast
+  ) {
+  background: #fff;
+  color: #172334;
+  border-color: #dce2e9;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-resource-toolbar,
+    .admin-localized-panel,
+    .admin-variant-row,
+    .admin-language-tabs,
+    .admin-resource-table tbody tr:hover
+  ) {
+  background: #f2f5f9;
+  color: #172334;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-nav > a,
+    .admin-page-head span,
+    .admin-profile small,
+    .admin-panel td,
+    .admin-resource-table td,
+    .admin-form-field > span,
+    .admin-form-field small,
+    .admin-form-section-head p,
+    .admin-variant-empty,
+    .admin-form-toggle,
+    .admin-sidebar-foot > a,
+    .admin-logout,
+    .admin-top-actions > a
+  ) {
+  color: #526173;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .resource-title strong,
+    .admin-panel h2,
+    .admin-panel td strong,
+    .admin-language-tabs button,
+    .admin-context,
+    .admin-menu,
+    .admin-brand > button
+  ) {
+  color: #172334;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-form-field input,
+    .admin-form-field textarea,
+    .admin-shell .xion-select > button,
+    .admin-modal .xion-select > button,
+    .xion-select-menu.is-admin,
+    .admin-resource-toolbar input,
+    .admin-resource-toolbar button,
+    .resource-actions button,
+    .admin-upload-trigger,
+    .admin-variant-row > header button,
+    .admin-form-section-head button,
+    .admin-head-actions > button,
+    .admin-top-actions > button
+  ) {
+  background: #fff;
+  color: #26384b;
+  border-color: #ced7e2;
+}
+:root[data-admin-theme="light"] .admin-nav > a.active {
+  background: #e9f2ff;
+  color: #0a5dd3;
+  border-color: #9fc9ff;
+}
+:root[data-admin-theme="light"] .admin-nav > a[href$="/operators"] {
+  background: #e7f2ff;
+  color: #165a9f;
+  border-color: #a5cef6;
+}
+:root[data-admin-theme="light"] .admin-language-tabs button.is-active {
+  background: #172334;
+  color: #fff;
+  border-color: #172334;
+}
+
+.admin-password-field {
+  position: relative;
+  width: 100%;
+}
+.admin-password-field > input {
+  width: 100%;
+  padding-right: 48px !important;
+}
+.admin-password-field > button {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #8b95a4;
+  cursor: pointer;
+}
+.admin-password-field > button:hover {
+  background: #20242b;
+  color: #fff;
+}
+:root[data-admin-theme="light"] .admin-main {
+  background: #f4f6f9;
+  color: #172334;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-content,
+    .admin-page-head h1,
+    .admin-page-head p,
+    .admin-panel h1,
+    .admin-panel h2,
+    .admin-panel h3,
+    .admin-resource-panel h2,
+    .admin-resource-panel h3,
+    .admin-form-section h3,
+    .admin-modal h2,
+    .admin-confirm h2,
+    .admin-toast strong,
+    .resource-title strong,
+    .admin-kpi strong,
+    .admin-kpi b,
+    .admin-empty p,
+    .admin-resource-loading
+  ) {
+  color: #172334;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-resource-table th,
+    .admin-panel th,
+    .admin-form-divider span,
+    .admin-modal > header p,
+    .admin-confirm p,
+    .admin-toast p,
+    .admin-kpi span,
+    .admin-resource-toolbar span,
+    .admin-resource-toolbar small
+  ) {
+  color: #5b6979;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-sidebar-foot,
+    .admin-topbar,
+    .admin-resource-table th,
+    .admin-resource-table td,
+    .admin-panel th,
+    .admin-panel td,
+    .admin-form-section,
+    .admin-form-divider
+  ) {
+  border-color: #dce2e9;
+}
+:root[data-admin-theme="light"]
+  :is(.admin-error, .admin-upload-error, .login-error) {
+  color: #a61b2b;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .admin-password-field > button,
+    .admin-form-field input::placeholder,
+    .admin-form-field textarea::placeholder
+  ) {
+  color: #7a8797;
+}
+:root[data-admin-theme="light"] .admin-password-field > button:hover {
+  background: #e7edf4;
+  color: #172334;
+}
+:root[data-admin-theme="light"]
+  :is(
+    .telegram-status-card,
+    .admin-preview-card,
+    .admin-upload-previews figure
+  ) {
+  background: #fff;
+  color: #172334;
+  border-color: #dce2e9;
+}
+:root[data-admin-theme="light"] input[type="datetime-local"] {
+  color-scheme: light;
+}
+.admin-banner-preview {
+  position: relative;
+  min-height: 210px;
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 12px;
+  background: #111;
+}
+.admin-banner-preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--preview-fit, contain);
+  object-position: var(--preview-position, center);
+}
+.admin-banner-preview span {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  z-index: 1;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 2px 15px #000;
+}
+:root[data-admin-theme="light"]
+  .admin-resource-form
+  > footer
+  button[type="submit"] {
+  background: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+:root[data-admin-theme="light"]
+  .admin-resource-form
+  > footer
+  button[type="button"] {
+  background: #eff3f7;
+  color: #526173;
+  border-color: #dce2e9;
+}
+:root[data-admin-theme="light"] .admin-form-toggle input:checked + i {
+  background: #0d6efd;
+}
+:root[data-admin-theme="light"] .admin-form-toggle input:checked + i::after {
+  background: #fff;
+}
+:root[data-admin-theme="light"] .admin-modal,
+:root[data-admin-theme="light"] .admin-confirm {
+  box-shadow: 0 30px 100px #12223a40;
+}
+@media (max-width: 720px) {
+  .admin-page-head {
+    flex-wrap: wrap;
+  }
+  .admin-head-actions {
+    width: 100%;
+  }
+  .admin-head-actions > button {
+    flex: 1;
+  }
+  .admin-content {
+    padding-inline: 16px;
+  }
+  .admin-modal-backdrop {
+    padding: 12px;
+  }
+  .admin-modal {
+    max-height: calc(100dvh - 24px);
+  }
+  .admin-resource-form {
+    padding: 18px;
+  }
+  .admin-form-options {
+    gap: 16px;
+  }
+  .admin-form-grid {
+    gap: 16px;
+  }
+}
+
+.admin-product-form-error {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 6px;
+  margin: 0 0 18px;
+}
+.admin-product-form-error span {
+  font-size: 11px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}

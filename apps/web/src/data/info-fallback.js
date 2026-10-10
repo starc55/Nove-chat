@@ -75,7 +75,7 @@ const pages = {
         { question: "Mahsulot tanlash bo‘yicha maslahat berasizmi?", answer: "Ha. Mutaxassis ehtiyoj, o‘lcham va modifikatsiyani aniqlashga yordam beradi. Tibbiy qo‘llash bo‘yicha yakuniy qaror shifokor tomonidan qabul qilinadi." },
         { question: "O‘zbekiston bo‘ylab yetkazib berasizmi?", answer: "Ha. Yetkazish muddati va usuli buyurtma hajmi hamda manzilga qarab menejer bilan kelishiladi." },
         { question: "Tibbiyot muassasasi uchun hujjatlar beriladimi?", answer: "Mavjud ruxsat, sertifikat va foydalanish yo‘riqnomalari mahsulot kartasida yoki so‘rov asosida taqdim etiladi." },
-        { question: "Ish vaqti qanday?", answer: "Dushanba–Juma, 08:00–17:00. Jonli chat va Telegram orqali murojaat qoldirish mumkin." },
+        { question: "Ish vaqti qanday?", answer: "Dushanba–Shanba, 09:00–18:00. Jonli chat va Telegram orqali murojaat qoldirish mumkin." },
       ] }],
     },
     ru: {
@@ -86,7 +86,7 @@ const pages = {
         { question: "Помогаете выбрать изделие?", answer: "Да. Специалист поможет уточнить потребность, размер и модификацию. Решение о медицинском применении принимает врач." },
         { question: "Есть доставка по Узбекистану?", answer: "Да. Срок и способ доставки согласуются с менеджером." },
         { question: "Предоставляете документы?", answer: "Регистрационные документы, сертификаты и инструкции доступны в карточке товара или по запросу." },
-        { question: "Какой график работы?", answer: "Понедельник–пятница, 08:00–17:00. Обращение можно оставить в чате или Telegram." },
+        { question: "Какой график работы?", answer: "Понедельник–суббота, 09:00–18:00. Обращение можно оставить в чате или Telegram." },
       ] }],
     },
     en: {
@@ -97,7 +97,7 @@ const pages = {
         { question: "Can you help select a product?", answer: "Yes. A specialist can clarify the need, size and modification. The final medical-use decision belongs to a physician." },
         { question: "Do you deliver across Uzbekistan?", answer: "Yes. Delivery time and method are agreed with a manager." },
         { question: "Are product documents available?", answer: "Registration documents, certificates and instructions are available on product pages or on request." },
-        { question: "What are your working hours?", answer: "Monday–Friday, 08:00–17:00. You can leave a message in live chat or Telegram." },
+        { question: "What are your working hours?", answer: "Monday–Saturday, 09:00–18:00. You can leave a message in live chat or Telegram." },
       ] }],
     },
   },

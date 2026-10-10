@@ -86,6 +86,15 @@ publicRouter.get("/products/:slug", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+publicRouter.get("/advertisements/:id", async (req, res, next) => {
+  try {
+    const now = new Date();
+    const advertisement = await prisma.advertisement.findFirst({ where: { id: req.params.id, enabled: true, AND: [{ OR: [{ startAt: null }, { startAt: { lte: now } }] }, { OR: [{ endAt: null }, { endAt: { gte: now } }] }] } });
+    if (!advertisement) throw new ApiError(404, "ADVERTISEMENT_NOT_FOUND", "Aksiya topilmadi.");
+    res.json({ success: true, data: advertisement });
+  } catch (error) { next(error); }
+});
+
 publicRouter.post("/reviews", submissionLimiter, async (req, res, next) => {
   try {
     const input = z.object({
@@ -129,8 +138,9 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
       comment: z.string().trim().max(1000).optional().default(""),
       sourcePath: z.string().trim().max(300).optional().default("/")
     }).parse(req.body);
-    const product = await prisma.product.findFirst({ where: { id: input.productId, active: true }, select: { id: true, title: true, price: true, stock: true, variants: { where: { active: true }, select: { id: true } } } });
+    const product = await prisma.product.findFirst({ where: { id: input.productId, active: true }, select: { id: true, title: true, price: true, stock: true, purchasable: true, variants: { where: { active: true }, select: { id: true } } } });
     if (!product) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
+    if (!product.purchasable) throw new ApiError(409, "PRODUCT_NOT_FOR_SALE", "Bu mahsulot hozir buyurtma uchun yopiq.");
     if (product.variants.length && !input.productVariantId) throw new ApiError(422, "VARIANT_REQUIRED", "Razmer yoki mahsulot turini tanlang.");
     const order = await prisma.$transaction(async (tx) => {
       let variant = null;
@@ -155,7 +165,7 @@ publicRouter.post("/orders", submissionLimiter, async (req, res, next) => {
           productVariantId: variant?.id || null,
           productTitle: product.title,
           productPrice: variant?.price ?? product.price,
-          variantLabel: variant?.label || null,
+          variantLabel: variant ? [...new Set([variant.label, variant.size, variant.type].filter(Boolean))].join(" · ") : null,
           quantity: input.quantity,
           stockManaged: Boolean(variant || product.stock !== null),
           name: input.name,

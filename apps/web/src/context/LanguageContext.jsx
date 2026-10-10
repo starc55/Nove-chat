@@ -3,7 +3,7 @@ import { copy } from "../i18n/landing.js";
 import { languageFromPath, localizedPath } from "../config/seo.js";
 
 const LanguageContext = createContext(null);
-const LANGUAGE_KEY = "nova_language";
+const LANGUAGE_KEY = "xion_language";
 
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {

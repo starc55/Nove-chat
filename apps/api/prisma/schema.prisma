@@ -281,6 +281,7 @@ model Product {
   productType      String?
   tags              String[]       @default([])
   showTags          Boolean        @default(true)
+  purchasable       Boolean        @default(true)
   active           Boolean        @default(true)
   featured         Boolean        @default(false)
   sortOrder        Int            @default(0)
@@ -344,6 +345,7 @@ model Advertisement {
   ctaLabel    String?
   ctaUrl      String?
   translations Json?
+  display      Json?
   placement   AdvertisementPlacement
   startAt     DateTime?
   endAt       DateTime?

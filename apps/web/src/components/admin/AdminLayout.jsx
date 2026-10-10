@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Archive, ArrowUpRight, Bot, ChevronLeft, ClipboardList, FileText, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, X } from "lucide-react";
+import { Archive, ArrowUpRight, Bot, ChevronLeft, ClipboardList, FileText, LayoutDashboard, LogOut, Megaphone, Menu, Package, ShoppingBag, Star, UsersRound, X } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { AdminUiProvider, useAdminUi } from "./AdminUi.jsx";
 import { ADMIN_BASE } from "../../config/admin.js";
 import { BrandLogo } from "../common/BrandLogo.jsx";
 import { Seo } from "../common/Seo.jsx";
+import { Moon, Sun } from "lucide-react";
 
 function AdminLayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem("xion_admin_theme") || "dark");
+  useEffect(() => {
+    document.documentElement.dataset.adminTheme = theme;
+    localStorage.setItem("xion_admin_theme", theme);
+    return () => { delete document.documentElement.dataset.adminTheme; };
+  }, [theme]);
   const { user, logout } = useAuth();
   const { confirm } = useAdminUi();
   const reduceMotion = useReducedMotion();
@@ -45,6 +52,7 @@ function AdminLayoutContent() {
           <NavLink to={`${ADMIN_BASE}/orders`} onClick={() => setSidebarOpen(false)}><ShoppingBag size={18}/><b>Buyurtmalar</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/archive`} onClick={() => setSidebarOpen(false)}><Archive size={18}/><b>Chat arxivi</b></NavLink>
           <NavLink to={`${ADMIN_BASE}/operators`} onClick={() => setSidebarOpen(false)}><Bot size={18}/><b>Operatorlar</b></NavLink>
+          <NavLink to={`${ADMIN_BASE}/accounts`} onClick={() => setSidebarOpen(false)}><UsersRound size={18}/><b>Adminlar va xavfsizlik</b></NavLink>
         </nav>
         <div className="admin-sidebar-foot">
           <a href="/" target="_blank" rel="noreferrer">Saytni ochish <ArrowUpRight size={16}/></a>
@@ -56,7 +64,7 @@ function AdminLayoutContent() {
         <header className="admin-topbar">
           <button className="admin-menu" onClick={() => setSidebarOpen(true)} aria-label="Menyuni ochish"><Menu/></button>
           <div className="admin-context"><span>XION</span><i/>Administratsiya</div>
-          <div className="admin-top-actions"><a href="/" aria-label="Saytga qaytish"><ChevronLeft size={16}/> Sayt</a></div>
+          <div className="admin-top-actions"><button type="button" onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")} aria-label={theme === "dark" ? "Yorug‘ rejim" : "Tungi rejim"} aria-pressed={theme === "dark"}>{theme === "dark" ? <Sun size={18}/> : <Moon size={18}/>}</button><a href="/" aria-label="Saytga qaytish"><ChevronLeft size={16}/> Sayt</a></div>
         </header>
         <Outlet />
       </div>

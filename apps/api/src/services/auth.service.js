@@ -20,9 +20,9 @@ function publicUser(user) {
 
 async function createSession(user, persistent = true) {
   const accessToken = jwt.sign(
-    { sub: user.id, role: user.role },
+    { sub: user.id, role: user.role, authVersion: user.updatedAt.getTime() },
     env.JWT_ACCESS_SECRET,
-    { expiresIn: env.ACCESS_TOKEN_TTL, issuer: "nova-api", audience: "nova-admin" }
+    { expiresIn: env.ACCESS_TOKEN_TTL, issuer: "xion-api", audience: "xion-admin" }
   );
   const refreshToken = randomBytes(48).toString("base64url");
   const expiresAt = new Date(Date.now() + (persistent ? env.REFRESH_TOKEN_DAYS : 1) * 86_400_000);

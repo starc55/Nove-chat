@@ -1,3 +1,4 @@
+import { XionSelect } from "../../components/common/XionSelect.jsx";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -98,7 +99,7 @@ export function Header({ contact = {}, loading = false }) {
         <div className="nav-actions">
           <label className="language-select">
             <span className="sr-only">{t.language}</span>
-            <select
+            <XionSelect
               data-header-select
               value={language}
               onChange={(event) => setLanguage(event.target.value)}
@@ -106,7 +107,7 @@ export function Header({ contact = {}, loading = false }) {
               <option value="uz">O‘z</option>
               <option value="ru">Рус</option>
               <option value="en">Eng</option>
-            </select>
+            </XionSelect>
             <ChevronDown size={13} />
           </label>
           <button
@@ -140,7 +141,7 @@ export function Header({ contact = {}, loading = false }) {
         </button>
         <label className="language-select mobile-language-select">
           <span className="sr-only">{t.language}</span>
-          <select
+          <XionSelect
             data-header-select
             value={language}
             onChange={(event) => setLanguage(event.target.value)}
@@ -148,7 +149,7 @@ export function Header({ contact = {}, loading = false }) {
             <option value="uz">O‘z</option>
             <option value="ru">Рус</option>
             <option value="en">Eng</option>
-          </select>
+          </XionSelect>
           <ChevronDown size={13} />
         </label>
         <button

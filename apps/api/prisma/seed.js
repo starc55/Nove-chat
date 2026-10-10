@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   if (process.env.NODE_ENV === "production") {
-    throw new Error("Development seed productionda bloklangan. ADMIN_EMAIL, ADMIN_PASSWORD va ADMIN_NAME bilan npm run admin:create -w @nova/api buyrug‘ini ishlating.");
+    throw new Error("Development seed productionda bloklangan. ADMIN_EMAIL, ADMIN_PASSWORD va ADMIN_NAME bilan npm run admin:create -w @xion/api buyrug‘ini ishlating.");
   }
   const passwordHash = await bcrypt.hash("XionDev2026!", 12);
   const user = await prisma.user.upsert({

@@ -144,6 +144,13 @@ select {
   color: #63a4ff;
 }
 
+/* XION form controls: native arrows are replaced consistently. */
+.site-shell select,
+.admin-shell select { appearance:none; -webkit-appearance:none; background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%); background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:34px; }
+:root[data-theme="dark"] .site-shell select { border-color:var(--theme-line); background-color:var(--theme-input); color:var(--theme-text); }
+:root[data-theme="dark"] .campaign-card:not(.has-image) .campaign-copy a,:root[data-theme="dark"] .campaign-card:not(.has-image) .campaign-copy button { color:#8dc1ff; }
+:root[data-theme="dark"] .campaign-side-arrow { background:#172230; color:#dcecff; border:1px solid #2a3b4e; }
+
 /* Landing sections */
 :root[data-theme="dark"] .hero,
 :root[data-theme="dark"] .products-section,
@@ -821,8 +828,11 @@ select:not([multiple]):not([data-header-select]):focus-visible {
 :root[data-theme="dark"] .blog-post-content > aside a { border-color:var(--theme-line);background:#111a24;color:var(--theme-text) }
 :root[data-theme="dark"] .news-index-tabs button.is-active,
 :root[data-theme="dark"] .blog-post-content > aside .blog-video-link { background:var(--blue);color:#fff }
-:root[data-theme="dark"] .catalog-storefront .catalog-category-nav button { background:transparent;color:var(--theme-text) }
+:root[data-theme="dark"] .catalog-storefront .catalog-category-nav button { background:#172332;color:var(--theme-text) }
+:root[data-theme="dark"] .catalog-storefront .catalog-category-nav button.is-active:not(.catalog-all-button) { background:#203e63;color:#a8d1ff }
 :root[data-theme="dark"] .catalog-storefront .catalog-category-nav .catalog-all-button { background:#172332;color:var(--theme-text) }
 :root[data-theme="dark"] .catalog-storefront .catalog-category-nav .catalog-all-button.is-active { background:var(--blue);color:#fff }
 :root[data-theme="dark"] .catalog-storefront .catalog-filter-heading,
 :root[data-theme="dark"] .catalog-storefront .catalog-filter-footer { background:rgba(17,26,36,.96);border-color:var(--theme-line) }
+
+.xion-back-top{position:fixed;z-index:79;left:24px;bottom:24px;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--theme-line);border-radius:15px;background:var(--theme-card);color:var(--theme-text);box-shadow:0 10px 35px #0d264333;cursor:pointer}.xion-back-top:hover{color:#0d6efd;transform:translateY(-3px)}.xion-back-top:focus-visible{outline:2px solid #0d6efd;outline-offset:3px}.product-commerce-layout .product-detail-media img,.catalog-product-image-link>img{object-fit:contain;object-position:center;transform:none}.campaign-card.has-image .campaign-copy a{color:#fff}.campaign-side-arrow svg{stroke:currentColor;opacity:1}.site-shell .campaign-side-arrow:disabled{opacity:.6}.chat-launcher:not(.is-open)>span svg{width:30px;height:30px}.product-card footer button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:600px){.xion-back-top{width:42px;height:42px;left:16px;bottom:20px}.chat-launcher:not(.is-open){width:60px;height:60px}}

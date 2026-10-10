@@ -15,3 +15,16 @@ export function openOutlookCompose(event, email) {
   event?.preventDefault?.();
   window.location.assign(outlookComposeUrl(email));
 }
+
+export function xionWorkingHours(value, language = "uz") {
+  if (
+    value &&
+    !/(08:00|17:00|Dushanba.?Juma|Понедельник.?пятница|Monday.?Friday)/i.test(
+      value,
+    )
+  )
+    return value;
+  if (language === "ru") return "Пн–Сб, 09:00–18:00";
+  if (language === "en") return "Mon–Sat, 09:00–18:00";
+  return "Du–Shan, 09:00–18:00";
+}

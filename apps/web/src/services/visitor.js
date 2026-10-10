@@ -1,5 +1,13 @@
-const VISITOR_KEY = "nova_visitor_id";
-const PROFILE_KEY = "nova_visitor_profile";
+const VISITOR_KEY = "xion_visitor_id";
+const PROFILE_KEY = "xion_visitor_profile";
+
+// Preserve existing customer/chat identity during the brand migration.
+for (const [current, previous] of [[VISITOR_KEY, "nova_visitor_id"], [PROFILE_KEY, "nova_visitor_profile"]]) {
+  try {
+    const legacy = localStorage.getItem(previous);
+    if (!localStorage.getItem(current) && legacy) localStorage.setItem(current, legacy);
+  } catch { /* Storage may be restricted by the browser. */ }
+}
 
 export function getVisitorId() {
   const current = localStorage.getItem(VISITOR_KEY);

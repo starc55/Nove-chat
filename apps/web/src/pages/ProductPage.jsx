@@ -78,7 +78,8 @@ export function ProductPage() {
 
   const settings = Object.keys(state.settings).length ? state.settings : landing.data.settings;
   const availability = variants.length ? (totalStock > 0 ? `${totalStock} ${c.inStock}` : c.outOfStock) : product?.stock != null ? (product.stock > 0 ? `${product.stock} ${c.inStock}` : c.outOfStock) : c.availability;
-  const canOrder = variants.length ? Boolean(selectedVariant && selectedVariant.stock > 0) : product?.stock !== 0;
+  const purchasable = product?.purchasable !== false;
+  const canOrder = purchasable && (variants.length ? Boolean(selectedVariant && selectedVariant.stock > 0) : product?.stock !== 0);
   const productPath = product ? `/products/${product.slug}` : "/catalog";
   const productUrl = `${XION_SITE_URL}${localizedPath(productPath, language)}`;
   const seoPrices = product ? [product.price, ...variants.map((variant) => variant.price)].filter((price) => price != null).map(Number) : [];
@@ -103,7 +104,7 @@ export function ProductPage() {
           url: productUrl,
           priceCurrency: "UZS",
           price: seoPrice,
-          availability: (variants.length && totalStock < 1) || (!variants.length && product.stock === 0) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+          availability: product.purchasable === false || (variants.length && totalStock < 1) || (!variants.length && product.stock === 0) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
           itemCondition: "https://schema.org/NewCondition",
           seller: { "@id": `${XION_SITE_URL}/#organization` },
         } : undefined,
@@ -156,7 +157,7 @@ export function ProductPage() {
               {product.oldPrice ? <del>{money(product.oldPrice, t.priceOnRequest, language, t.currency)}</del> : null}
               <span>{c.orderText}</span>
               {variants.length ? <fieldset className="product-variant-picker"><legend>{c.chooseSize}</legend><div>{variants.map((variant) => <label className={`${selectedVariantId === variant.id ? "is-selected" : ""} ${variant.stock < 1 ? "is-disabled" : ""}`} key={variant.id}><input type="radio" name="product-variant" checked={selectedVariantId === variant.id} onChange={() => setSelectedVariantId(variant.id)} disabled={variant.stock < 1}/><span><strong>{variant.label}</strong><small>{variant.stock > 0 ? `${variant.stock} ${c.inStock}` : c.outOfStock}</small>{variant.price != null ? <b>{money(variant.price, t.priceOnRequest, language, t.currency)}</b> : null}</span></label>)}</div>{!selectedVariantId && totalStock > 0 ? <small className="product-variant-required">{c.chooseRequired}</small> : null}</fieldset> : null}
-              <button className="button button--primary" type="button" onClick={startOrder} disabled={!canOrder}><ShoppingBag size={18}/>{!canOrder && (variants.length || product.stock === 0) ? c.outOfStock : t.buy}</button>
+              <button className="button button--primary" type="button" onClick={startOrder} disabled={!canOrder}><ShoppingBag size={18}/>{!purchasable ? (language === "ru" ? "Заказ временно закрыт" : language === "en" ? "Ordering temporarily closed" : "Buyurtma vaqtincha yopiq") : !canOrder && (variants.length || product.stock === 0) ? c.outOfStock : t.buy}</button>
               <ul><li><CheckCircle2 size={17}/>{c.response}</li><li><Truck size={17}/>{c.delivery}</li><li><PackageCheck size={17}/>{c.documents}</li><li><Headphones size={17}/>{c.consultation}</li></ul>
             </aside>
           </article>

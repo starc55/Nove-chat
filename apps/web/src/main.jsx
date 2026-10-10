@@ -8,6 +8,8 @@ import "./styles/xion-content.css";
 import "./styles/landing-mobiuz.css";
 import "./styles/storefront.css";
 import "./styles/theme.css";
+import "./styles/select.css";
+import "./styles/admin-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

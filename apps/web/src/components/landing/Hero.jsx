@@ -75,9 +75,9 @@ export function Hero({
   const go = useCallback(
     (offset) =>
       setActive(
-        (current) => (current + offset + slides.length) % slides.length
+        (current) => (current + offset + slides.length) % slides.length,
       ),
-    [slides.length]
+    [slides.length],
   );
   useEffect(() => {
     if (paused || reduceMotion || slides.length < 2) return undefined;
@@ -144,6 +144,16 @@ export function Hero({
             <motion.article
               key={slide.id}
               className={`hero-banner ${slide.image ? "has-image" : ""}`}
+              style={{
+                "--hero-height-desktop": `${slide.display?.heightDesktop || 365}px`,
+                "--hero-height-mobile": `${slide.display?.heightMobile || 680}px`,
+                "--hero-image-fit": slide.display?.imageFit || "contain",
+                "--hero-image-position":
+                  slide.display?.imagePosition || "center",
+                "--hero-copy-align": slide.display?.contentAlign || "left",
+                "--hero-overlay-opacity":
+                  (slide.display?.overlayOpacity ?? 20) / 100,
+              }}
               initial={reduceMotion ? false : { opacity: 0, x: 28 }}
               animate={{ opacity: 1, x: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -28 }}

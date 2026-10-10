@@ -9,6 +9,16 @@ import { BrandLogo } from "../../components/common/BrandLogo.jsx";
 import { Seo } from "../../components/common/Seo.jsx";
 
 const REMEMBERED_EMAIL_KEY = "xion_admin_email";
+const LEGACY_ADMIN_EMAIL = "admin@nova.uz";
+const XION_ADMIN_EMAIL = "admin@xion.uz";
+
+function getRememberedAdminEmail() {
+  const rememberedEmail = window.localStorage.getItem(REMEMBERED_EMAIL_KEY) || "";
+  if (rememberedEmail.trim().toLowerCase() !== LEGACY_ADMIN_EMAIL) return rememberedEmail;
+
+  window.localStorage.setItem(REMEMBERED_EMAIL_KEY, XION_ADMIN_EMAIL);
+  return XION_ADMIN_EMAIL;
+}
 
 export function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +27,7 @@ export function AdminLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const reduceMotion = useReducedMotion();
-  const rememberedEmail = window.localStorage.getItem(REMEMBERED_EMAIL_KEY) || "";
+  const rememberedEmail = getRememberedAdminEmail();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ defaultValues: { email: rememberedEmail, password: "", remember: true } });
 
   useEffect(() => { if (user) navigate(location.state?.from || ADMIN_BASE, { replace: true }); }, [user, navigate, location.state]);

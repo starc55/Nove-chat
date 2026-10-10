@@ -25,6 +25,7 @@ const InfoPage = lazy(() =>
 );
 const NewsPage = lazy(() => import("./pages/NewsPage.jsx").then((module) => ({ default: module.NewsPage })));
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage.jsx").then((module) => ({ default: module.BlogPostPage })));
+const CampaignPage = lazy(() => import("./pages/CampaignPage.jsx").then((module) => ({ default: module.CampaignPage })));
 const AdminLayout = lazy(() =>
   import("./components/admin/AdminLayout.jsx").then((module) => ({
     default: module.AdminLayout,
@@ -80,6 +81,7 @@ const AdminConversationArchivePage = lazy(() =>
     default: module.AdminConversationArchivePage,
   }))
 );
+const AdminAccountsPage = lazy(() => import("./pages/admin/AdminAccountsPage.jsx").then((module) => ({ default: module.AdminAccountsPage })));
 const OperatorAppPage = lazy(() =>
   import("./pages/OperatorAppPage.jsx").then((module) => ({
     default: module.OperatorAppPage,
@@ -138,6 +140,7 @@ export function App() {
           />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/news/:slug" element={<BlogPostPage />} />
+          <Route path="/campaigns/:id" element={<CampaignPage />} />
           <Route path="/career" element={<InfoPage slug="career" />} />
           <Route path="/contact" element={<InfoPage slug="contact" />} />
           <Route
@@ -156,6 +159,7 @@ export function App() {
             <Route path="manufacturers" element={<InfoPage slug="manufacturers" />} />
             <Route path="news" element={<NewsPage />} />
             <Route path="news/:slug" element={<BlogPostPage />} />
+            <Route path="campaigns/:id" element={<CampaignPage />} />
             <Route path="career" element={<InfoPage slug="career" />} />
             <Route path="contact" element={<InfoPage slug="contact" />} />
             <Route path="warranty-return" element={<InfoPage slug="warranty-return" />} />
@@ -184,6 +188,7 @@ export function App() {
             <Route path="reviews" element={<AdminReviewsPage />} />
             <Route path="content" element={<AdminContentPagesPage />} />
             <Route path="archive" element={<AdminConversationArchivePage />} />
+            <Route path="accounts" element={<AdminAccountsPage />} />
           </Route>
           <Route
             path={`${LEGACY_ADMIN_BASE}/*`}

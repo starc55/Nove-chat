@@ -8,7 +8,7 @@ const schema = z.object({
   PORT: z.coerce.number().default(4000),
   CLIENT_URL: z.string().default("http://localhost:5173"),
   PUBLIC_API_URL: optionalString(z.string().url()),
-  DATABASE_URL: z.string().default("postgresql://postgres:postgres@localhost:5432/nova_platform?schema=public"),
+  DATABASE_URL: z.string().default("postgresql://postgres:postgres@localhost:5432/xion_platform?schema=public"),
   JWT_ACCESS_SECRET: z.string().min(32).default("development-access-secret-change-me-now"),
   JWT_REFRESH_SECRET: z.string().min(32).default("development-refresh-secret-change-me-now"),
   ACCESS_TOKEN_TTL: z.string().default("15m"),

@@ -1,3 +1,4 @@
+import { XionSelect } from "../../components/common/XionSelect.jsx";
 import { useCallback, useEffect, useState } from "react";
 import { LoaderCircle, Search, Trash2 } from "lucide-react";
 import { api } from "../../services/api.js";
@@ -24,13 +25,17 @@ const configs = {
 const dateFormat = new Intl.DateTimeFormat("uz-UZ", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 function RecordTitle({ kind, item }) {
-  if (kind === "orders") return <><strong>{item.name}</strong><small>{item.product?.title || item.productTitle}{item.variantLabel ? ` · ${item.variantLabel}` : ""} · {item.quantity || 1} dona</small></>;
+  if (kind === "orders") return <><strong>{item.name}</strong><small>{item.productTitle || item.product?.title}{item.variantLabel ? ` · ${item.variantLabel}` : ""} · {item.quantity || 1} dona</small></>;
   if (kind === "reviews") return <><strong>{item.customerName} · {item.rating}/5</strong><small>{item.customerPhone || "Telefon yo‘q"}</small></>;
   return <><strong>{item.name}</strong><small>{item.phone}</small></>;
 }
 
 function RecordDetails({ kind, item }) {
-  if (kind === "orders") return item.comment || "Izoh qoldirilmagan";
+  if (kind === "orders") {
+    const price = item.productPrice == null ? null : Number(item.productPrice);
+    const money = (value) => `${new Intl.NumberFormat("uz-UZ").format(value)} so‘m`;
+    return <><div>{price == null ? "Narx kelishiladi" : `${money(price)} × ${item.quantity || 1} = ${money(price * (item.quantity || 1))}`}</div><small>{item.comment || "Izoh qoldirilmagan"}</small></>;
+  }
   if (kind === "reviews") return item.comment;
   return item.message || (item.conversation?.publicId ? `Chat #${item.conversation.publicId}` : item.source);
 }
@@ -85,7 +90,7 @@ function AdminRecordsPage({ kind }) {
       <div className="admin-resource-toolbar"><form onSubmit={(event) => { event.preventDefault(); void load(search); }}><Search size={16}/><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={config.search}/><button type="submit">Qidirish</button></form><span>{state.items.length} ta yozuv</span></div>
       {state.error ? <div className="admin-error"><div><strong>Ma’lumot yuklanmadi</strong><p>{state.error}</p></div><button onClick={() => load(search)}>Qayta urinish</button></div> : null}
       <section className="admin-resource-panel">
-        {state.loading ? <div className="admin-resource-loading"><LoaderCircle className="admin-spin" size={18}/> Yuklanmoqda</div> : state.items.length === 0 ? <div className="admin-empty"><p>{config.empty}</p></div> : <div className="admin-resource-table"><table><thead><tr><th>Mijoz / manba</th><th>Telefon</th><th>Izoh</th><th>Vaqt</th><th>Holat</th><th/></tr></thead><tbody>{state.items.map((item) => <tr key={item.id} className={busyId === item.id ? "is-muted" : ""}><td><div className="resource-title"><span>{(item.name || item.customerName).charAt(0)}</span><div><RecordTitle kind={kind} item={item}/></div></div></td><td>{item.phone || item.customerPhone || "—"}</td><td className="record-detail-cell"><RecordDetails kind={kind} item={item}/></td><td>{dateFormat.format(new Date(item.createdAt))}</td><td><select className="admin-status-select" value={item.status} onChange={(event) => void updateStatus(item, event.target.value)} disabled={busyId === item.id}>{Object.entries(config.statuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></td><td><div className="resource-actions"><button type="button" className="is-danger" onClick={() => void remove(item)} disabled={busyId === item.id} aria-label="Yozuvni o‘chirish"><Trash2 size={15}/></button></div></td></tr>)}</tbody></table></div>}
+        {state.loading ? <div className="admin-resource-loading"><LoaderCircle className="admin-spin" size={18}/> Yuklanmoqda</div> : state.items.length === 0 ? <div className="admin-empty"><p>{config.empty}</p></div> : <div className="admin-resource-table"><table><thead><tr><th>Mijoz / manba</th><th>Telefon</th><th>Izoh</th><th>Vaqt</th><th>Holat</th><th/></tr></thead><tbody>{state.items.map((item) => <tr key={item.id} className={busyId === item.id ? "is-muted" : ""}><td><div className="resource-title"><span>{(item.name || item.customerName).charAt(0)}</span><div><RecordTitle kind={kind} item={item}/></div></div></td><td>{item.phone || item.customerPhone || "—"}</td><td className="record-detail-cell"><RecordDetails kind={kind} item={item}/></td><td>{dateFormat.format(new Date(item.createdAt))}</td><td><XionSelect className="admin-status-select" value={item.status} onChange={(event) => void updateStatus(item, event.target.value)} disabled={busyId === item.id}>{Object.entries(config.statuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</XionSelect></td><td><div className="resource-actions"><button type="button" className="is-danger" onClick={() => void remove(item)} disabled={busyId === item.id} aria-label="Yozuvni o‘chirish"><Trash2 size={15}/></button></div></td></tr>)}</tbody></table></div>}
       </section>
     </main>
   );

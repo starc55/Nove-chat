@@ -2,8 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { api, setAccessToken } from "../services/api.js";
 
 const AuthContext = createContext(null);
-const SESSION_HINT_KEY = "nova_admin_session";
-const SESSION_TAB_HINT_KEY = "nova_admin_tab_session";
+const SESSION_HINT_KEY = "xion_admin_session";
+const SESSION_TAB_HINT_KEY = "xion_admin_tab_session";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let active = true;
     const onExpired = () => clearSession();
-    window.addEventListener("nova:auth-expired", onExpired);
+    window.addEventListener("xion:auth-expired", onExpired);
     if (window.localStorage.getItem(SESSION_HINT_KEY) === "1" || window.sessionStorage.getItem(SESSION_TAB_HINT_KEY) === "1") {
       api.post("/auth/refresh")
         .then(({ data }) => {
@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
     } else {
       setLoading(false);
     }
-    return () => { active = false; window.removeEventListener("nova:auth-expired", onExpired); };
+    return () => { active = false; window.removeEventListener("xion:auth-expired", onExpired); };
   }, [clearSession]);
 
   const login = useCallback(async (credentials) => {

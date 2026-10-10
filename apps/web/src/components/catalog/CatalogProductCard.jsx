@@ -27,7 +27,8 @@ export function CatalogProductCard({ product, language, t, onBuy, priority = fal
         ? language === "ru" ? `${product.stock} шт. в наличии` : language === "en" ? `${product.stock} in stock` : `${product.stock} dona mavjud`
         : language === "ru" ? "Нет в наличии" : language === "en" ? "Out of stock" : "Sotuvda yo‘q"
       : language === "ru" ? "Наличие по запросу" : language === "en" ? "Availability on request" : "Mavjudlik so‘rov asosida";
-  const outOfStock = variants.length ? totalStock === 0 : product.stock === 0;
+  const purchasable = product.purchasable !== false;
+  const outOfStock = !purchasable || (variants.length ? totalStock === 0 : product.stock === 0);
 
   const selectByPointer = (event) => {
     if (gallery.length < 2 || event.pointerType === "touch") return;
@@ -36,7 +37,7 @@ export function CatalogProductCard({ product, language, t, onBuy, priority = fal
     setImageIndex(Math.floor(ratio * gallery.length));
   };
 
-  return <article className="catalog-product-card">
+  return <article className={`catalog-product-card ${!purchasable ? "is-not-for-sale" : ""}`}>
     <div className="catalog-product-image" onPointerMove={selectByPointer} onPointerLeave={() => setImageIndex(0)}>
       <Link className="catalog-product-image-link" to={productPath} aria-label={product.title}>
         {gallery[imageIndex] ? <img key={gallery[imageIndex]} src={gallery[imageIndex]} alt={product.title} width="560" height="500" loading={priority ? "eager" : "lazy"} decoding="async"/> : <span>{product.title.charAt(0)}</span>}
@@ -47,7 +48,7 @@ export function CatalogProductCard({ product, language, t, onBuy, priority = fal
     </div>
     <div className="catalog-product-copy">
       <p>{product.category || "XION MEDICAL"}</p><Link to={productPath}><h2>{product.title}</h2></Link><span>{product.shortDescription}</span>
-      <div className={`catalog-product-availability ${outOfStock ? "is-out" : ""}`}><CheckCircle2 size={14}/>{stockText}</div>
+      <div className={`catalog-product-availability ${outOfStock ? "is-out" : ""}`}><CheckCircle2 size={14}/>{!purchasable ? (language === "ru" ? "Заказ временно закрыт" : language === "en" ? "Ordering temporarily closed" : "Buyurtma vaqtincha yopiq") : stockText}</div>
       <div className="catalog-product-bottom"><strong>{money(displayPrice, t.priceOnRequest, language, t.currency)}</strong><div><button type="button" onClick={() => onBuy(product)} aria-label={`${product.title} ${t.buy}`} disabled={outOfStock}><ShoppingBag size={17}/></button><Link to={productPath} aria-label={`${product.title} ${t.details}`}><ArrowUpRight size={18}/></Link></div></div>
     </div>
   </article>;

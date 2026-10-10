@@ -28,8 +28,20 @@ export function Approach({ newsItems = [], loading = false }) {
       <div className="container news-panel">
         <div className="news-list">
           <div className="news-tabs" role="tablist">
-            <button type="button" className={category === "NEWS" ? "is-active" : ""} onClick={() => setCategory("NEWS")}>{t.news}</button>
-            <button type="button" className={category === "XION_LIFE" ? "is-active" : ""} onClick={() => setCategory("XION_LIFE")}>{t.xionLife}</button>
+            <button
+              type="button"
+              className={category === "NEWS" ? "is-active" : ""}
+              onClick={() => setCategory("NEWS")}
+            >
+              {t.news}
+            </button>
+            <button
+              type="button"
+              className={category === "XION_LIFE" ? "is-active" : ""}
+              onClick={() => setCategory("XION_LIFE")}
+            >
+              {t.xionLife}
+            </button>
           </div>
           {entries.map((item, index) => (
             <Reveal
@@ -37,20 +49,26 @@ export function Approach({ newsItems = [], loading = false }) {
               key={item.id || item.slug || item.title}
               delay={index * 0.04}
             >
-              <Link to={item.slug ? localizedPath(`/news/${item.slug}`, language) : localizedPath("/news", language)}>
-              <div>
-                <time>
-                  {new Intl.DateTimeFormat(locale, {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  }).format(
-                    new Date(item.publishedAt || item.createdAt || Date.now())
-                  )}
-                </time>
-                <h3>{item.title}</h3>
-              </div>
-              <ArrowRight size={18} />
+              <Link
+                to={
+                  item.slug
+                    ? localizedPath(`/news/${item.slug}`, language)
+                    : localizedPath("/news", language)
+                }
+              >
+                <div>
+                  <time>
+                    {new Intl.DateTimeFormat(locale, {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }).format(
+                      new Date(item.publishedAt || item.createdAt || Date.now())
+                    )}
+                  </time>
+                  <h3>{item.title}</h3>
+                </div>
+                <ArrowRight size={18} />
               </Link>
             </Reveal>
           ))}

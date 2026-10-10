@@ -43,7 +43,7 @@ export async function listProducts({ page, limit, q }) {
 export async function createProduct(input) {
   const data = productData(input);
   if (input.gallery?.length) data.images = { create: galleryData(input.gallery) };
-  if (input.variants?.length) data.variants = { create: variantData(input.variants) };
+  if (input.variants?.length) data.variants = { create: variantData(input.variants).map(({ id: _id, ...variant }) => variant) };
   return prisma.product.create({ data, include: productInclude });
 }
 
@@ -52,8 +52,21 @@ export async function updateProduct(id, input) {
   if (!existing) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
   const data = productData(input);
   if (input.gallery) data.images = { deleteMany: {}, create: galleryData(input.gallery) };
-  if (input.variants) data.variants = { deleteMany: {}, create: variantData(input.variants) };
-  return prisma.product.update({ where: { id }, data, include: productInclude });
+  return prisma.$transaction(async (tx) => {
+    if (input.variants) {
+      const existingVariants = await tx.productVariant.findMany({ where: { productId: id }, select: { id: true } });
+      const owned = new Set(existingVariants.map((variant) => variant.id));
+      const retained = input.variants.map((variant) => variant.id).filter(Boolean);
+      if (retained.some((variantId) => !owned.has(variantId)) || new Set(retained).size !== retained.length) throw new ApiError(422, "INVALID_VARIANT", "Variant bu mahsulotga tegishli emas yoki takrorlangan.");
+      // Keep historical variant relations so cancelled orders restore correct stock.
+      await tx.productVariant.updateMany({ where: { productId: id, id: { notIn: retained } }, data: { active: false } });
+      for (const { id: variantId, ...variant } of variantData(input.variants)) {
+        if (variantId) await tx.productVariant.update({ where: { id: variantId }, data: variant });
+        else await tx.productVariant.create({ data: { ...variant, productId: id } });
+      }
+    }
+    return tx.product.update({ where: { id }, data, include: productInclude });
+  });
 }
 
 export async function deleteProduct(id) {
