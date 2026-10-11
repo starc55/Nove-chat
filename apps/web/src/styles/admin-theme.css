@@ -365,3 +365,669 @@
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
+
+/* Final admin theme contract. Keep this block last: admin.css contains the
+   component geometry, while these rules own every theme-dependent colour. */
+.admin-shell {
+  --admin-canvas: #050505;
+  --admin-card: #0b0b0b;
+  --admin-card-soft: #111214;
+  --admin-control: #111318;
+  --admin-control-hover: #191c21;
+  --admin-text: #f5f6f7;
+  --admin-text-soft: #a5abb4;
+  --admin-text-muted: #747b85;
+  --admin-theme-accent: #ffffff;
+  --admin-danger-bg: #160e0f;
+  --admin-danger-text: #ef8b91;
+  --admin-shadow: rgba(0, 0, 0, 0.42);
+  color-scheme: dark;
+}
+
+:root[data-admin-theme="light"] .admin-shell {
+  --admin-bg: #f3f5f8;
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f5f7fa;
+  --admin-line: #d8e0e9;
+  --admin-muted: #617083;
+  --admin-accent: #0d6efd;
+  --admin-canvas: #f3f5f8;
+  --admin-card: #ffffff;
+  --admin-card-soft: #f4f7fa;
+  --admin-control: #ffffff;
+  --admin-control-hover: #eaf0f6;
+  --admin-text: #172334;
+  --admin-text-soft: #526173;
+  --admin-text-muted: #6f7d8d;
+  --admin-theme-accent: #0d6efd;
+  --admin-danger-bg: #fff1f2;
+  --admin-danger-text: #a61b2b;
+  --admin-shadow: rgba(23, 35, 52, 0.12);
+  color-scheme: light;
+  background: var(--admin-canvas);
+  color: var(--admin-text);
+}
+
+:root[data-admin-theme="light"] .admin-main {
+  background: var(--admin-canvas);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-sidebar,
+    .admin-topbar,
+    .admin-kpi,
+    .admin-panel,
+    .admin-resource-panel,
+    .telegram-status-card,
+    .admin-modal,
+    .admin-modal > header,
+    .admin-confirm,
+    .admin-toast,
+    .admin-localized-panel,
+    .admin-variant-row,
+    .admin-archive-note,
+    .admin-archive-contact > div,
+    .admin-content-map > a
+  ) {
+  background: var(--admin-card);
+  color: var(--admin-text);
+  border-color: var(--admin-line);
+}
+
+:root[data-admin-theme="light"] .admin-topbar {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 28px rgba(23, 35, 52, 0.05);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-resource-toolbar form,
+    .admin-language-tabs,
+    .admin-upload-trigger,
+    .admin-variant-empty,
+    .admin-load-older,
+    .admin-pagination button,
+    .operator-avatar,
+    .resource-title > span,
+    .telegram-status-icon
+  ) {
+  background: var(--admin-card-soft);
+  color: var(--admin-text-soft);
+  border-color: var(--admin-line);
+  box-shadow: none;
+}
+
+:root[data-admin-theme="light"] .admin-kpi-skeleton {
+  border-color: var(--admin-line);
+  background: linear-gradient(
+    100deg,
+    #eef2f6 20%,
+    #ffffff 40%,
+    #eef2f6 60%
+  );
+  background-size: 200% 100%;
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-page-head h1,
+    .admin-page-head p,
+    .admin-kpi strong,
+    .admin-panel h2,
+    .admin-panel h3,
+    .admin-panel td strong,
+    .admin-resource-panel h2,
+    .admin-resource-panel h3,
+    .admin-form-section h3,
+    .admin-form-section-head h3,
+    .admin-modal h2,
+    .admin-confirm h2,
+    .admin-toast strong,
+    .resource-title strong,
+    .operator-list strong,
+    .compact-list strong,
+    .admin-content-map strong,
+    .admin-archive-note strong,
+    .admin-archive-contact strong,
+    .admin-profile strong,
+    .admin-context,
+    .admin-menu
+  ) {
+  color: var(--admin-text);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-page-head span,
+    .admin-kpi > div,
+    .admin-kpi small,
+    .admin-panel > header,
+    .admin-panel > header p,
+    .admin-panel th,
+    .admin-panel td,
+    .admin-panel td small,
+    .operator-list small,
+    .compact-list small,
+    .compact-list > div > span,
+    .admin-empty,
+    .admin-resource-loading,
+    .admin-resource-toolbar > span,
+    .admin-resource-table th,
+    .admin-resource-table td,
+    .resource-title small,
+    .admin-resource-table td > small,
+    .admin-form-field > span,
+    .admin-form-field small,
+    .admin-form-divider > span,
+    .admin-form-section-head p,
+    .admin-variant-empty,
+    .admin-confirm-copy > p,
+    .admin-confirm-copy > span,
+    .admin-confirm-copy > small,
+    .admin-toast p,
+    .admin-content-map small,
+    .admin-content-map i,
+    .admin-archive-note span,
+    .admin-archive-contact small,
+    .admin-archive-contact span,
+    .admin-archive-start,
+    .admin-pagination span,
+    .telegram-status-card p,
+    .telegram-status-card span,
+    .admin-profile small
+  ) {
+  color: var(--admin-text-soft);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-form-field input,
+    .admin-form-field textarea,
+    .admin-form-field select,
+    .admin-shell .xion-select > button,
+    .admin-modal .xion-select > button,
+    .admin-status-select,
+    .admin-resource-toolbar input,
+    .admin-resource-toolbar button,
+    .resource-actions button,
+    .admin-form-section-head button,
+    .admin-variant-row > header button,
+    .telegram-status-card > button,
+    .admin-resource-form > footer button[type="button"],
+    .admin-confirm > footer button:not(.is-confirm),
+    .admin-password-field > button
+  ) {
+  background-color: var(--admin-control);
+  color: var(--admin-text);
+  border-color: var(--admin-line);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-form-field input,
+    .admin-form-field textarea,
+    .admin-form-field select,
+    .admin-shell .xion-select > button,
+    .admin-status-select
+  ):focus {
+  background-color: #ffffff;
+  border-color: #78aef6;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.11);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-form-field input,
+    .admin-form-field textarea,
+    .admin-resource-toolbar input
+  )::placeholder {
+  color: #8a96a5;
+  opacity: 1;
+}
+
+:root[data-admin-theme="light"] .admin-form-field option {
+  background: #ffffff;
+  color: var(--admin-text);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-resource-toolbar button,
+    .resource-actions button,
+    .admin-form-section-head button,
+    .admin-variant-row > header button,
+    .telegram-status-card > button,
+    .admin-password-field > button,
+    .admin-load-older,
+    .admin-pagination button
+  ):hover:not(:disabled) {
+  background: var(--admin-control-hover);
+  color: var(--admin-text);
+  border-color: #aebac8;
+}
+
+:root[data-admin-theme="light"] .admin-resource-table tbody tr:hover {
+  background: #f4f7fa;
+}
+
+:root[data-admin-theme="light"] .admin-nav > span {
+  color: #7a8797;
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-nav > a, .admin-nav-next, .admin-sidebar-foot > a, .admin-logout) {
+  color: #526173;
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-nav > a:hover, .admin-sidebar-foot > a:hover, .admin-logout:hover) {
+  color: #172334;
+}
+
+:root[data-admin-theme="light"] .admin-nav > a.active {
+  background: #eaf3ff;
+  color: #075bbf;
+  border-color: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-brand > a .brand-logo {
+  color: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-profile > span {
+  background: #172334;
+  color: #ffffff;
+}
+
+:root[data-admin-theme="light"] .admin-top-actions > button {
+  background: #ffffff;
+  color: #172334;
+  border-color: var(--admin-line);
+}
+
+:root[data-admin-theme="light"] .admin-top-actions > button i {
+  background: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-top-actions > a {
+  color: #526173;
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-page-head > button,
+    .admin-head-actions > button,
+    .admin-resource-form > footer button[type="submit"],
+    .admin-confirm > footer .is-confirm
+  ) {
+  background: #0d6efd;
+  color: #ffffff;
+  border-color: #0d6efd;
+  box-shadow: 0 10px 26px rgba(13, 110, 253, 0.16);
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-page-head > button,
+    .admin-head-actions > button,
+    .admin-resource-form > footer button[type="submit"],
+    .admin-confirm > footer .is-confirm
+  ):hover:not(:disabled) {
+  background: #075fda;
+  color: #ffffff;
+  border-color: #075fda;
+}
+
+:root[data-admin-theme="light"] .admin-language-tabs button {
+  color: #667487;
+}
+
+:root[data-admin-theme="light"] .admin-language-tabs button:hover {
+  background: #e9eef4;
+  color: #172334;
+}
+
+:root[data-admin-theme="light"] .admin-language-tabs button.is-active {
+  background: #172334;
+  color: #ffffff;
+  border-color: #172334;
+}
+
+:root[data-admin-theme="light"] .admin-form-toggle {
+  color: var(--admin-text-soft);
+}
+
+:root[data-admin-theme="light"] .admin-form-toggle i {
+  background: #c4ceda;
+}
+
+:root[data-admin-theme="light"] .admin-form-toggle i::after {
+  background: #ffffff;
+}
+
+:root[data-admin-theme="light"] .admin-form-toggle input:checked + i {
+  background: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-form-toggle input:checked + i::after {
+  background: #ffffff;
+}
+
+:root[data-admin-theme="light"] .resource-badge {
+  background: #eef2f6;
+  color: #59687a;
+  border-color: #d1d9e3;
+}
+
+:root[data-admin-theme="light"] .resource-badge.is-active {
+  background: #eaf8f0;
+  color: #187449;
+  border-color: #b9e3cd;
+}
+
+:root[data-admin-theme="light"] .telegram-link-state,
+:root[data-admin-theme="light"]
+  .telegram-status-card.is-ready
+  .telegram-status-icon {
+  color: #176b45;
+}
+
+:root[data-admin-theme="light"] .telegram-status-card.is-ready {
+  border-color: #b9e3cd;
+}
+
+:root[data-admin-theme="light"]
+  .telegram-status-card.is-ready
+  .telegram-status-icon {
+  background: #eaf8f0;
+}
+
+:root[data-admin-theme="light"] .telegram-status-card.is-ready::before {
+  background: #24915f;
+  box-shadow: 0 0 18px rgba(36, 145, 95, 0.22);
+}
+
+:root[data-admin-theme="light"] .admin-error {
+  background: var(--admin-danger-bg);
+  color: #7f1722;
+  border-color: #f0c5ca;
+}
+
+:root[data-admin-theme="light"] .admin-error p,
+:root[data-admin-theme="light"] .admin-upload-error {
+  color: var(--admin-danger-text);
+}
+
+:root[data-admin-theme="light"] .admin-confirm-icon {
+  background: #fff0f1;
+  color: #b72a38;
+  border-color: #f0c2c7;
+}
+
+:root[data-admin-theme="light"] .admin-confirm.is-warning .admin-confirm-icon {
+  background: #fff8e8;
+  color: #8a6413;
+  border-color: #ead8a7;
+}
+
+:root[data-admin-theme="light"] .admin-toast-icon {
+  background: #eaf3ff;
+  color: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-toast.is-success .admin-toast-icon {
+  background: #eaf8f0;
+  color: #187449;
+}
+
+:root[data-admin-theme="light"] .admin-toast.is-danger .admin-toast-icon {
+  background: #fff0f1;
+  color: #b72a38;
+}
+
+:root[data-admin-theme="light"] .admin-archive-note {
+  border-left-color: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-archive-note > svg {
+  color: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-archive-message {
+  background: #f1f4f8;
+  color: #172334;
+  border-color: #d7e0ea;
+}
+
+:root[data-admin-theme="light"] .admin-archive-message.is-operator {
+  background: #0d6efd;
+  color: #ffffff;
+  border-color: #0d6efd;
+}
+
+:root[data-admin-theme="light"] .admin-archive-message.is-system {
+  background: #e9eef4;
+  color: #59687a;
+}
+
+:root[data-admin-theme="light"] .admin-modal,
+:root[data-admin-theme="light"] .admin-confirm,
+:root[data-admin-theme="light"] .admin-toast,
+:root[data-admin-theme="light"] .admin-panel,
+:root[data-admin-theme="light"] .admin-resource-panel,
+:root[data-admin-theme="light"] .admin-kpi {
+  box-shadow: 0 18px 55px var(--admin-shadow);
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-shell button, .admin-shell a):focus-visible {
+  outline-color: #0d6efd;
+}
+
+/* Reassert dark controls as well, so native form widgets never inherit the
+   public site's light palette while the admin panel is dark. */
+:root:not([data-admin-theme="light"])
+  .admin-shell
+  :is(
+    .admin-form-field input,
+    .admin-form-field textarea,
+    .admin-form-field select,
+    .admin-shell .xion-select > button,
+    .admin-status-select
+  ) {
+  background-color: var(--admin-control);
+  color: var(--admin-text);
+  border-color: var(--admin-line);
+}
+
+:root:not([data-admin-theme="light"]) .admin-shell .admin-form-field option {
+  background: #111318;
+  color: #f5f6f7;
+}
+
+/* Icon contrast follows the surface, not the legacy black/white palette. */
+:root[data-admin-theme="light"]
+  :is(
+    .admin-kpi > div svg,
+    .admin-content-map > a > svg,
+    .admin-empty > svg,
+    .admin-archive-note > svg
+  ) {
+  color: #0d6efd;
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-nav > a svg,
+    .admin-nav-next svg,
+    .admin-sidebar-foot > a svg,
+    .admin-logout svg,
+    .admin-top-actions > a svg,
+    .admin-menu svg,
+    .admin-resource-toolbar form > svg,
+    .admin-resource-loading > svg,
+    .admin-upload-trigger > svg,
+    .resource-title > span svg,
+    .resource-badge svg,
+    .admin-password-field > button svg,
+    .admin-modal > header button svg,
+    .admin-toast > button svg
+  ) {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+:root[data-admin-theme="light"] .admin-nav > a.active svg {
+  color: #075bbf;
+}
+
+:root[data-admin-theme="light"] .resource-actions button svg {
+  color: #43546a;
+  stroke: currentColor;
+}
+
+:root[data-admin-theme="light"] .resource-actions button:hover:not(:disabled) svg {
+  color: #172334;
+}
+
+:root[data-admin-theme="light"] .resource-actions button.is-danger svg,
+:root[data-admin-theme="light"] .resource-actions button.is-danger:hover:not(:disabled) svg {
+  color: #b4232f;
+}
+
+:root[data-admin-theme="light"]
+  :is(
+    .admin-page-head > button,
+    .admin-head-actions > button,
+    .admin-resource-form > footer button[type="submit"],
+    .admin-confirm > footer .is-confirm
+  )
+  svg {
+  color: #ffffff;
+  stroke: currentColor;
+}
+
+:root[data-admin-theme="light"] .telegram-status-icon svg,
+:root[data-admin-theme="light"] .admin-confirm-icon svg,
+:root[data-admin-theme="light"] .admin-toast-icon svg {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+/* Custom selects are portalled to <body>, so they cannot inherit variables
+   from .admin-shell. Keep their complete palette explicit in both themes. */
+:root[data-admin-theme="light"]
+  :is(.admin-shell .xion-select > button, .admin-modal .xion-select > button) {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: #223247;
+  border-color: #cbd6e2;
+  box-shadow: 0 1px 2px rgba(23, 35, 52, 0.04);
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-shell .xion-select > button, .admin-modal .xion-select > button):hover:not(:disabled) {
+  background: #ffffff;
+  border-color: #9fb1c4;
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-shell .xion-select > button, .admin-modal .xion-select > button)[aria-expanded="true"] {
+  background: #ffffff;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-shell .xion-select > button, .admin-modal .xion-select > button)
+  > svg {
+  color: #607086;
+  stroke: currentColor;
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+:root[data-admin-theme="light"]
+  :is(.admin-shell .xion-select > button, .admin-modal .xion-select > button)[aria-expanded="true"]
+  > svg {
+  color: #0d6efd;
+  transform: rotate(180deg);
+}
+
+:root[data-admin-theme="light"] .xion-select-menu.is-admin {
+  background: #ffffff;
+  color: #223247;
+  border-color: #cbd6e2;
+  box-shadow: 0 20px 55px rgba(23, 35, 52, 0.18),
+    0 3px 12px rgba(23, 35, 52, 0.08);
+}
+
+:root[data-admin-theme="light"]
+  .xion-select-menu.is-admin
+  > [role="option"] {
+  color: #35465b;
+}
+
+:root[data-admin-theme="light"]
+  .xion-select-menu.is-admin
+  > [role="option"].is-focused {
+  background: #edf5ff;
+  color: #123c72;
+}
+
+:root[data-admin-theme="light"]
+  .xion-select-menu.is-admin
+  > [role="option"].is-selected {
+  background: #e4f0ff;
+  color: #075bbf;
+  font-weight: 700;
+}
+
+:root[data-admin-theme="light"]
+  .xion-select-menu.is-admin
+  > [role="option"].is-selected
+  svg {
+  color: #0d6efd;
+  stroke: currentColor;
+}
+
+:root:not([data-admin-theme="light"]) .xion-select-menu.is-admin {
+  background: #111318;
+  color: #f5f6f7;
+  border-color: #343a43;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.52);
+}
+
+:root:not([data-admin-theme="light"])
+  .xion-select-menu.is-admin
+  > [role="option"] {
+  color: #cbd1d9;
+}
+
+:root:not([data-admin-theme="light"])
+  .xion-select-menu.is-admin
+  > [role="option"].is-focused {
+  background: #1c2531;
+  color: #ffffff;
+}
+
+:root:not([data-admin-theme="light"])
+  .xion-select-menu.is-admin
+  > [role="option"].is-selected {
+  background: #142b49;
+  color: #85baff;
+}
+
+/* Topbar context has child colours in the legacy dark palette. */
+:root[data-admin-theme="light"] .admin-context {
+  color: #667487;
+}
+
+:root[data-admin-theme="light"] .admin-context > span {
+  color: #075bbf;
+  font-weight: 700;
+}
+
+:root[data-admin-theme="light"] .admin-context > i {
+  background: #0d6efd;
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+}

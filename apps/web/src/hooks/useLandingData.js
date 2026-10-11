@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api.js";
 import { landingFallback } from "../data/landing-fallback.js";
 
-const CACHE_KEY = "xion_landing_cache_v3";
+// Increment when catalogue media resolution changes so an old product image
+// cannot flash or remain cached after an administrator replaces it.
+const CACHE_KEY = "xion_landing_cache_v4";
 const CACHE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 function readCachedLanding() {

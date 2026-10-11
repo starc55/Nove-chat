@@ -33,7 +33,10 @@ export function xionAssetUrl(url) {
 }
 
 export function landingProductImage(product) {
-  return localProductImages[product?.id] || xionAssetUrl(product?.image);
+  // Admin-managed media is the source of truth. The bundled image exists only
+  // to keep imported/fallback catalogue entries presentable when no image has
+  // been saved in the database yet.
+  return xionAssetUrl(product?.image) || localProductImages[product?.id] || "";
 }
 
 export function landingAdvertisementImage(advertisement) {
