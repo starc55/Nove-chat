@@ -26,20 +26,8 @@
       "destination": "/xion-logo.svg"
     },
     {
-      "source": "/sitemap.xml",
-      "destination": "https://nove-chat.onrender.com/sitemap.xml"
-    },
-    {
-      "source": "/robots.txt",
-      "destination": "https://nove-chat.onrender.com/robots.txt"
-    },
-    {
       "source": "/api/v1/:path*",
       "destination": "https://nove-chat.onrender.com/api/v1/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }

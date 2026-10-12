@@ -116,7 +116,7 @@ function ScrollToTop() {
 
 function LocalizedPublicRoutes() {
   const { locale } = useParams();
-  return locale === "ru" || locale === "en" ? <Outlet /> : <Navigate to="/" replace />;
+  return locale === "ru" ? <Outlet /> : <Navigate to="/" replace />;
 }
 
 export function App() {

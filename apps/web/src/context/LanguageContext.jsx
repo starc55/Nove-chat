@@ -4,16 +4,17 @@ import { languageFromPath, localizedPath } from "../config/seo.js";
 
 const LanguageContext = createContext(null);
 const LANGUAGE_KEY = "xion_language";
+const SUPPORTED_LANGUAGES = new Set(["uz", "ru"]);
 
 export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
     const pathLanguage = languageFromPath(window.location.pathname);
     if (pathLanguage !== "uz") return pathLanguage;
     const stored = localStorage.getItem(LANGUAGE_KEY);
-    return copy[stored] ? stored : "uz";
+    return SUPPORTED_LANGUAGES.has(stored) ? stored : "uz";
   });
   const setLanguage = (value) => {
-    if (!copy[value]) return;
+    if (!SUPPORTED_LANGUAGES.has(value)) return;
     localStorage.setItem(LANGUAGE_KEY, value);
     setLanguageState(value);
     if (!/^\/(?:admin|operator)(?:\/|$)/.test(window.location.pathname)) {
@@ -28,7 +29,7 @@ export function LanguageProvider({ children }) {
   }, [language]);
   useEffect(() => {
     const syncLanguage = (event) => {
-      if (event.key === LANGUAGE_KEY && copy[event.newValue]) setLanguageState(event.newValue);
+      if (event.key === LANGUAGE_KEY && SUPPORTED_LANGUAGES.has(event.newValue)) setLanguageState(event.newValue);
     };
     window.addEventListener("storage", syncLanguage);
     return () => window.removeEventListener("storage", syncLanguage);

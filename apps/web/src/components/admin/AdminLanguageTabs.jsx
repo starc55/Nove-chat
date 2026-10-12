@@ -1,7 +1,6 @@
 const languages = [
   { code: "uz", label: "O‘zbekcha", badge: "UZ" },
-  { code: "ru", label: "Русский", badge: "RU" },
-  { code: "en", label: "English", badge: "EN" }
+  { code: "ru", label: "Русский", badge: "RU" }
 ];
 
 export function AdminLanguageTabs({ value, onChange }) {

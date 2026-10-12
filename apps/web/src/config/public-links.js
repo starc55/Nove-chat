@@ -3,6 +3,11 @@ export const XION_TELEGRAM_URL = "https://t.me/xion_office";
 export const XION_ADDRESS =
   "Toshkent shahri, Olmazor tumani, Allon ko‘chasi 141A";
 
+export const xionAddress = (language = "uz") =>
+  language === "ru"
+    ? "г. Ташкент, Алмазарский район, ул. Аллон 141А"
+    : XION_ADDRESS;
+
 export const XION_POSITION = [41.346819, 69.214511];
 export const XION_YANDEX_POSITION = [XION_POSITION[1], XION_POSITION[0]];
 
@@ -17,6 +22,11 @@ export function openOutlookCompose(event, email) {
 }
 
 export function xionWorkingHours(value, language = "uz") {
+  const isDefaultSchedule = !value || /(Du.?Shan|Dushanba|Пн.?Сб|Понедельник|Mon.?Sat|Monday|08:00|09:00|17:00|18:00)/i.test(value);
+  if (isDefaultSchedule) {
+    if (language === "ru") return "Пн–Сб, 09:00–18:00";
+    return "Du–Shan, 09:00–18:00";
+  }
   if (
     value &&
     !/(08:00|17:00|Dushanba.?Juma|Понедельник.?пятница|Monday.?Friday)/i.test(
@@ -25,6 +35,5 @@ export function xionWorkingHours(value, language = "uz") {
   )
     return value;
   if (language === "ru") return "Пн–Сб, 09:00–18:00";
-  if (language === "en") return "Mon–Sat, 09:00–18:00";
   return "Du–Shan, 09:00–18:00";
 }

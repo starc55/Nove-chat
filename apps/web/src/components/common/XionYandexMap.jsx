@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import "../../styles/global.css";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import {
-  XION_ADDRESS,
   XION_MAP_URL,
   XION_YANDEX_POSITION,
+  xionAddress,
 } from "../../config/public-links.js";
 import { loadYandexMaps } from "../../services/yandex-maps.js";
 
@@ -65,7 +65,7 @@ function createMarkerElement(copy) {
   popup.append(
     createTextElement("span", "xion-yandex-popup__eyebrow", copy.eyebrow),
     createTextElement("strong", "xion-yandex-popup__title", "XION"),
-    createTextElement("p", "xion-yandex-popup__address", XION_ADDRESS),
+    createTextElement("p", "xion-yandex-popup__address", copy.address),
     createTextElement(
       "small",
       "xion-yandex-popup__description",
@@ -98,7 +98,7 @@ function createMarkerElement(copy) {
 export function XionYandexMap({ className = "" }) {
   const containerRef = useRef(null);
   const { language } = useLanguage();
-  const copy = popupCopy[language] || popupCopy.uz;
+  const copy = { ...(popupCopy[language] || popupCopy.uz), address: xionAddress(language) };
   const [status, setStatus] = useState("loading");
 
   useEffect(() => {

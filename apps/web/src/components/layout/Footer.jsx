@@ -6,6 +6,7 @@ import {
   outlookComposeUrl,
   XION_MAP_URL,
   XION_TELEGRAM_URL,
+  xionAddress,
   xionWorkingHours,
 } from "../../config/public-links.js";
 import { localizedPath } from "../../config/seo.js";
@@ -42,7 +43,7 @@ export function Footer({ settings = {}, loading = false }) {
           {loading ? (
             <span className="footer-skeleton is-description" />
           ) : (
-            <p>{settings.company?.descriptor || t.companyDescriptor}</p>
+            <p>{language === "ru" ? t.companyDescriptor : settings.company?.descriptor || t.companyDescriptor}</p>
           )}
           <a className="footer-catalog-link" href={publicHref("/catalog")}>
             {t.searchProducts}
@@ -121,7 +122,7 @@ export function Footer({ settings = {}, loading = false }) {
                 rel="noreferrer"
               >
                 <MapPin size={18} />
-                {contact.address || t.supportAddress}
+                {language === "ru" ? xionAddress(language) : contact.address || t.supportAddress}
               </a>
               <small>{xionWorkingHours(contact.workingHours, language)}</small>
             </>

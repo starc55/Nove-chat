@@ -106,7 +106,6 @@ export function Header({ contact = {}, loading = false }) {
             >
               <option value="uz">O‘z</option>
               <option value="ru">Рус</option>
-              <option value="en">Eng</option>
             </XionSelect>
             <ChevronDown size={13} />
           </label>
@@ -148,7 +147,6 @@ export function Header({ contact = {}, loading = false }) {
           >
             <option value="uz">O‘z</option>
             <option value="ru">Рус</option>
-            <option value="en">Eng</option>
           </XionSelect>
           <ChevronDown size={13} />
         </label>

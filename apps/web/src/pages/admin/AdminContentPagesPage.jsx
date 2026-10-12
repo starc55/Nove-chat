@@ -10,12 +10,12 @@ import { useAdminUi } from "../../components/admin/AdminUi.jsx";
 const emptyLocale = () => ({ eyebrow: "", title: "", excerpt: "", sections: [], extraJson: "{}" });
 const emptySection = () => ({ title: "", text: "", itemsText: "", date: "" });
 const emptyShared = () => ({ type: "page", category: "NEWS", coverImage: "", videoUrl: "", telegramUrl: "https://t.me/xion_office", phonesText: "+998 71 230 04 40\n+998 99 556 06 60", publishedAt: "" });
-const emptyForm = () => ({ slug: "", title: "", locale: { uz: emptyLocale(), ru: emptyLocale(), en: emptyLocale() }, shared: emptyShared(), active: true, sortOrder: 0 });
+const emptyForm = () => ({ slug: "", title: "", locale: { uz: emptyLocale(), ru: emptyLocale() }, shared: emptyShared(), active: true, sortOrder: 0 });
 const slugify = (value) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function pageForm(item) {
   const content = item.content || {};
-  const locale = Object.fromEntries(["uz", "ru", "en"].map((language) => {
+  const locale = Object.fromEntries(["uz", "ru"].map((language) => {
     const value = content[language] || {};
     const extras = Object.fromEntries(Object.entries(value).filter(([key]) => !["eyebrow", "title", "excerpt", "sections"].includes(key)));
     return [language, { eyebrow: value.eyebrow || "", title: value.title || "", excerpt: value.excerpt || "", extraJson: JSON.stringify(extras, null, 2), sections: (value.sections || []).map((section) => ({ ...section, itemsText: (section.items || []).join("\n"), date: section.date || "" })) }];
@@ -58,7 +58,7 @@ export function AdminContentPagesPage() {
     try {
       const { phonesText, ...shared } = form.shared;
       const content = { ...shared, phones: phonesText.split("\n").map((item) => item.trim()).filter(Boolean), publishedAt: form.shared.publishedAt ? new Date(`${form.shared.publishedAt}T08:00:00.000Z`).toISOString() : undefined };
-      for (const code of ["uz", "ru", "en"]) {
+      for (const code of ["uz", "ru"]) {
         const value = form.locale[code];
         const extras = JSON.parse(value.extraJson || "{}");
         if (!extras || Array.isArray(extras) || typeof extras !== "object") throw new Error("Qo‘shimcha kontent JSON obyekt bo‘lishi kerak.");
@@ -66,7 +66,7 @@ export function AdminContentPagesPage() {
       }
       const payload = { slug: form.slug, title: form.title, content, active: form.active, sortOrder: Number(form.sortOrder) };
       if (editing) await api.patch(`/admin/content-pages/${editing.id}`, payload); else await api.post("/admin/content-pages", payload);
-      close(); await load(query); notify({ tone: "success", title: "Kontent saqlandi", message: `${payload.title} uch tilda yangilandi.` });
+      close(); await load(query); notify({ tone: "success", title: "Kontent saqlandi", message: `${payload.title} ikki tilda yangilandi.` });
     } catch (requestError) {
       setError(requestError.message); notify({ tone: "danger", title: "Saqlanmadi", message: requestError.message });
     } finally { setSaving(false); }
@@ -82,7 +82,7 @@ export function AdminContentPagesPage() {
   const addSection = () => setLocale("sections", [...locale.sections, emptySection()]);
   const removeSection = (index) => setLocale("sections", locale.sections.filter((_, sectionIndex) => sectionIndex !== index));
   return <main className="admin-content admin-resource-page">
-    <div className="admin-page-head"><div><p>CONTENT · BLOG · 3 LANGUAGES</p><h1>Kontent va yangiliklar</h1><span>Sahifalar hamda “Yangiliklar / XION hayoti” bloglarini rasmlar va havolalar bilan boshqaring.</span></div><button type="button" onClick={startCreate}><Plus size={15}/> Qo‘shish</button></div>
+    <div className="admin-page-head"><div><p>CONTENT · BLOG · 2 LANGUAGES</p><h1>Kontent va yangiliklar</h1><span>Sahifalar hamda “Yangiliklar / XION hayoti” bloglarini rasmlar va havolalar bilan boshqaring.</span></div><button type="button" onClick={startCreate}><Plus size={15}/> Qo‘shish</button></div>
     <div className="admin-resource-toolbar"><form onSubmit={(event) => { event.preventDefault(); void load(query); }}><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Sahifa nomi yoki slug..."/><button type="submit">Qidirish</button></form><span>{items.length} ta sahifa</span></div>
     {error ? <div className="admin-error" role="alert"><strong>{error}</strong></div> : null}
     <section className="admin-resource-panel">{loading ? <div className="admin-resource-loading"><LoaderCircle className="admin-spin"/> Yuklanmoqda...</div> : <div className="admin-resource-table"><table><thead><tr><th>Sahifa</th><th>Slug</th><th>Holat</th><th>Tartib</th><th>Amallar</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td><div className="resource-title"><span><FileText size={17}/></span><strong>{item.title}</strong></div></td><td>/{item.slug}</td><td><span className={`resource-badge ${item.active ? "is-active" : ""}`}>{item.active ? "Faol" : "Yashirin"}</span></td><td>{item.sortOrder}</td><td><div className="resource-actions"><button type="button" onClick={() => startEdit(item)} aria-label="Tahrirlash"><Edit3 size={15}/></button><button type="button" className="is-danger" onClick={() => remove(item)} aria-label="O‘chirish"><Trash2 size={15}/></button></div></td></tr>)}</tbody></table></div>}</section>

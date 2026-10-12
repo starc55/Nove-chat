@@ -57,8 +57,8 @@ export function Hero({
       : [
           {
             id: "default",
-            title: settings.hero?.title || t.heroTitleA,
-            description: settings.hero?.subtitle || t.heroText,
+            title: language === "ru" ? t.heroTitleA : settings.hero?.title || t.heroTitleA,
+            description: language === "ru" ? t.heroText : settings.hero?.subtitle || t.heroText,
             kind: "default",
           },
         ];

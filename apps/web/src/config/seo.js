@@ -1,12 +1,11 @@
 export const XION_SITE_URL = "https://xion.uz";
 export const XION_DEFAULT_IMAGE = `${XION_SITE_URL}/og.png?v=xion-20260904`;
-export const XION_LANGUAGES = ["uz", "ru", "en"];
+export const XION_LANGUAGES = ["uz", "ru"];
 export const XION_DEFAULT_LANGUAGE = "uz";
 
 export const XION_LANGUAGE_LOCALES = {
   uz: "uz_UZ",
   ru: "ru_RU",
-  en: "en_US",
 };
 
 export const XION_PAGE_SEO = {
@@ -92,14 +91,14 @@ export const XION_PAGE_SEO = {
 
 export function stripLanguagePrefix(pathname = "/") {
   const normalized = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  const match = normalized.match(/^\/(uz|ru|en)(?=\/|$)/);
+  const match = normalized.match(/^\/(uz|ru)(?=\/|$)/);
   const path = match ? normalized.slice(match[0].length - (match[0].endsWith("/") ? 1 : 0)) : normalized;
   return path && path !== "" ? (path.startsWith("/") ? path : `/${path}`) : "/";
 }
 
 export function languageFromPath(pathname = "/") {
-  const match = String(pathname).match(/^\/(uz|ru|en)(?=\/|$)/);
-  return match?.[1] || XION_DEFAULT_LANGUAGE;
+  const match = String(pathname).match(/^\/(uz|ru)(?=\/|$)/);
+  return match?.[1] === "ru" ? "ru" : XION_DEFAULT_LANGUAGE;
 }
 
 export function localizedPath(path = "/", language = XION_DEFAULT_LANGUAGE) {
@@ -107,7 +106,7 @@ export function localizedPath(path = "/", language = XION_DEFAULT_LANGUAGE) {
   const url = new URL(path, "https://xion.local");
   const basePath = stripLanguagePrefix(url.pathname);
   const prefix = language === XION_DEFAULT_LANGUAGE ? "" : `/${language}`;
-  const pathname = basePath === "/" ? prefix || "/" : `${prefix}${basePath}`;
+  const pathname = basePath === "/" ? (prefix ? `${prefix}/` : "/") : `${prefix}${basePath}`;
   return `${pathname}${url.search}${url.hash}`;
 }
 
@@ -119,7 +118,6 @@ export function alternateLanguageUrls(path = "/") {
   return {
     uz: absoluteLocalizedUrl(path, "uz"),
     ru: absoluteLocalizedUrl(path, "ru"),
-    en: absoluteLocalizedUrl(path, "en"),
     "x-default": absoluteLocalizedUrl(path, "uz"),
   };
 }

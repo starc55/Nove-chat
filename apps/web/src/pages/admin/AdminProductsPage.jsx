@@ -30,7 +30,7 @@ const emptyLocale = () => ({
   tags: "",
 });
 const emptyForm = () => ({
-  locale: { uz: emptyLocale(), ru: emptyLocale(), en: emptyLocale() },
+  locale: { uz: emptyLocale(), ru: emptyLocale() },
   slug: "",
   price: "",
   oldPrice: "",
@@ -49,7 +49,7 @@ const emptyForm = () => ({
   sortOrder: 0,
 });
 const emptyVariant = () => ({
-  labels: { uz: "", ru: "", en: "" },
+  labels: { uz: "", ru: "" },
   size: "",
   type: "",
   sku: "",
@@ -106,20 +106,12 @@ function formFromProduct(item) {
           ? translated.ru.tags.join(", ")
           : translated.ru?.tags || "",
       },
-      en: {
-        ...emptyLocale(),
-        ...(translated.en || {}),
-        tags: Array.isArray(translated.en?.tags)
-          ? translated.en.tags.join(", ")
-          : translated.en?.tags || "",
-      },
     },
     variants: (item.variants || []).map((variant) => ({
       id: variant.id,
       labels: {
         uz: variant.label,
         ru: variant.translations?.ru?.label || "",
-        en: variant.translations?.en?.label || "",
       },
       size: stringValue(variant.size),
       type: stringValue(variant.type),
@@ -234,13 +226,6 @@ export function AdminProductsPage() {
               .map((tag) => tag.trim())
               .filter(Boolean),
           },
-          en: {
-            ...form.locale.en,
-            tags: form.locale.en.tags
-              .split(",")
-              .map((tag) => tag.trim())
-              .filter(Boolean),
-          },
         },
         brand: form.brand || null,
         tags: [
@@ -269,7 +254,6 @@ export function AdminProductsPage() {
           sku: variant.sku || null,
           translations: {
             ru: { label: variant.labels.ru },
-            en: { label: variant.labels.en },
           },
           price: variant.price === "" ? null : Number(variant.price),
           stock: Number(variant.stock),

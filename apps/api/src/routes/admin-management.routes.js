@@ -39,6 +39,7 @@ import { ApiError } from "../utils/api-error.js";
 import bcrypt from "bcryptjs";
 import { prisma } from "../config/database.js";
 import rateLimit from "express-rate-limit";
+import { notifyIndexNow } from "../services/indexnow.service.js";
 
 export const adminManagementRouter = Router();
 
@@ -319,28 +320,25 @@ adminManagementRouter.get(
 adminManagementRouter.post(
   "/products",
   route(async (req, res) => {
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: await createProduct(productSchema.parse(req.body)),
-      });
+    const product = await createProduct(productSchema.parse(req.body));
+    void notifyIndexNow(["/", "/catalog", `/products/${product.slug}`]);
+    res.status(201).json({ success: true, data: product });
   }),
 );
 adminManagementRouter.patch(
   "/products/:id",
   route(async (req, res) => {
     const input = productBaseSchema.partial().strict().parse(req.body);
-    res.json({
-      success: true,
-      data: await updateProduct(idSchema.parse(req.params.id), input),
-    });
+    const product = await updateProduct(idSchema.parse(req.params.id), input);
+    void notifyIndexNow(["/", "/catalog", `/products/${product.slug}`]);
+    res.json({ success: true, data: product });
   }),
 );
 adminManagementRouter.delete(
   "/products/:id",
   route(async (req, res) => {
     await deleteProduct(idSchema.parse(req.params.id));
+    void notifyIndexNow(["/", "/catalog"]);
     res.status(204).end();
   }),
 );
@@ -491,30 +489,24 @@ adminManagementRouter.get(
 adminManagementRouter.post(
   "/advertisements",
   route(async (req, res) => {
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: await createAdvertisement(advertisementSchema.parse(req.body)),
-      });
+    const advertisement = await createAdvertisement(advertisementSchema.parse(req.body));
+    void notifyIndexNow(["/", `/campaigns/${advertisement.id}`]);
+    res.status(201).json({ success: true, data: advertisement });
   }),
 );
 adminManagementRouter.patch(
   "/advertisements/:id",
   route(async (req, res) => {
-    res.json({
-      success: true,
-      data: await updateAdvertisement(
-        idSchema.parse(req.params.id),
-        advertisementSchema.partial().strict().parse(req.body),
-      ),
-    });
+    const advertisement = await updateAdvertisement(idSchema.parse(req.params.id), advertisementSchema.partial().strict().parse(req.body));
+    void notifyIndexNow(["/", `/campaigns/${advertisement.id}`]);
+    res.json({ success: true, data: advertisement });
   }),
 );
 adminManagementRouter.delete(
   "/advertisements/:id",
   route(async (req, res) => {
     await deleteAdvertisement(idSchema.parse(req.params.id));
+    void notifyIndexNow(["/"]);
     res.status(204).end();
   }),
 );
@@ -531,30 +523,24 @@ adminManagementRouter.get(
 adminManagementRouter.post(
   "/content-pages",
   route(async (req, res) => {
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: await createContentPage(contentPageSchema.parse(req.body)),
-      });
+    const page = await createContentPage(contentPageSchema.parse(req.body));
+    void notifyIndexNow(["/", "/news", page.content?.type === "blog" ? `/news/${page.slug}` : `/${page.slug}`]);
+    res.status(201).json({ success: true, data: page });
   }),
 );
 adminManagementRouter.patch(
   "/content-pages/:id",
   route(async (req, res) => {
-    res.json({
-      success: true,
-      data: await updateContentPage(
-        idSchema.parse(req.params.id),
-        contentPageSchema.partial().strict().parse(req.body),
-      ),
-    });
+    const page = await updateContentPage(idSchema.parse(req.params.id), contentPageSchema.partial().strict().parse(req.body));
+    void notifyIndexNow(["/", "/news", page.content?.type === "blog" ? `/news/${page.slug}` : `/${page.slug}`]);
+    res.json({ success: true, data: page });
   }),
 );
 adminManagementRouter.delete(
   "/content-pages/:id",
   route(async (req, res) => {
     await deleteContentPage(idSchema.parse(req.params.id));
+    void notifyIndexNow(["/", "/news"]);
     res.status(204).end();
   }),
 );

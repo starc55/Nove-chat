@@ -85,9 +85,14 @@ api.interceptors.response.use(
         setAccessToken(response.data.data.accessToken);
         original.headers.Authorization = `Bearer ${response.data.data.accessToken}`;
         return api(original);
-      } catch {
-        setAccessToken("");
-        window.dispatchEvent(new Event("xion:auth-expired"));
+      } catch (refreshError) {
+        const refreshStatus = refreshError.response?.status;
+        // A temporary network/CORS failure must not sign the administrator out.
+        // Only an explicitly rejected refresh session is an expired session.
+        if (refreshStatus === 401 || refreshStatus === 403) {
+          setAccessToken("");
+          window.dispatchEvent(new Event("xion:auth-expired"));
+        }
       } finally {
         refreshPromise = null;
       }

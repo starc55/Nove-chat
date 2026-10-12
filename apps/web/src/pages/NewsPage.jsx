@@ -14,7 +14,6 @@ import { localizeBlogPost } from "../utils/localize-blog-post.js";
 const copy = {
   uz: { eyebrow: "XION MEDIA", title: "Yangiliklar va kompaniya hayoti", intro: "Mahsulotlar, tibbiy yangiliklar va XION faoliyatidagi muhim voqealar.", news: "Yangiliklar", life: "XION hayoti", read: "Batafsil o‘qish", empty: "Bu bo‘limda hozircha material yo‘q." },
   ru: { eyebrow: "XION MEDIA", title: "Новости и жизнь компании", intro: "Продукты, медицинские материалы и важные события в жизни XION.", news: "Новости", life: "Жизнь XION", read: "Читать подробнее", empty: "В этом разделе пока нет материалов." },
-  en: { eyebrow: "XION MEDIA", title: "News and company life", intro: "Products, medical insights and important events from XION.", news: "News", life: "XION life", read: "Read more", empty: "There are no articles in this section yet." },
 };
 
 export function NewsPage() {
@@ -23,7 +22,7 @@ export function NewsPage() {
   const c = copy[language] || copy.uz;
   const [category, setCategory] = useState("NEWS");
   const posts = useMemo(() => (data.blogPosts || []).filter((post) => (post.content?.category || "NEWS") === category).map((post) => localizeBlogPost(post, language)), [category, data.blogPosts, language]);
-  const locale = language === "ru" ? "ru-RU" : language === "en" ? "en-US" : "uz-UZ";
+  const locale = language === "ru" ? "ru-RU" : "uz-UZ";
 
   return <div className="site-shell"><Seo title={c.title} description={c.intro} canonicalPath="/news" language={language}/><Header contact={data.settings.contact} loading={loading}/><main className="news-index-page">
     <section className="news-index-hero"><div className="container"><p className="eyebrow"><span/>{c.eyebrow}</p><h1>{c.title}</h1><p>{c.intro}</p></div></section>

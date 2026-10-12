@@ -11,7 +11,7 @@ const schema = z.object({
   DATABASE_URL: z.string().default("postgresql://postgres:postgres@localhost:5432/xion_platform?schema=public"),
   JWT_ACCESS_SECRET: z.string().min(32).default("development-access-secret-change-me-now"),
   JWT_REFRESH_SECRET: z.string().min(32).default("development-refresh-secret-change-me-now"),
-  ACCESS_TOKEN_TTL: z.string().default("15m"),
+  ACCESS_TOKEN_TTL: z.string().default("8h"),
   REFRESH_TOKEN_DAYS: z.coerce.number().int().min(1).max(90).default(7),
   TELEGRAM_BOT_TOKEN: optionalString(z.string().regex(/^\d{6,15}:[A-Za-z0-9_-]{30,}$/)),
   TELEGRAM_WEBHOOK_SECRET: optionalString(z.string().min(16).max(256).regex(/^[A-Za-z0-9_-]+$/)),

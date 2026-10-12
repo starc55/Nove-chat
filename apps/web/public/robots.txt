@@ -4,5 +4,26 @@ Disallow: /admin
 Disallow: /operator
 Disallow: /api/
 
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /operator
+Disallow: /api/
+
+User-agent: YandexBot
+Allow: /
+Disallow: /admin
+Disallow: /operator
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
 Sitemap: https://xion.uz/sitemap.xml
 Host: xion.uz

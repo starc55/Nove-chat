@@ -19,6 +19,7 @@ const DIST_DIR = resolve("dist");
 const API_URL = (process.env.SEO_API_URL || process.env.VITE_API_URL || "https://nove-chat.onrender.com/api/v1").replace(/\/$/, "");
 const GOOGLE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || process.env.VITE_GOOGLE_SITE_VERIFICATION || "";
 const YANDEX_VERIFICATION = process.env.YANDEX_SITE_VERIFICATION || process.env.VITE_YANDEX_SITE_VERIFICATION || "";
+const INDEXNOW_KEY = process.env.INDEXNOW_KEY || "f4c9b612e58147f0a23d8096ac75e31b";
 const PUBLIC_ROUTES = Object.keys(XION_PAGE_SEO);
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
@@ -31,6 +32,32 @@ const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character
 
 const escapeXml = (value) => escapeHtml(value);
 const absoluteUrl = (value) => new URL(value || XION_DEFAULT_IMAGE, XION_SITE_URL).href;
+
+function plainText(value) {
+  return String(value ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function collectText(value, output = []) {
+  if (typeof value === "string") {
+    const text = plainText(value);
+    if (text && !/^https?:\/\//i.test(text) && text.length > 2) output.push(text);
+  } else if (Array.isArray(value)) {
+    value.forEach((item) => collectText(item, output));
+  } else if (value && typeof value === "object") {
+    Object.values(value).forEach((item) => collectText(item, output));
+  }
+  return [...new Set(output)].slice(0, 24);
+}
+
+function snapshotHtml({ title, description, language, image, sections = [], links = [] }) {
+  const imageHtml = image ? `<img src="${escapeHtml(absoluteUrl(image))}" alt="${escapeHtml(title)}" width="960" height="540" loading="eager" />` : "";
+  const sectionHtml = sections.filter(Boolean).map((text) => `<p>${escapeHtml(plainText(text))}</p>`).join("");
+  const linkHtml = links.length ? `<nav aria-label="${language === "ru" ? "Связанные страницы" : "Bog‘liq sahifalar"}">${links.map((link) => `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`).join(" ")}</nav>` : "";
+  return `<main class="seo-prerender" lang="${language}"><article>${imageHtml}<h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p>${sectionHtml}${linkHtml}</article></main>`;
+}
 
 function removeSeoTags(html) {
   const metaKeys = [
@@ -79,9 +106,9 @@ function commonGraph({ canonicalUrl, language, title, description, type = "WebPa
       geo: { "@type": "GeoCoordinates", latitude: 41.346819, longitude: 69.214511 },
       openingHoursSpecification: [{
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        opens: "08:00",
-        closes: "17:00",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        opens: "09:00",
+        closes: "18:00",
       }],
       sameAs: ["https://t.me/xion_office"],
     },
@@ -91,7 +118,7 @@ function commonGraph({ canonicalUrl, language, title, description, type = "WebPa
       url: `${XION_SITE_URL}/`,
       name: "XION",
       publisher: { "@id": `${XION_SITE_URL}/#organization` },
-      inLanguage: ["uz", "ru", "en"],
+      inLanguage: ["uz", "ru"],
     },
     {
       "@type": type,
@@ -109,9 +136,9 @@ function commonGraph({ canonicalUrl, language, title, description, type = "WebPa
 
 function breadcrumbGraph(path, language, currentName) {
   if (path === "/") return null;
-  const items = [{ "@type": "ListItem", position: 1, name: language === "ru" ? "Главная" : language === "en" ? "Home" : "Bosh sahifa", item: absoluteLocalizedUrl("/", language) }];
+  const items = [{ "@type": "ListItem", position: 1, name: language === "ru" ? "Главная" : "Bosh sahifa", item: absoluteLocalizedUrl("/", language) }];
   if (path.startsWith("/products/")) {
-    items.push({ "@type": "ListItem", position: 2, name: language === "ru" ? "Каталог" : language === "en" ? "Catalogue" : "Katalog", item: absoluteLocalizedUrl("/catalog", language) });
+    items.push({ "@type": "ListItem", position: 2, name: language === "ru" ? "Каталог" : "Katalog", item: absoluteLocalizedUrl("/catalog", language) });
   }
   items.push({ "@type": "ListItem", position: items.length + 1, name: currentName, item: absoluteLocalizedUrl(path, language) });
   return { "@type": "BreadcrumbList", "@id": `${absoluteLocalizedUrl(path, language)}#breadcrumb`, itemListElement: items };
@@ -160,11 +187,14 @@ function renderHtml(template, page) {
     <meta name="twitter:description" content="${escapeHtml(page.description)}" />
     <meta name="twitter:image" content="${escapeHtml(imageUrl)}" />
     <meta name="twitter:image:alt" content="${escapeHtml(page.imageAlt || page.title)}" />
-    <script id="xion-static-jsonld" type="application/ld+json">${jsonLd}</script>`;
+    <script id="xion-static-jsonld" type="application/ld+json">${jsonLd}</script>
+    <style id="xion-prerender-style">.seo-prerender{max-width:1180px;margin:0 auto;padding:48px 24px;font:16px/1.65 Arial,sans-serif;color:#212529}.seo-prerender article{max-width:900px}.seo-prerender h1{font-size:clamp(2rem,5vw,4rem);line-height:1.05}.seo-prerender img{display:block;width:100%;height:auto;border-radius:20px}.seo-prerender nav{display:flex;flex-wrap:wrap;gap:16px;margin-top:24px}.seo-prerender a{color:#0d6efd}@media(prefers-color-scheme:dark){.seo-prerender{color:#fff;background:#101319}}</style>`;
 
-  return removeSeoTags(template)
+  let output = removeSeoTags(template)
     .replace(/<html\s+lang=["'][^"']+["']/, `<html lang="${page.language}"`)
     .replace("</head>", `${tags}\n  </head>`);
+  if (page.bodyHtml) output = output.replace('<div id="root"></div>', `<div id="root">${page.bodyHtml}</div>`);
+  return output;
 }
 
 async function fetchJson(path) {
@@ -226,7 +256,8 @@ function productGraph(product, language, contact) {
   const variants = product.variants || [];
   const stock = variants.length ? variants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0) : product.stock;
   const description = product.shortDescription || product.longDescription || "XION medical product";
-  const graph = commonGraph({ canonicalUrl, language, title: `${product.title} | XION`, description, type: "ItemPage", contact });
+  const seoTitle = `${product.title} — ${language === "ru" ? "характеристики и заказ" : "xususiyatlari va buyurtma"} | XION`;
+  const graph = commonGraph({ canonicalUrl, language, title: seoTitle, description, type: "ItemPage", contact });
   graph.push({
     "@type": "Product",
     "@id": `${canonicalUrl}#product`,
@@ -238,7 +269,7 @@ function productGraph(product, language, contact) {
     category: product.category || undefined,
     brand: { "@type": "Brand", name: product.brand || "XION" },
     additionalProperty: product.specifications && typeof product.specifications === "object" ? Object.entries(product.specifications).map(([name, value]) => ({ "@type": "PropertyValue", name, value: String(value) })) : [],
-    offers: price != null ? {
+    offers: price != null && product.purchasable !== false ? {
       "@type": "Offer",
       url: canonicalUrl,
       priceCurrency: "UZS",
@@ -249,7 +280,7 @@ function productGraph(product, language, contact) {
     } : undefined,
   });
   graph.push(breadcrumbGraph(path, language, product.title));
-  return { graph, images, description };
+  return { graph, images, description, seoTitle };
 }
 
 function blogGraph(post, language, contact) {
@@ -277,8 +308,8 @@ async function writeRoute(path, html) {
     await writeFile(resolve(DIST_DIR, "index.html"), html, "utf8");
     return;
   }
-  if (path === "/ru" || path === "/en") {
-    const output = resolve(DIST_DIR, path.slice(1), "index.html");
+  if (path === "/ru/" || path === "/ru") {
+    const output = resolve(DIST_DIR, "ru", "index.html");
     await mkdir(resolve(output, ".."), { recursive: true });
     await writeFile(output, html, "utf8");
     return;
@@ -286,6 +317,46 @@ async function writeRoute(path, html) {
   const output = resolve(DIST_DIR, `${path.replace(/^\//, "")}.html`);
   await mkdir(resolve(output, ".."), { recursive: true });
   await writeFile(output, html, "utf8");
+}
+
+const ROUTE_TO_PAGE_SLUG = {
+  "/company": "about",
+  "/medical-institutions": "medical-institutions",
+  "/manufacturers": "manufacturers",
+  "/simurg": "simurg",
+  "/career": "career",
+  "/contact": "contact",
+  "/warranty-return": "warranty-return",
+  "/terms": "terms",
+  "/privacy": "privacy",
+};
+
+function staticSnapshot({ basePath, language, seo, content, pages, products, blogPosts }) {
+  const page = pages.find((item) => item.slug === ROUTE_TO_PAGE_SLUG[basePath]);
+  const localizedContent = page?.content?.[language] || page?.content?.uz || page?.content;
+  let sections = collectText(localizedContent);
+  let links = [];
+  if (basePath === "/") {
+    sections = collectText({ hero: content.heroSlides, offers: content.offerCards, settings: content.settings }).slice(0, 18);
+    links = [
+      { href: localizedPath("/catalog", language), label: language === "ru" ? "Каталог продукции" : "Mahsulotlar katalogi" },
+      { href: localizedPath("/company", language), label: language === "ru" ? "О компании" : "Kompaniya haqida" },
+      { href: localizedPath("/contact", language), label: language === "ru" ? "Контакты" : "Aloqa" },
+    ];
+  } else if (basePath === "/catalog") {
+    sections = products.slice(0, 40).map((source) => localizeProduct(source, language).title);
+    links = products.slice(0, 40).map((source) => {
+      const product = localizeProduct(source, language);
+      return { href: localizedPath(`/products/${product.slug}`, language), label: product.title };
+    });
+  } else if (basePath === "/news") {
+    sections = blogPosts.slice(0, 30).map((source) => localizeBlogPost(source, language).excerpt);
+    links = blogPosts.slice(0, 30).map((source) => {
+      const post = localizeBlogPost(source, language);
+      return { href: localizedPath(`/news/${post.slug}`, language), label: post.title };
+    });
+  }
+  return snapshotHtml({ title: seo.title, description: seo.description, language, sections, links });
 }
 
 function sitemapXml(entries) {
@@ -303,6 +374,7 @@ async function main() {
   const products = content.products || [];
   const pages = content.pages || [];
   const blogPosts = content.blogPosts || [];
+  const advertisements = content.advertisements || [];
   const contact = content.settings?.contact || {};
   const sitemapEntries = [];
 
@@ -311,7 +383,8 @@ async function main() {
       const seo = getPageSeo(basePath, language);
       const path = localizedPath(basePath, language);
       const graph = pageGraph({ path: basePath, language, title: seo.title, description: seo.description, products, pages, contact });
-      await writeRoute(path, renderHtml(template, { path: basePath, language, ...seo, graph }));
+      const bodyHtml = staticSnapshot({ basePath, language, seo, content, pages, products, blogPosts });
+      await writeRoute(path, renderHtml(template, { path: basePath, language, ...seo, graph, bodyHtml }));
       sitemapEntries.push({ basePath, url: absoluteLocalizedUrl(basePath, language), changefreq: basePath === "/" || basePath === "/catalog" || basePath === "/news" ? "weekly" : "monthly", priority: basePath === "/" ? "1.0" : basePath === "/catalog" ? "0.9" : "0.7", title: seo.title });
     }
   }
@@ -322,7 +395,15 @@ async function main() {
       const path = `/products/${product.slug}`;
       const details = productGraph(product, language, contact);
       const localized = localizedPath(path, language);
-      await writeRoute(localized, renderHtml(template, { path, language, title: `${product.title} | XION`, description: details.description, image: details.images[0], imageAlt: product.title, ogType: "product", graph: details.graph }));
+      const bodyHtml = snapshotHtml({
+        title: product.title,
+        description: details.description,
+        language,
+        image: details.images[0],
+        sections: collectText({ description: product.longDescription, specifications: product.specifications, variants: product.variants }),
+        links: [{ href: localizedPath("/catalog", language), label: language === "ru" ? "Вернуться в каталог" : "Katalogga qaytish" }],
+      });
+      await writeRoute(localized, renderHtml(template, { path, language, title: details.seoTitle, description: details.description, image: details.images[0], imageAlt: product.title, ogType: "product", graph: details.graph, bodyHtml }));
       sitemapEntries.push({ basePath: path, url: absoluteLocalizedUrl(path, language), lastmod: product.updatedAt, changefreq: "weekly", priority: "0.8", image: details.images[0], title: product.title });
     }
   }
@@ -332,8 +413,26 @@ async function main() {
       const post = localizeBlogPost(source, language);
       const path = `/news/${post.slug}`;
       const localized = localizedPath(path, language);
-      await writeRoute(localized, renderHtml(template, { path, language, title: `${post.title} | XION`, description: post.excerpt, image: post.coverImage, imageAlt: post.title, ogType: "article", graph: blogGraph(post, language, contact) }));
+      const seoTitle = `${post.title} — ${language === "ru" ? "новости XION" : "XION yangiliklari"}`;
+      const bodyHtml = snapshotHtml({ title: post.title, description: post.excerpt, language, image: post.coverImage, sections: collectText(post.content), links: [{ href: localizedPath("/news", language), label: language === "ru" ? "Все новости" : "Barcha yangiliklar" }] });
+      await writeRoute(localized, renderHtml(template, { path, language, title: seoTitle, description: post.excerpt, image: post.coverImage, imageAlt: post.title, ogType: "article", graph: blogGraph(post, language, contact), bodyHtml }));
       sitemapEntries.push({ basePath: path, url: absoluteLocalizedUrl(path, language), lastmod: post.updatedAt, changefreq: "monthly", priority: "0.8", image: post.coverImage, title: post.title });
+    }
+  }
+
+  for (const campaign of advertisements.filter((item) => item.enabled && item.id)) {
+    for (const language of XION_LANGUAGES) {
+      const translated = campaign.translations?.[language] || {};
+      const title = translated.title || campaign.title;
+      const description = translated.description || campaign.description || title;
+      const path = `/campaigns/${campaign.id}`;
+      const localized = localizedPath(path, language);
+      const seoTitle = `${title} — ${language === "ru" ? "предложение XION" : "XION taklifi"}`;
+      const graph = commonGraph({ canonicalUrl: absoluteLocalizedUrl(path, language), language, title: seoTitle, description, type: "WebPage", contact });
+      graph.push(breadcrumbGraph(path, language, title));
+      const bodyHtml = snapshotHtml({ title, description, language, image: campaign.image, links: [{ href: localizedPath("/catalog", language), label: language === "ru" ? "Каталог продукции" : "Mahsulotlar katalogi" }] });
+      await writeRoute(localized, renderHtml(template, { path, language, title: seoTitle, description, image: campaign.image, imageAlt: title, graph, bodyHtml }));
+      sitemapEntries.push({ basePath: path, url: absoluteLocalizedUrl(path, language), lastmod: campaign.updatedAt, changefreq: "monthly", priority: "0.7", image: campaign.image, title });
     }
   }
 
@@ -344,8 +443,22 @@ async function main() {
   await writeRoute("/operator", renderHtml(template, { path: "/operator", language: "uz", title: "XION Operator", description: "XION yopiq operator paneli", noindex: true, graph: [] }));
   await writeFile(resolve(DIST_DIR, "404.html"), renderHtml(template, { path: "/404", language: "uz", title: "Sahifa topilmadi | XION", description: "So‘ralgan sahifa topilmadi.", noindex: true, graph: [] }), "utf8");
   await writeFile(resolve(DIST_DIR, "sitemap.xml"), sitemapXml(sitemapEntries), "utf8");
-  await writeFile(resolve(DIST_DIR, "robots.txt"), "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /operator\nDisallow: /api/\n\nSitemap: https://xion.uz/sitemap.xml\nHost: xion.uz\n", "utf8");
-  console.log(`[seo] ${sitemapEntries.length} sitemap URL va ${(PUBLIC_ROUTES.length + products.length + blogPosts.length) * XION_LANGUAGES.length} public SEO sahifa yaratildi.`);
+  const robots = [
+    "User-agent: *", "Allow: /", "Disallow: /admin", "Disallow: /operator", "Disallow: /api/", "",
+    "User-agent: Googlebot", "Allow: /", "Disallow: /admin", "Disallow: /operator", "Disallow: /api/", "",
+    "User-agent: YandexBot", "Allow: /", "Disallow: /admin", "Disallow: /operator", "Disallow: /api/", "",
+    "User-agent: OAI-SearchBot", "Allow: /", "",
+    "User-agent: ChatGPT-User", "Allow: /", "",
+    "User-agent: GPTBot", "Allow: /", "",
+    "Sitemap: https://xion.uz/sitemap.xml", "Host: xion.uz", "",
+  ].join("\n");
+  await writeFile(resolve(DIST_DIR, "robots.txt"), robots, "utf8");
+  const llmsLinks = sitemapEntries.filter((entry) => !entry.url.includes("/ru/") && !entry.url.endsWith("/ru/")).map((entry) => `- [${entry.title || "XION"}](${entry.url})`).join("\n");
+  await writeFile(resolve(DIST_DIR, "llms.txt"), `# XION\n\n> O‘zbekiston bo‘ylab ginekologiya va akusherlik uchun sertifikatlangan tibbiy mahsulotlar, mutaxassis maslahati va buyurtma xizmati.\n\n## Asosiy sahifalar\n\n${llmsLinks}\n\n## Aloqa\n\n- Sayt: https://xion.uz/\n- Telegram: https://t.me/xion_office\n- Telefon: ${contact.phone || "+998 99 556 06 60"}\n`, "utf8");
+  const fullText = sitemapEntries.map((entry) => `${entry.title || "XION"}\n${entry.url}`).join("\n\n");
+  await writeFile(resolve(DIST_DIR, "llms-full.txt"), `# XION public content index\n\n${fullText}\n`, "utf8");
+  await writeFile(resolve(DIST_DIR, `${INDEXNOW_KEY}.txt`), INDEXNOW_KEY, "utf8");
+  console.log(`[seo] ${sitemapEntries.length} sitemap URL va ${(PUBLIC_ROUTES.length + products.length + blogPosts.length + advertisements.length) * XION_LANGUAGES.length} public SEO sahifa yaratildi.`);
 }
 
 await main();

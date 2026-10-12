@@ -126,7 +126,7 @@ export function ProductPage() {
   };
 
   return <div className="site-shell">
-    {product ? <Seo title={`${product.title} | XION`} description={seoDescription} canonicalPath={productPath} image={images[0]} imageAlt={product.title} type="product" language={language} jsonLd={productJsonLd}/> : null}
+    {product ? <Seo title={`${product.title} — ${language === "ru" ? "характеристики и заказ" : "xususiyatlari va buyurtma"} | XION`} description={seoDescription} canonicalPath={productPath} image={images[0]} imageAlt={product.title} type="product" language={language} jsonLd={productJsonLd}/> : null}
     <Header contact={settings.contact} loading={state.loading}/>
     <main className="product-page product-storefront">
       <div className="container">
@@ -157,7 +157,7 @@ export function ProductPage() {
               {product.oldPrice ? <del>{money(product.oldPrice, t.priceOnRequest, language, t.currency)}</del> : null}
               <span>{c.orderText}</span>
               {variants.length ? <fieldset className="product-variant-picker"><legend>{c.chooseSize}</legend><div>{variants.map((variant) => <label className={`${selectedVariantId === variant.id ? "is-selected" : ""} ${variant.stock < 1 ? "is-disabled" : ""}`} key={variant.id}><input type="radio" name="product-variant" checked={selectedVariantId === variant.id} onChange={() => setSelectedVariantId(variant.id)} disabled={variant.stock < 1}/><span><strong>{variant.label}</strong><small>{variant.stock > 0 ? `${variant.stock} ${c.inStock}` : c.outOfStock}</small>{variant.price != null ? <b>{money(variant.price, t.priceOnRequest, language, t.currency)}</b> : null}</span></label>)}</div>{!selectedVariantId && totalStock > 0 ? <small className="product-variant-required">{c.chooseRequired}</small> : null}</fieldset> : null}
-              <button className="button button--primary" type="button" onClick={startOrder} disabled={!canOrder}><ShoppingBag size={18}/>{!purchasable ? (language === "ru" ? "Заказ временно закрыт" : language === "en" ? "Ordering temporarily closed" : "Buyurtma vaqtincha yopiq") : !canOrder && (variants.length || product.stock === 0) ? c.outOfStock : t.buy}</button>
+              <button className="button button--primary" type="button" onClick={startOrder} disabled={!canOrder}><ShoppingBag size={18}/>{!purchasable ? (language === "ru" ? "Заказ временно закрыт" : "Buyurtma vaqtincha yopiq") : !canOrder && (variants.length || product.stock === 0) ? c.outOfStock : t.buy}</button>
               <ul><li><CheckCircle2 size={17}/>{c.response}</li><li><Truck size={17}/>{c.delivery}</li><li><PackageCheck size={17}/>{c.documents}</li><li><Headphones size={17}/>{c.consultation}</li></ul>
             </aside>
           </article>

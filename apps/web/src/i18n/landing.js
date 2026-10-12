@@ -335,6 +335,7 @@ export const copy = {
       feature: "Xususiyati",
       sterility: "Sterillik",
       material: "Material",
+      type: "Turi",
     },
   },
   ru: {
@@ -508,6 +509,7 @@ export const copy = {
       feature: "Особенность",
       sterility: "Стерильность",
       material: "Материал",
+      type: "Тип",
     },
   },
   en: {

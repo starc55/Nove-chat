@@ -164,7 +164,7 @@ export function InfoPage({ slug }) {
   const contact = state.settings.contact || {};
   const phone = contact.phones?.[0] || contact.phone || "+998 99 556 06 60";
   const email = contact.email || "info@xion.uz";
-  const address = contact.address || XION_ADDRESS;
+  const address = language === "ru" ? t.supportAddress : contact.address || XION_ADDRESS;
   const routePath = `/${slug === "about" ? "company" : slug}`;
   const seo = getPageSeo(routePath, language);
 

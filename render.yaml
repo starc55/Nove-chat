@@ -17,12 +17,16 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: ACCESS_TOKEN_TTL
+        value: 8h
       - key: NODE_VERSION
         value: 22.22.0
       - key: CLIENT_URL
         sync: false
       - key: PUBLIC_API_URL
         value: https://nove-chat.onrender.com
+      - key: INDEXNOW_KEY
+        value: f4c9b612e58147f0a23d8096ac75e31b
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL

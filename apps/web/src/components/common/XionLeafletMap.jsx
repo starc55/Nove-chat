@@ -4,9 +4,9 @@ import "leaflet/dist/leaflet.css";
 import "../../styles/global.css";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import {
-  XION_ADDRESS,
   XION_MAP_URL,
   XION_POSITION,
+  xionAddress,
 } from "../../config/public-links.js";
 
 const MARKER_WIDTH = 60;
@@ -74,7 +74,7 @@ export function XionLeafletMap({ className = "" }) {
           <article className="xion-map-popup">
             <span>{copy.eyebrow}</span>
             <strong>XION</strong>
-            <p>{XION_ADDRESS}</p>
+            <p>{xionAddress(language)}</p>
             <small>{copy.description}</small>
             <a href={XION_MAP_URL} target="_blank" rel="noreferrer">
               {copy.action}

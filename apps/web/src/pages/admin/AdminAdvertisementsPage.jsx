@@ -22,7 +22,7 @@ const emptyDisplay = () => ({
   overlayOpacity: 20,
 });
 const emptyForm = () => ({
-  locale: { uz: emptyLocale(), ru: emptyLocale(), en: emptyLocale() },
+  locale: { uz: emptyLocale(), ru: emptyLocale() },
   image: "",
   ctaUrl: "",
   placement: "HERO",
@@ -105,7 +105,6 @@ export function AdminAdvertisementsPage() {
           ctaLabel: item.ctaLabel || "",
         },
         ru: { ...emptyLocale(), ...(item.translations?.ru || {}) },
-        en: { ...emptyLocale(), ...(item.translations?.en || {}) },
       },
     });
     setModalOpen(true);
@@ -154,7 +153,7 @@ export function AdminAdvertisementsPage() {
         title: uz.title,
         description: uz.description || null,
         ctaLabel: uz.ctaLabel || null,
-        translations: { ru: form.locale.ru, en: form.locale.en },
+        translations: { ru: form.locale.ru },
         image: form.image || null,
         ctaUrl: form.ctaUrl || null,
         placement: form.placement,
@@ -225,10 +224,10 @@ export function AdminAdvertisementsPage() {
     <main className="admin-content admin-resource-page">
       <div className="admin-page-head">
         <div>
-          <p>LANDING CONTENT · 3 LANGUAGES</p>
+          <p>LANDING CONTENT · 2 LANGUAGES</p>
           <h1>Landing bannerlari</h1>
           <span>
-            Hero va aksiyalar bannerlarini uch tilda, rasm va ko‘rinish muddati
+            Hero va aksiyalar bannerlarini ikki tilda, rasm va ko‘rinish muddati
             bilan boshqaring.
           </span>
         </div>
