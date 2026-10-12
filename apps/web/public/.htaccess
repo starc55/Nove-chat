@@ -15,6 +15,10 @@ Options -Indexes -MultiViews
   RewriteCond %{HTTP_HOST} !^xion\.uz$ [NC]
   RewriteRule ^ https://xion.uz%{REQUEST_URI} [R=301,L,NE]
 
+  # English locale was retired; consolidate legacy URLs into the live UZ routes.
+  RewriteRule ^en/?$ / [R=301,L]
+  RewriteRule ^en/(.+)$ /$1 [R=301,L,NE]
+
   # Never expose generated .html filenames as duplicate public URLs.
   RewriteCond %{THE_REQUEST} \s/+(.+?)\.html(?:[?\s]) [NC]
   RewriteRule ^(.+)\.html$ /$1 [R=301,L,NE]
