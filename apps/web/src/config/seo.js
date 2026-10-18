@@ -1,4 +1,5 @@
 export const XION_SITE_URL = "https://xion.uz";
+export const XION_GOOGLE_SITE_VERIFICATION = "jUU5JN10c1wQS5WaLx-0YnFHFIkgyt12qDgj-hauSLM";
 export const XION_DEFAULT_IMAGE = `${XION_SITE_URL}/og.png?v=xion-20260904`;
 export const XION_LANGUAGES = ["uz", "ru"];
 export const XION_DEFAULT_LANGUAGE = "uz";

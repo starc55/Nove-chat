@@ -152,10 +152,16 @@ export function AdminAdvertisementsPage() {
       const payload = {
         title: uz.title,
         description: uz.description || null,
-        ctaLabel: uz.ctaLabel || null,
-        translations: { ru: form.locale.ru },
+        ctaLabel: form.placement === "HERO" ? null : uz.ctaLabel || null,
+        translations: {
+          ru: {
+            ...form.locale.ru,
+            ctaLabel:
+              form.placement === "HERO" ? "" : form.locale.ru.ctaLabel,
+          },
+        },
         image: form.image || null,
-        ctaUrl: form.ctaUrl || null,
+        ctaUrl: form.placement === "HERO" ? null : form.ctaUrl || null,
         placement: form.placement,
         startAt: form.startAt ? new Date(form.startAt).toISOString() : null,
         endAt: form.endAt ? new Date(form.endAt).toISOString() : null,
@@ -227,8 +233,8 @@ export function AdminAdvertisementsPage() {
           <p>LANDING CONTENT · 2 LANGUAGES</p>
           <h1>Landing bannerlari</h1>
           <span>
-            Hero va aksiyalar bannerlarini ikki tilda, rasm va ko‘rinish muddati
-            bilan boshqaring.
+            Har bir Hero va aksiya postini alohida boshqaring. Hero bannerlari
+            mahsulotlarga avtomatik ulanmaydi.
           </span>
         </div>
         <button type="button" onClick={openCreate}>
@@ -280,7 +286,11 @@ export function AdminAdvertisementsPage() {
                         )}
                         <div>
                           <strong>{item.title}</strong>
-                          <small>{item.ctaLabel || "CTA yo‘q"}</small>
+                          <small>
+                            {item.placement === "HERO"
+                              ? "Mustaqil Hero posti"
+                              : item.ctaLabel || "CTA yo‘q"}
+                          </small>
                         </div>
                       </div>
                     </td>
@@ -364,26 +374,33 @@ export function AdminAdvertisementsPage() {
                   }
                 />
               </FormField>
-              <FormField label={`CTA matni · ${language.toUpperCase()}`} wide>
-                <input
-                  value={locale.ctaLabel}
-                  onChange={(event) =>
-                    setLocale("ctaLabel", event.target.value)
-                  }
-                  placeholder="Batafsil"
-                />
-              </FormField>
+              {form.placement !== "HERO" ? (
+                <FormField
+                  label={`Ixtiyoriy tugma matni · ${language.toUpperCase()}`}
+                  wide
+                >
+                  <input
+                    value={locale.ctaLabel}
+                    onChange={(event) =>
+                      setLocale("ctaLabel", event.target.value)
+                    }
+                    placeholder="Bo‘sh qoldirilsa tugma chiqmaydi"
+                  />
+                </FormField>
+              ) : null}
             </div>
             <div className="admin-form-section">
               <h3>Banner sozlamalari</h3>
               <div className="admin-form-grid">
-                <FormField label="CTA manzili">
-                  <input
-                    value={form.ctaUrl}
-                    onChange={(event) => set("ctaUrl", event.target.value)}
-                    placeholder="#contact yoki https://..."
-                  />
-                </FormField>
+                {form.placement !== "HERO" ? (
+                  <FormField label="Ixtiyoriy tugma manzili">
+                    <input
+                      value={form.ctaUrl}
+                      onChange={(event) => set("ctaUrl", event.target.value)}
+                      placeholder="Bo‘sh qoldirilsa post hech qayerga ulanmaydi"
+                    />
+                  </FormField>
+                ) : null}
                 <FormField label="Joylashuv">
                   <XionSelect
                     value={form.placement}

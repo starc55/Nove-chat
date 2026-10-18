@@ -6,6 +6,7 @@ import {
   getPageSeo,
   localizedPath,
   XION_DEFAULT_IMAGE,
+  XION_GOOGLE_SITE_VERIFICATION,
   XION_LANGUAGES,
   XION_LANGUAGE_LOCALES,
   XION_PAGE_SEO,
@@ -17,7 +18,7 @@ import { localizeBlogPost } from "../src/utils/localize-blog-post.js";
 
 const DIST_DIR = resolve("dist");
 const API_URL = (process.env.SEO_API_URL || process.env.VITE_API_URL || "https://nove-chat.onrender.com/api/v1").replace(/\/$/, "");
-const GOOGLE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || process.env.VITE_GOOGLE_SITE_VERIFICATION || "";
+const GOOGLE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || process.env.VITE_GOOGLE_SITE_VERIFICATION || XION_GOOGLE_SITE_VERIFICATION;
 const YANDEX_VERIFICATION = process.env.YANDEX_SITE_VERIFICATION || process.env.VITE_YANDEX_SITE_VERIFICATION || "";
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY || "f4c9b612e58147f0a23d8096ac75e31b";
 const PUBLIC_ROUTES = Object.keys(XION_PAGE_SEO);

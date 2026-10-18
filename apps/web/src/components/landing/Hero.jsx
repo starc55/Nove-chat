@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Instagram,
@@ -12,19 +11,13 @@ import {
 } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { BrandLogo } from "../common/BrandLogo.jsx";
-import { localizeProduct } from "../../utils/localize-product.js";
 import { localizeAdvertisement } from "../../utils/localize-advertisement.js";
 import { XION_TELEGRAM_URL } from "../../config/public-links.js";
-import {
-  landingAdvertisementImage,
-  landingProductImage,
-} from "../../utils/landing-assets.js";
+import { landingAdvertisementImage } from "../../utils/landing-assets.js";
 
 export function Hero({
-  settings = {},
   advertisements = [],
-  products = [],
-  onBuy,
+  contact = {},
   loading = false,
 }) {
   const { language, t } = useLanguage();
@@ -33,7 +26,7 @@ export function Hero({
   const [paused, setPaused] = useState(false);
   const touchStart = useRef(null);
   const slides = useMemo(() => {
-    const ads = advertisements.map((sourceAdvertisement) => {
+    return advertisements.map((sourceAdvertisement) => {
       const item = localizeAdvertisement(sourceAdvertisement, language);
       return {
         ...item,
@@ -41,36 +34,7 @@ export function Hero({
         kind: "advertisement",
       };
     });
-    const productSlides = products.slice(0, 3).map((sourceProduct) => {
-      const item = localizeProduct(sourceProduct, language);
-      return {
-        id: `product-${item.id}`,
-        title: item.title,
-        description: item.shortDescription,
-        image: landingProductImage(item),
-        product: item,
-        kind: "product",
-      };
-    });
-    return [...ads, ...productSlides].length
-      ? [...ads, ...productSlides]
-      : [
-          {
-            id: "default",
-            title: language === "ru" ? t.heroTitleA : settings.hero?.title || t.heroTitleA,
-            description: language === "ru" ? t.heroText : settings.hero?.subtitle || t.heroText,
-            kind: "default",
-          },
-        ];
-  }, [
-    advertisements,
-    language,
-    products,
-    settings.hero?.subtitle,
-    settings.hero?.title,
-    t.heroText,
-    t.heroTitleA,
-  ]);
+  }, [advertisements, language]);
 
   const go = useCallback(
     (offset) =>
@@ -89,13 +53,7 @@ export function Hero({
   }, [active, slides.length]);
 
   const slide = slides[active];
-  const contact = settings.contact || {};
   const phone = contact.phones?.[0] || contact.phone;
-  const runAction = () => {
-    if (slide.product) return onBuy(slide.product);
-    if (slide.ctaUrl) return window.location.assign(slide.ctaUrl);
-    document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" });
-  };
   if (loading)
     return (
       <main id="top" className="hero">
@@ -114,6 +72,7 @@ export function Hero({
         </div>
       </main>
     );
+  if (!slide) return null;
   return (
     <main id="top" className="hero">
       <div className="container">
@@ -165,10 +124,6 @@ export function Hero({
                 </p>
                 <h1>{slide.title}</h1>
                 <span>{slide.description || t.heroText}</span>
-                <button type="button" onClick={runAction}>
-                  {slide.product ? t.buy : slide.ctaLabel || t.heroPrimary}
-                  <ArrowRight size={17} />
-                </button>
               </div>
               {slide.image ? (
                 <div className="hero-slide-media" aria-hidden="true">
@@ -191,14 +146,6 @@ export function Hero({
                   <Wifi className="hero-wifi" />
                 </div>
               )}
-              <button
-                className="hero-mobile-action"
-                type="button"
-                onClick={runAction}
-              >
-                {slide.product ? t.buy : slide.ctaLabel || t.heroPrimary}
-                <ArrowRight size={17} />
-              </button>
             </motion.article>
           </AnimatePresence>
           {slides.length > 1 ? (
