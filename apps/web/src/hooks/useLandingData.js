@@ -37,7 +37,11 @@ export function useLandingData() {
     api.get("/public/landing", { signal: controller.signal })
       .then(({ data }) => {
         if (!data?.data?.products?.length) return;
-        const normalized = { ...data.data, blogPosts: data.data.blogPosts || landingFallback.blogPosts };
+        const normalized = {
+          ...data.data,
+          blogPosts: data.data.blogPosts || landingFallback.blogPosts,
+          catalogTaxonomies: data.data.catalogTaxonomies || landingFallback.catalogTaxonomies,
+        };
         saveCachedLanding(normalized);
         setState({ data: normalized, loading: false, error: "" });
       })

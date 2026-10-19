@@ -46,6 +46,11 @@ const AdminProductsPage = lazy(() =>
     default: module.AdminProductsPage,
   }))
 );
+const AdminCatalogTaxonomiesPage = lazy(() =>
+  import("./pages/admin/AdminCatalogTaxonomiesPage.jsx").then((module) => ({
+    default: module.AdminCatalogTaxonomiesPage,
+  }))
+);
 const AdminAdvertisementsPage = lazy(() =>
   import("./pages/admin/AdminAdvertisementsPage.jsx").then((module) => ({
     default: module.AdminAdvertisementsPage,
@@ -178,6 +183,7 @@ export function App() {
           >
             <Route index element={<AdminDashboardPage />} />
             <Route path="products" element={<AdminProductsPage />} />
+            <Route path="catalog-taxonomies" element={<AdminCatalogTaxonomiesPage />} />
             <Route
               path="advertisements"
               element={<AdminAdvertisementsPage />}

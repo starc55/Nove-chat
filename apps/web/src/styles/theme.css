@@ -507,6 +507,11 @@ select {
   background: radial-gradient(circle at 82% 18%, rgba(13, 110, 253, .2), transparent 30%), linear-gradient(145deg, #111923, #090e14 68%);
 }
 
+:root[data-theme="dark"] .info-page--medical-institutions .info-hero-visual {
+  background: #111923;
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.3);
+}
+
 :root[data-theme="dark"] .info-breadcrumb,
 :root[data-theme="dark"] .product-breadcrumb,
 :root[data-theme="dark"] .product-breadcrumb a,

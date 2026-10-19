@@ -24,6 +24,18 @@ const products = [
 
 export const landingFallback = {
   products,
+  catalogTaxonomies: [
+    {
+      id: "fallback-category-iud",
+      kind: "CATEGORY",
+      name: "Bachadon ichi vositalari",
+      slug: "bachadon-ichi-vositalari",
+      value: "Bachadon ichi vositalari",
+      translations: { ru: { name: "Внутриматочные спирали" } },
+      active: true,
+      sortOrder: 10,
+    },
+  ],
   blogPosts: [{
     id: "xion-blog-juno-gold-2026",
     slug: "vnutrimatochnaya-spiral-juno-gold",

@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { api } from "../../services/api.js";
+import { XionSelect } from "../../components/common/XionSelect.jsx";
 import { xionAssetUrl } from "../../utils/landing-assets.js";
 import {
   AdminModal,
@@ -126,6 +127,7 @@ function formFromProduct(item) {
 
 export function AdminProductsPage() {
   const [items, setItems] = useState([]);
+  const [taxonomies, setTaxonomies] = useState([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -141,10 +143,10 @@ export function AdminProductsPage() {
     setLoading(true);
     setError("");
     try {
-      const { data } = await api.get("/admin/products", {
-        params: { q: search, limit: 100 },
-      });
-      setItems(data.data.items);
+      const productsResponse = await api.get("/admin/products", { params: { q: search, limit: 100 } });
+      const taxonomyResponse = await api.get("/admin/catalog-taxonomies").catch(() => null);
+      setItems(productsResponse.data.data.items);
+      setTaxonomies(taxonomyResponse?.data?.data?.items || []);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -325,6 +327,8 @@ export function AdminProductsPage() {
   };
 
   const locale = form.locale[language];
+  const categoryOptions = taxonomies.filter((item) => item.kind === "CATEGORY" && item.active !== false);
+  const typeOptions = taxonomies.filter((item) => item.kind === "PRODUCT_TYPE" && item.active !== false);
   return (
     <main className="admin-content admin-resource-page">
       <div className="admin-page-head">
@@ -500,12 +504,13 @@ export function AdminProductsPage() {
                 />
               </FormField>
               <FormField label={`Kategoriya · ${language.toUpperCase()}`}>
-                <input
-                  value={locale.category}
-                  onChange={(event) =>
-                    setLocale("category", event.target.value)
-                  }
-                />
+                {language === "uz" && categoryOptions.length ? (
+                  <XionSelect value={locale.category} onChange={(event) => setLocale("category", event.target.value)}>
+                    <option value="">Tanlang</option>
+                    {locale.category && !categoryOptions.some((item) => item.value === locale.category) ? <option value={locale.category}>{locale.category}</option> : null}
+                    {categoryOptions.map((item) => <option value={item.value} key={item.id}>{item.name}</option>)}
+                  </XionSelect>
+                ) : <input value={locale.category} onChange={(event) => setLocale("category", event.target.value)}/>}
               </FormField>
               <FormField
                 label={`Qisqa tavsif · ${language.toUpperCase()}`}
@@ -551,12 +556,13 @@ export function AdminProductsPage() {
                 label={`Mahsulot tipi · ${language.toUpperCase()}`}
                 wide
               >
-                <input
-                  value={locale.productType}
-                  onChange={(event) =>
-                    setLocale("productType", event.target.value)
-                  }
-                />
+                {language === "uz" && typeOptions.length ? (
+                  <XionSelect value={locale.productType} onChange={(event) => setLocale("productType", event.target.value)}>
+                    <option value="">Tanlang</option>
+                    {locale.productType && !typeOptions.some((item) => item.value === locale.productType) ? <option value={locale.productType}>{locale.productType}</option> : null}
+                    {typeOptions.map((item) => <option value={item.value} key={item.id}>{item.name}</option>)}
+                  </XionSelect>
+                ) : <input value={locale.productType} onChange={(event) => setLocale("productType", event.target.value)}/>}
               </FormField>
               <FormField
                 label={`Taglar · ${language.toUpperCase()}`}

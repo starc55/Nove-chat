@@ -74,6 +74,64 @@ export async function deleteProduct(id) {
   if (!deleted.count) throw new ApiError(404, "PRODUCT_NOT_FOUND", "Mahsulot topilmadi.");
 }
 
+const taxonomyOrder = [{ kind: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }];
+
+function normalizeTaxonomy(input) {
+  const data = { ...input };
+  if (typeof data.name === "string") data.name = data.name.trim();
+  if (typeof data.slug === "string") data.slug = data.slug.trim().toLowerCase();
+  if (typeof data.value === "string") data.value = data.value.trim();
+  return data;
+}
+
+function taxonomyConflict(error) {
+  if (error?.code === "P2002") {
+    throw new ApiError(409, "CATALOG_TAXONOMY_EXISTS", "Bu bo‘lim nomi yoki qiymati avval yaratilgan.");
+  }
+  throw error;
+}
+
+export async function listCatalogTaxonomies() {
+  return prisma.catalogTaxonomy.findMany({ orderBy: taxonomyOrder });
+}
+
+export async function createCatalogTaxonomy(input) {
+  try {
+    return await prisma.catalogTaxonomy.create({ data: normalizeTaxonomy(input) });
+  } catch (error) {
+    return taxonomyConflict(error);
+  }
+}
+
+export async function updateCatalogTaxonomy(id, input) {
+  const existing = await prisma.catalogTaxonomy.findUnique({ where: { id }, select: { id: true, kind: true, value: true } });
+  if (!existing) throw new ApiError(404, "CATALOG_TAXONOMY_NOT_FOUND", "Katalog bo‘limi topilmadi.");
+  const data = normalizeTaxonomy(input);
+  if (data.kind && data.kind !== existing.kind) throw new ApiError(409, "CATALOG_TAXONOMY_KIND_LOCKED", "Mavjud bo‘lim turini o‘zgartirib bo‘lmaydi. Yangi bo‘lim yarating.");
+  try {
+    return await prisma.$transaction(async (tx) => {
+      if (data.value && data.value !== existing.value) {
+        if (existing.kind === "CATEGORY") {
+          await tx.product.updateMany({ where: { category: existing.value }, data: { category: data.value } });
+        } else {
+          await Promise.all([
+            tx.product.updateMany({ where: { productType: existing.value }, data: { productType: data.value } }),
+            tx.productVariant.updateMany({ where: { type: existing.value }, data: { type: data.value } }),
+          ]);
+        }
+      }
+      return tx.catalogTaxonomy.update({ where: { id }, data });
+    });
+  } catch (error) {
+    return taxonomyConflict(error);
+  }
+}
+
+export async function deleteCatalogTaxonomy(id) {
+  const deleted = await prisma.catalogTaxonomy.deleteMany({ where: { id } });
+  if (!deleted.count) throw new ApiError(404, "CATALOG_TAXONOMY_NOT_FOUND", "Katalog bo‘limi topilmadi.");
+}
+
 export async function listAdvertisements({ page, limit, q }) {
   const where = q
     ? { OR: [{ title: { contains: q, mode: "insensitive" } }, { description: { contains: q, mode: "insensitive" } }] }

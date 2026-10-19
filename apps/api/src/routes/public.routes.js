@@ -13,15 +13,23 @@ const phoneSchema = z.string().trim().regex(/^\+?[0-9 ()-]{7,24}$/);
 publicRouter.get("/landing", async (req, res, next) => {
   try {
     const now = new Date();
-    const [products, advertisements, reviews, settings, contentPages] = await Promise.all([
+    const [products, advertisements, reviews, settings, contentPages, catalogTaxonomies] = await Promise.all([
       prisma.product.findMany({ where: { active: true }, include: { images: { orderBy: { sortOrder: "asc" } }, variants: { where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } }, orderBy: [{ featured: "desc" }, { sortOrder: "asc" }] }),
       prisma.advertisement.findMany({ where: { enabled: true, AND: [{ OR: [{ startAt: null }, { startAt: { lte: now } }] }, { OR: [{ endAt: null }, { endAt: { gte: now } }] }] }, orderBy: { sortOrder: "asc" } }),
       prisma.review.findMany({ where: { status: "APPROVED" }, orderBy: { createdAt: "desc" }, take: 8 }),
       prisma.siteSetting.findMany(),
-      prisma.contentPage.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] })
+      prisma.contentPage.findMany({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }),
+      prisma.catalogTaxonomy.findMany({ where: { active: true }, orderBy: [{ kind: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }] })
     ]);
     const blogPosts = contentPages.filter((page) => page.content?.type === "blog");
-    res.json({ success: true, data: { products, advertisements, reviews, blogPosts, settings: Object.fromEntries(settings.map(({ key, value }) => [key, value])) } });
+    res.json({ success: true, data: { products, advertisements, reviews, blogPosts, catalogTaxonomies, settings: Object.fromEntries(settings.map(({ key, value }) => [key, value])) } });
+  } catch (error) { next(error); }
+});
+
+publicRouter.get("/catalog-taxonomies", async (_req, res, next) => {
+  try {
+    const items = await prisma.catalogTaxonomy.findMany({ where: { active: true }, orderBy: [{ kind: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }] });
+    res.json({ success: true, data: items });
   } catch (error) { next(error); }
 });
 

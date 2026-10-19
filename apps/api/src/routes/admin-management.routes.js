@@ -3,12 +3,16 @@ import multer from "multer";
 import { z } from "zod";
 import {
   createAdvertisement,
+  createCatalogTaxonomy,
   createProduct,
   deleteAdvertisement,
+  deleteCatalogTaxonomy,
   deleteProduct,
   listAdvertisements,
+  listCatalogTaxonomies,
   listProducts,
   updateAdvertisement,
+  updateCatalogTaxonomy,
   updateProduct,
 } from "../services/admin-catalog.service.js";
 import {
@@ -107,6 +111,17 @@ const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(50),
   q: z.string().trim().max(100).default(""),
 });
+const catalogTaxonomySchema = z
+  .object({
+    kind: z.enum(["CATEGORY", "PRODUCT_TYPE"]),
+    name: z.string().trim().min(2).max(100),
+    slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
+    value: z.string().trim().min(1).max(160),
+    translations: z.record(z.string(), z.unknown()).nullable().optional(),
+    active: z.boolean().default(true),
+    sortOrder: z.coerce.number().int().min(-10000).max(10000).default(0),
+  })
+  .strict();
 
 const productBaseSchema = z
   .object({
@@ -339,6 +354,40 @@ adminManagementRouter.delete(
   route(async (req, res) => {
     await deleteProduct(idSchema.parse(req.params.id));
     void notifyIndexNow(["/", "/catalog"]);
+    res.status(204).end();
+  }),
+);
+
+adminManagementRouter.get(
+  "/catalog-taxonomies",
+  route(async (_req, res) => {
+    res.json({ success: true, data: { items: await listCatalogTaxonomies() } });
+  }),
+);
+adminManagementRouter.post(
+  "/catalog-taxonomies",
+  route(async (req, res) => {
+    const taxonomy = await createCatalogTaxonomy(catalogTaxonomySchema.parse(req.body));
+    void notifyIndexNow(["/catalog"]);
+    res.status(201).json({ success: true, data: taxonomy });
+  }),
+);
+adminManagementRouter.patch(
+  "/catalog-taxonomies/:id",
+  route(async (req, res) => {
+    const taxonomy = await updateCatalogTaxonomy(
+      idSchema.parse(req.params.id),
+      catalogTaxonomySchema.partial().strict().parse(req.body),
+    );
+    void notifyIndexNow(["/catalog"]);
+    res.json({ success: true, data: taxonomy });
+  }),
+);
+adminManagementRouter.delete(
+  "/catalog-taxonomies/:id",
+  route(async (req, res) => {
+    await deleteCatalogTaxonomy(idSchema.parse(req.params.id));
+    void notifyIndexNow(["/catalog"]);
     res.status(204).end();
   }),
 );

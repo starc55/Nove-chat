@@ -410,6 +410,22 @@
   filter: saturate(0.7) contrast(1.1);
 }
 
+.info-page--medical-institutions .info-hero-visual {
+  background: #fff;
+  box-shadow: 0 28px 72px rgba(33, 37, 41, 0.12);
+}
+
+.info-page--medical-institutions .info-hero-visual::before,
+.info-page--medical-institutions .info-hero-visual::after {
+  display: none;
+}
+
+.info-page--medical-institutions .info-hero-visual.is-contained .info-hero-main-image {
+  object-fit: cover;
+  opacity: 1;
+  filter: none;
+}
+
 .info-hero-product {
   position: absolute;
   right: 24px;
