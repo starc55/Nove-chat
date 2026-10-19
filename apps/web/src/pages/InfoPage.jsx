@@ -46,11 +46,9 @@ const initialForm = {
 const visualPages = {
   about: {
     image: "/media/xion-products/hero-catalog.webp",
-    secondary: "/media/xion-products/xion-003.webp",
   },
   "medical-institutions": {
     image: "/media/products/product-5.jpg",
-    secondary: "/media/xion-products/xion-001.webp",
     contain: true,
   },
   contact: {
@@ -281,16 +279,18 @@ export function InfoPage({ slug }) {
                       height="680"
                       decoding="async"
                     />
-                    <div className="info-hero-product">
-                      <img
-                        src={visual.secondary}
-                        alt=""
-                        width="240"
-                        height="220"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
+                    {visual.secondary ? (
+                      <div className="info-hero-product">
+                        <img
+                          src={visual.secondary}
+                          alt=""
+                          width="240"
+                          height="220"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    ) : null}
                     <div className="info-visual-badge">
                       <BadgeCheck size={20} />
                       <span>
